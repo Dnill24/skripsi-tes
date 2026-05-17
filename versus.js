@@ -37,6 +37,7 @@ const elements = {
   endGameModal: document.getElementById('endGameModal'),
   endTitle: document.getElementById('endTitle'),
   endMessage: document.getElementById('endMessage'),
+  rematchStatus: document.getElementById('rematchStatus'),
   btnPlayAgain: document.getElementById('btnPlayAgain'),
   btnReturnEnd: document.getElementById('btnReturnEnd')
 };
@@ -60,6 +61,8 @@ let timerInterval = null;
 const MAX_TIME = 15;
 let timeLeft = MAX_TIME;
 let gameActive = false;
+let myRematchReady = false;
+let opponentRematchReady = false;
 
 // Initialize Peer
 function initPeer(id = null) {
@@ -74,7 +77,7 @@ function initPeer(id = null) {
 
 function generateRoomCode() {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-  let result = 'MQ-';
+  let result = '';
   for (let i = 0; i < 4; i++) result += chars.charAt(Math.floor(Math.random() * chars.length));
   return result;
 }
@@ -155,6 +158,14 @@ function handleNetworkData(data) {
     takeDamage(data.damage);
   } else if (data.type === 'gameover') {
     endGame(getTranslation('txt_you_win', settings.language), true);
+  } else if (data.type === 'rematch') {
+    opponentRematchReady = true;
+    if (myRematchReady) {
+      startGame();
+    } else {
+      elements.rematchStatus.textContent = getTranslation('txt_opponent_rematch', settings.language);
+      elements.rematchStatus.classList.remove('hidden');
+    }
   }
 }
 
@@ -178,6 +189,13 @@ function startGame() {
   elements.lblCombo.classList.add('hidden');
   elements.opponentCombo.classList.add('hidden');
   elements.endGameModal.classList.add('hidden');
+  
+  myRematchReady = false;
+  opponentRematchReady = false;
+  elements.btnPlayAgain.textContent = getTranslation('btn_rematch', settings.language);
+  elements.btnPlayAgain.disabled = false;
+  elements.btnPlayAgain.classList.remove('opacity-50');
+  elements.rematchStatus.classList.add('hidden');
   
   broadcastUpdate();
   nextQuestion();
@@ -354,9 +372,15 @@ function endGame(title, isWin) {
 }
 
 elements.btnPlayAgain.onclick = () => {
-  elements.endGameModal.classList.add('hidden');
-  resetLobby();
-  elements.gameArena.classList.add('hidden');
-  elements.gameArena.classList.remove('flex');
-  elements.lobbyModal.classList.remove('hidden');
+  myRematchReady = true;
+  elements.btnPlayAgain.textContent = getTranslation('txt_rematch_wait', settings.language);
+  elements.btnPlayAgain.disabled = true;
+  elements.btnPlayAgain.classList.add('opacity-50');
+  conn.send({ type: 'rematch' });
+  
+  if (opponentRematchReady) {
+    startGame();
+  } else {
+    elements.rematchStatus.classList.add('hidden');
+  }
 };

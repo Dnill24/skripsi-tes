@@ -1,0 +1,229 @@
+const locales = {
+  en: {
+    // UI Game.html
+    title_hub: "Game Hub",
+    welcome: "Welcome back, Hero!",
+    btn_start: "Start Run",
+    btn_shop: "Skin Shop",
+    btn_achievements: "Achievements",
+    btn_settings: "Settings",
+    btn_logout: "Logout",
+    modal_shop: "Skin Shop",
+    gold_label: "Gold: ",
+    btn_close: "Close",
+    modal_achievements: "Achievements",
+    stat_best: "Best Score",
+    stat_gold: "Total Gold",
+    stat_bosses: "Bosses Defeated",
+    stat_runs: "Total Runs",
+    modal_settings: "Settings",
+    lbl_volume: "Volume",
+    lbl_language: "Language",
+    btn_save: "Save",
+    modal_mode: "Select Mode",
+    btn_normal: "Normal Mode (Mixed)",
+    btn_add: "Addition Mode",
+    btn_sub: "Subtraction Mode",
+    btn_mul: "Multiplication Mode",
+    btn_div: "Division Mode",
+    hdr_stats: "Statistics",
+    hdr_goals: "Goals",
+
+    // UI Play.html
+    btn_flee: "Flee",
+    lbl_run: "Run",
+    lbl_score: "Score: ",
+    lbl_health: "Health",
+    lbl_def: "DEF: ",
+    lbl_goldmod: "GOLD: ",
+    lbl_scoremod: "SCORE: ",
+    lbl_start: "Start",
+    lbl_boss_encounter: "Boss Encounter",
+    lbl_boss_hp: "Boss HP",
+    lbl_loading: "Loading...",
+    modal_run_over: "Run Over",
+    msg_bravely: "You fought bravely.",
+    rec_focus: "Recommendation: Focus on ",
+    btn_practice: "Practice Now",
+    btn_return: "Return to Hub",
+    modal_reward: "BOSS DEFEATED!",
+    msg_reward: "Choose your reward...",
+
+    // Dynamic Play text
+    txt_combo: "x COMBO!",
+    txt_hit: "HIT!",
+    txt_miss: "MISS!",
+    txt_timeout: "TIME OUT!",
+    txt_crit: "CRIT!",
+    txt_fled: "Fled from battle.",
+    txt_defeated: "Defeated...",
+    txt_nine_lives: "NINE LIVES!",
+
+    // Subjects
+    sub_add: "Addition",
+    sub_sub: "Subtraction",
+    sub_mul: "Multiplication",
+    sub_div: "Division",
+
+    // Buttons Dynamic
+    btn_equip: "Equip",
+    btn_equipped: "Equipped",
+    btn_buy: "Buy",
+    txt_free: "Free",
+    txt_not_enough: "Not enough gold!",
+    txt_confirm_flee: "Are you sure you want to flee? You'll lose your current progress!",
+
+    // Buffs
+    buff_heal_name: "Minor Heal", buff_heal_desc: "Restore 50 HP.",
+    buff_vit_name: "Vitality", buff_vit_desc: "Max HP +25, Heal 25 HP.",
+    buff_time_name: "Time Dilation", buff_time_desc: "+2 Seconds to Timer.",
+    buff_greed_name: "Greed", buff_greed_desc: "+50% Gold drops.",
+    buff_scholar_name: "Scholar", buff_scholar_desc: "+50% Score gains.",
+    buff_def_name: "Defense", buff_def_desc: "Reduce damage taken by 3.",
+    buff_boss_name: "Boss Rush", buff_boss_desc: "All enemies become Bosses. +200% Gold & Score.",
+    buff_glass_name: "Glass Cannon", buff_glass_desc: "Max HP becomes 1. +200% Gold & Score.",
+    buff_vamp_name: "Vampirism", buff_vamp_desc: "Heal 2 HP on correct answer.",
+    buff_gambler_name: "The Gambler", buff_gambler_desc: "50% chance for 3x Gold, 50% for 0 Gold.",
+    buff_nine_name: "Nine Lives", buff_nine_desc: "Resurrect once with 50 HP on death.",
+    buff_warp_name: "Time Warp", buff_warp_desc: "Timer is 5s. 3x Score.",
+
+    // Achievements
+    ach_g1_name: "Pocket Change", ach_g1_desc: "Earn 100 Total Gold.",
+    ach_g2_name: "Wealthy", ach_g2_desc: "Earn 1,000 Total Gold.",
+    ach_g3_name: "Dragon Hoard", ach_g3_desc: "Earn 10,000 Total Gold.",
+    ach_s1_name: "High Roller", ach_s1_desc: "Reach a Best Score of 10,000.",
+    ach_sk_name: "Fashionista", ach_sk_desc: "Unlock 10 different skins.",
+    ach_b1_name: "Boss Slayer", ach_b1_desc: "Defeat 50 Bosses.",
+    ach_p1_name: "Addition Pro", ach_p1_desc: "Answer 100 Addition questions correctly.",
+    ach_p2_name: "Subtraction Pro", ach_p2_desc: "Answer 100 Subtraction questions correctly.",
+    ach_p3_name: "Multiplication Pro", ach_p3_desc: "Answer 100 Multiplication questions correctly.",
+    ach_p4_name: "Division Pro", ach_p4_desc: "Answer 100 Division questions correctly.",
+    ach_m1_name: "Absolute Madman", ach_m1_desc: "Defeat 10 Bosses while the Boss Rush buff is active.",
+    ach_m2_name: "Living on the Edge", ach_m2_desc: "Defeat a Boss while the Glass Cannon buff is active.",
+    ach_m3_name: "Speed Demon", ach_m3_desc: "Answer a question in under 1 second.",
+    ach_m4_name: "Combo God", ach_m4_desc: "Reach a 50x Combo streak.",
+    ach_m5_name: "The True Hero", ach_m5_desc: "Unlock the Math God skin."
+  },
+  id: {
+    // UI Game.html
+    title_hub: "Pusat Permainan",
+    welcome: "Selamat datang kembali, Pahlawan!",
+    btn_start: "Mulai Petualangan",
+    btn_shop: "Toko Kostum",
+    btn_achievements: "Pencapaian",
+    btn_settings: "Pengaturan",
+    btn_logout: "Keluar",
+    modal_shop: "Toko Kostum",
+    gold_label: "Emas: ",
+    btn_close: "Tutup",
+    modal_achievements: "Pencapaian",
+    stat_best: "Skor Terbaik",
+    stat_gold: "Total Emas",
+    stat_bosses: "Bos Dikalahkan",
+    stat_runs: "Total Bermain",
+    modal_settings: "Pengaturan",
+    lbl_volume: "Volume",
+    lbl_language: "Bahasa",
+    btn_save: "Simpan",
+    modal_mode: "Pilih Mode",
+    btn_normal: "Mode Normal (Campur)",
+    btn_add: "Mode Pertambahan",
+    btn_sub: "Mode Pengurangan",
+    btn_mul: "Mode Perkalian",
+    btn_div: "Mode Pembagian",
+    hdr_stats: "Statistik",
+    hdr_goals: "Tujuan",
+
+    // UI Play.html
+    btn_flee: "Kabur",
+    lbl_run: "Lari",
+    lbl_score: "Skor: ",
+    lbl_health: "Darah",
+    lbl_def: "PER: ",
+    lbl_goldmod: "EMAS: ",
+    lbl_scoremod: "SKOR: ",
+    lbl_start: "Mulai",
+    lbl_boss_encounter: "Pertemuan Bos",
+    lbl_boss_hp: "Darah Bos",
+    lbl_loading: "Memuat...",
+    modal_run_over: "Permainan Selesai",
+    msg_bravely: "Kamu bertarung dengan berani.",
+    rec_focus: "Rekomendasi: Fokus pada ",
+    btn_practice: "Latihan Sekarang",
+    btn_return: "Kembali ke Pusat",
+    modal_reward: "BOS DIKALAHKAN!",
+    msg_reward: "Pilih hadiahmu...",
+
+    // Dynamic Play text
+    txt_combo: "x KOMBO!",
+    txt_hit: "KENA!",
+    txt_miss: "MELESET!",
+    txt_timeout: "WAKTU HABIS!",
+    txt_crit: "KRITIS!",
+    txt_fled: "Kabur dari pertempuran.",
+    txt_defeated: "Kalah...",
+    txt_nine_lives: "NYAWA SEMBILAN!",
+
+    // Subjects
+    sub_add: "Pertambahan",
+    sub_sub: "Pengurangan",
+    sub_mul: "Perkalian",
+    sub_div: "Pembagian",
+
+    // Buttons Dynamic
+    btn_equip: "Pakai",
+    btn_equipped: "Dipakai",
+    btn_buy: "Beli",
+    txt_free: "Gratis",
+    txt_not_enough: "Emas tidak cukup!",
+    txt_confirm_flee: "Apakah kamu yakin ingin kabur? Kemajuanmu akan hilang!",
+
+    // Buffs
+    buff_heal_name: "Penyembuhan Kecil", buff_heal_desc: "Pulihkan 50 Darah.",
+    buff_vit_name: "Vitalitas", buff_vit_desc: "Maks Darah +25, Pulihkan 25 Darah.",
+    buff_time_name: "Dilatasi Waktu", buff_time_desc: "+2 Detik ke Waktu.",
+    buff_greed_name: "Keserakahan", buff_greed_desc: "+50% Emas.",
+    buff_scholar_name: "Pelajar", buff_scholar_desc: "+50% Skor.",
+    buff_def_name: "Pertahanan", buff_def_desc: "Kurangi kerusakan sebanyak 3.",
+    buff_boss_name: "Serbuan Bos", buff_boss_desc: "Semua musuh menjadi Bos. +200% Emas & Skor.",
+    buff_glass_name: "Meriam Kaca", buff_glass_desc: "Maks Darah menjadi 1. +200% Emas & Skor.",
+    buff_vamp_name: "Vampirisme", buff_vamp_desc: "Pulihkan 2 Darah setiap jawaban benar.",
+    buff_gambler_name: "Penjudi", buff_gambler_desc: "Peluang 50% 3x Emas, 50% 0 Emas.",
+    buff_nine_name: "Nyawa Sembilan", buff_nine_desc: "Bangkit kembali dengan 50 Darah saat mati.",
+    buff_warp_name: "Warp Waktu", buff_warp_desc: "Waktu menjadi 5 dtk. 3x Skor.",
+
+    // Achievements
+    ach_g1_name: "Uang Saku", ach_g1_desc: "Dapatkan 100 Total Emas.",
+    ach_g2_name: "Kaya Raya", ach_g2_desc: "Dapatkan 1.000 Total Emas.",
+    ach_g3_name: "Timbunan Naga", ach_g3_desc: "Dapatkan 10.000 Total Emas.",
+    ach_s1_name: "Pemain Besar", ach_s1_desc: "Capai Skor Terbaik 10.000.",
+    ach_sk_name: "Fashionista", ach_sk_desc: "Buka 10 kostum berbeda.",
+    ach_b1_name: "Pembasmi Bos", ach_b1_desc: "Kalahkan 50 Bos.",
+    ach_p1_name: "Pro Pertambahan", ach_p1_desc: "Jawab 100 soal Pertambahan dengan benar.",
+    ach_p2_name: "Pro Pengurangan", ach_p2_desc: "Jawab 100 soal Pengurangan dengan benar.",
+    ach_p3_name: "Pro Perkalian", ach_p3_desc: "Jawab 100 soal Perkalian dengan benar.",
+    ach_p4_name: "Pro Pembagian", ach_p4_desc: "Jawab 100 soal Pembagian dengan benar.",
+    ach_m1_name: "Orang Gila", ach_m1_desc: "Kalahkan 10 Bos saat buff Serbuan Bos aktif.",
+    ach_m2_name: "Hidup di Tepi", ach_m2_desc: "Kalahkan Bos saat buff Meriam Kaca aktif.",
+    ach_m3_name: "Setan Kecepatan", ach_m3_desc: "Jawab pertanyaan dalam kurang dari 1 detik.",
+    ach_m4_name: "Dewa Kombo", ach_m4_desc: "Capai rentetan Kombo 50x.",
+    ach_m5_name: "Pahlawan Sejati", ach_m5_desc: "Buka kostum Dewa Matematika."
+  }
+};
+
+function getTranslation(key, lang = 'en') {
+  return locales[lang]?.[key] || locales['en']?.[key] || key;
+}
+
+function applyTranslationsToDOM(lang = 'en') {
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    // Don't overwrite if it contains child HTML that needs dynamic parsing, but most elements are simple spans.
+    if(el.children.length === 0) {
+      el.textContent = getTranslation(key, lang);
+    } else {
+      // For cases where there are children, we can use innerHTML but be careful.
+      el.innerHTML = getTranslation(key, lang);
+    }
+  });
+}

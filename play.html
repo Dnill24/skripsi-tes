@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Math Quest Adventure - Play</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&family=Press+Start+2P&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="locales.js"></script>
+  <script>
+    tailwind.config = { theme: { extend: { colors: { primary: '#0f172a', secondary: '#1e293b', accent: '#8b5cf6' } } } }
+  </script>
+</head>
+<body class="bg-retro min-h-screen flex flex-col text-slate-100 overflow-hidden">
+  
+  <!-- Top Bar: Progress -->
+  <header class="glass-panel p-4 flex flex-col gap-2 relative z-10 shadow-xl">
+    <div class="flex justify-between items-center max-w-4xl mx-auto w-full">
+      <button id="btnFlee" class="button-outlined py-2 px-4 text-sm w-auto" data-i18n="btn_flee">Flee</button>
+      <div class="text-center">
+        <p class="font-minecraft text-sm text-slate-300"><span data-i18n="lbl_run">Run</span> <span id="lblRunStage">1</span></p>
+        <p class="font-bold text-lg flex items-center justify-center gap-2">
+          <span data-i18n="lbl_score">Score: </span><span id="lblScore" class="text-purple-400">0</span>
+          <span id="lblCombo" class="text-yellow-400 font-bold text-xs bg-yellow-400/20 px-2 py-1 rounded hidden transition-all">2x COMBO!</span>
+        </p>
+      </div>
+      <div class="text-right">
+        <p class="font-minecraft text-sm text-slate-300" data-i18n="lbl_health">Health</p>
+        <p class="font-bold text-lg text-emerald-400"><span id="lblHealth">100/100</span></p>
+      </div>
+    </div>
+    
+    <!-- Active Stats Bar -->
+    <div class="max-w-4xl mx-auto w-full mt-2 flex justify-center gap-4 md:gap-8 text-xs text-slate-400 font-minecraft border-t border-slate-700/50 pt-2">
+      <p><span data-i18n="lbl_def">DEF: </span><span id="lblDefense" class="text-blue-400">0</span></p>
+      <p><span data-i18n="lbl_goldmod">GOLD: </span><span id="lblGoldMod" class="text-yellow-400">1.0x</span></p>
+      <p><span data-i18n="lbl_scoremod">SCORE: </span><span id="lblScoreMod" class="text-purple-400">1.0x</span></p>
+    </div>
+    
+    <!-- Run Progress Bar (To next boss) -->
+    <div class="max-w-4xl mx-auto w-full mt-2">
+      <div class="flex justify-between text-xs text-slate-400 mb-1">
+        <span data-i18n="lbl_start">Start</span>
+        <span data-i18n="lbl_boss_encounter">Boss Encounter</span>
+      </div>
+      <div class="w-full bg-slate-800 rounded-full h-3 overflow-hidden border border-slate-700 relative">
+        <div id="barProgress" class="bg-blue-500 h-3 transition-all duration-300" style="width: 0%"></div>
+      </div>
+    </div>
+
+    <!-- Boss HP Bar (Hidden initially) -->
+    <div id="bossHpContainer" class="max-w-4xl mx-auto w-full mt-4 hidden">
+      <p class="text-center font-bold text-red-400 mb-1 animate-pulse" data-i18n="lbl_boss_hp">Boss HP</p>
+      <div class="w-full bg-slate-800 rounded-full h-4 overflow-hidden border border-slate-700 shadow-[0_0_15px_rgba(239,68,68,0.5)]">
+        <div id="barBossHp" class="bg-gradient-to-r from-red-600 to-red-400 h-4 transition-all duration-300" style="width: 100%"></div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Combat Arena (Middle) -->
+  <main class="flex-grow flex items-center justify-center relative px-4">
+    <div class="absolute inset-0 bg-gradient-to-b from-transparent to-slate-900/80 pointer-events-none"></div>
+    
+    <div class="w-full max-w-5xl flex justify-between items-end pb-8 relative z-10">
+      <!-- Player Sprite -->
+      <div id="playerSpriteContainer" class="flex flex-col items-center animate-float relative">
+        <div id="playerSprite" class="text-6xl drop-shadow-[0_0_15px_rgba(59,130,246,0.6)] transition-transform duration-200">🧍</div>
+        <div class="w-16 h-3 bg-black/40 rounded-[50%] mt-3 blur-sm"></div>
+      </div>
+
+      <!-- Combat Text Feedback -->
+      <div id="combatText" class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-4xl font-minecraft font-bold text-yellow-400 opacity-0 transition-opacity duration-300 drop-shadow-lg text-center z-20">
+        Hit!
+      </div>
+
+      <!-- Enemy Sprite -->
+      <div id="enemySpriteContainer" class="flex flex-col items-center">
+        <div id="enemySprite" class="text-6xl drop-shadow-[0_0_15px_rgba(239,68,68,0.6)] transition-all duration-500 transform">👾</div>
+        <div id="enemyShadow" class="w-16 h-3 bg-black/40 rounded-[50%] mt-3 blur-sm transition-all duration-500"></div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Question Area (Bottom) -->
+  <footer class="glass-panel p-4 border-t-0 rounded-t-3xl shadow-[0_-10px_40px_rgba(0,0,0,0.5)] relative z-20 mt-4">
+    <div class="max-w-4xl mx-auto">
+      <!-- Timer Bar -->
+      <div class="w-full bg-slate-800 rounded-full h-2 mb-2 overflow-hidden border border-slate-700">
+        <div id="barTimer" class="bg-emerald-400 h-2 transition-all duration-100 ease-linear" style="width: 100%"></div>
+      </div>
+
+      <div class="text-center mb-4">
+        <h2 id="lblQuestion" class="text-4xl md:text-5xl font-bold text-white drop-shadow-md">Loading...</h2>
+      </div>
+      <div id="answerGrid" class="grid grid-cols-2 gap-4">
+        <!-- Buttons injected via JS -->
+      </div>
+    </div>
+  </footer>
+
+  <!-- Modals -->
+  <div class="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center hidden z-50" id="runOverModal">
+    <div class="glass-panel p-8 w-[90%] max-w-md rounded-2xl text-center">
+      <h2 class="text-3xl font-minecraft text-white mb-4" data-i18n="modal_run_over">Run Over</h2>
+      <p id="runOverMessage" class="text-slate-300 mb-6" data-i18n="msg_bravely">You fought bravely.</p>
+      <div class="grid grid-cols-2 gap-4 text-left bg-slate-800/50 p-4 rounded-xl mb-6">
+        <p class="text-slate-400"><span data-i18n="lbl_score">Score: </span><span id="finalScore" class="text-white font-bold block text-xl">0</span></p>
+        <p class="text-slate-400"><span data-i18n="lbl_goldmod">Gold: </span><span id="finalGold" class="text-yellow-400 font-bold block text-xl">0</span></p>
+      </div>
+      <div id="recommendationBox" class="hidden bg-slate-800/80 border border-purple-500 rounded-xl p-4 mb-6">
+        <p class="text-slate-300 text-sm mb-2"><span data-i18n="rec_focus">Recommendation: Focus on </span><strong id="recSubject" class="text-purple-400">Addition</strong></p>
+        <button id="btnPracticeRec" class="button-outlined w-full text-sm py-2" data-i18n="btn_practice">Practice Now</button>
+      </div>
+      <button id="btnReturnHub" class="big-button w-full" data-i18n="btn_return">Return to Hub</button>
+    </div>
+  </div>
+  <!-- Reward Modal -->
+  <div class="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center hidden z-50" id="rewardModal">
+    <div class="glass-panel p-8 w-[90%] max-w-4xl rounded-2xl relative text-center">
+      <h2 class="text-4xl font-minecraft text-yellow-400 mb-2" data-i18n="modal_reward">BOSS DEFEATED!</h2>
+      <p class="text-slate-300 mb-8" data-i18n="msg_reward">Choose your reward...</p>
+      <div id="rewardCardsContainer" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- Filled by JS -->
+      </div>
+    </div>
+  </div>
+
+  <script src="play.js"></script>
+</body>
+</html>

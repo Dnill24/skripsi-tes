@@ -4,6 +4,8 @@ const elements = {
   btnStartRun: document.getElementById('btnStartRun'),
   btnShop: document.getElementById('btnShop'),
   btnAchievements: document.getElementById('btnAchievements'),
+  btnLeaderboard: document.getElementById('btnLeaderboard'),
+  btnVersus: document.getElementById('btnVersus'),
   btnSettings: document.getElementById('btnSettings'),
   btnBackToTitle: document.getElementById('btnBackToTitle'),
   
@@ -13,6 +15,9 @@ const elements = {
   achievementsModal: document.getElementById('achievementsModal'),
   closeAchievementsModal: document.getElementById('closeAchievementsModal'),
   xCloseAchievements: document.getElementById('xCloseAchievements'),
+  leaderboardModal: document.getElementById('leaderboardModal'),
+  closeLeaderboardModal: document.getElementById('closeLeaderboardModal'),
+  xCloseLeaderboard: document.getElementById('xCloseLeaderboard'),
   modeModal: document.getElementById('modeModal'),
   closeModeModal: document.getElementById('closeModeModal'),
   xCloseMode: document.getElementById('xCloseMode'),
@@ -29,8 +34,11 @@ const elements = {
   statTotalGold: document.getElementById('statTotalGold'),
   statBosses: document.getElementById('statBosses'),
   statRuns: document.getElementById('statRuns'),
-  achievementsList: document.getElementById('achievementsList')
+  achievementsList: document.getElementById('achievementsList'),
+  leaderboardList: document.getElementById('leaderboardList')
 };
+
+let leaderboard = [];
 
 let user = 'Hero';
 let currency = 0;
@@ -130,6 +138,11 @@ function loadState() {
       }
     } catch(e){}
   }
+
+  const leaderboardStored = localStorage.getItem('mathQuestLeaderboard');
+  if (leaderboardStored) {
+    try { leaderboard = JSON.parse(leaderboardStored); } catch(e){}
+  }
 }
 
 function saveState() {
@@ -149,6 +162,34 @@ function updateUI() {
   elements.statRuns.textContent = totalRuns;
   renderShop();
   renderAchievements();
+}
+
+function renderLeaderboard() {
+  elements.leaderboardList.innerHTML = '';
+  
+  if (!leaderboard || leaderboard.length === 0) {
+    elements.leaderboardList.innerHTML = `<tr><td colspan="4" class="text-center py-4 text-slate-400">${getTranslation('txt_empty_leaderboard', settings.language)}</td></tr>`;
+    return;
+  }
+  
+  const sorted = [...leaderboard].sort((a, b) => b.score - a.score).slice(0, 100);
+  sorted.forEach((entry, idx) => {
+    const tr = document.createElement('tr');
+    tr.className = 'hover:bg-slate-800/50 transition-colors';
+    
+    let rankColor = 'text-slate-400';
+    if (idx === 0) rankColor = 'text-yellow-400 font-bold text-lg drop-shadow-md';
+    else if (idx === 1) rankColor = 'text-slate-300 font-bold';
+    else if (idx === 2) rankColor = 'text-amber-600 font-bold';
+    
+    tr.innerHTML = `
+      <td class="px-4 py-3 text-center ${rankColor}">#${idx + 1}</td>
+      <td class="px-4 py-3 font-bold text-white">${entry.name}</td>
+      <td class="px-4 py-3 text-right text-emerald-400 font-minecraft">${entry.score.toLocaleString()}</td>
+      <td class="px-4 py-3 text-right text-slate-500 text-xs">${entry.date}</td>
+    `;
+    elements.leaderboardList.appendChild(tr);
+  });
 }
 
 function renderAchievements() {
@@ -242,9 +283,22 @@ elements.btnShop.onclick = () => { elements.shopModal.classList.remove('hidden')
 elements.closeShopModal.onclick = () => { elements.shopModal.classList.add('hidden'); };
 elements.xCloseShop.onclick = elements.closeShopModal.onclick;
 
-elements.btnAchievements.onclick = () => { elements.achievementsModal.classList.remove('hidden'); updateUI(); };
-elements.closeAchievementsModal.onclick = () => { elements.achievementsModal.classList.add('hidden'); };
-elements.xCloseAchievements.onclick = elements.closeAchievementsModal.onclick;
+elements.btnAchievements.onclick = () => {
+  elements.achievementsModal.classList.remove('hidden');
+};
+elements.closeAchievementsModal.onclick = () => elements.achievementsModal.classList.add('hidden');
+elements.xCloseAchievements.onclick = () => elements.achievementsModal.classList.add('hidden');
+
+elements.btnLeaderboard.onclick = () => {
+  renderLeaderboard();
+  elements.leaderboardModal.classList.remove('hidden');
+};
+elements.closeLeaderboardModal.onclick = () => elements.leaderboardModal.classList.add('hidden');
+elements.xCloseLeaderboard.onclick = () => elements.leaderboardModal.classList.add('hidden');
+
+elements.btnVersus.onclick = () => {
+  window.location.href = 'versus.html';
+};
 
 // Settings
 elements.btnSettings.onclick = () => { elements.settingsModal.classList.remove('hidden'); };

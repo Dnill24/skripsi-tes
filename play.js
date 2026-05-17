@@ -87,7 +87,7 @@ const skinEmojis = {
   'celestial': '🌟', 'god': '♾️'
 };
 
-const bossEmojis = ['🐉', '🧟', '🧛', '👹', '👽'];
+const bossEmojis = ['🐉', '🧟', '🧛', '👹', '👽', '💀', '🤡', '🤖', '🦖', '🦍', '👁️', '🎃'];
 const enemyEmojis = ['👾', '👻', '🦇', '🕷️', '🐍'];
 
 const buffPool = [
@@ -98,14 +98,23 @@ const buffPool = [
   { id: 'scholar', nameKey: 'buff_scholar_name', descKey: 'buff_scholar_desc', icon: '📚', apply: () => { run.modifiers.scoreMult += 0.5; } },
   { id: 'defense', nameKey: 'buff_def_name', descKey: 'buff_def_desc', icon: '🛡️', apply: () => { run.modifiers.dmgReduction += 3; } },
   { id: 'bossrush', nameKey: 'buff_boss_name', descKey: 'buff_boss_desc', icon: '💀', apply: () => { run.modifiers.bossRush = true; run.modifiers.goldMult += 2.0; run.modifiers.scoreMult += 2.0; } },
-  { id: 'glasscannon', nameKey: 'buff_glass_name', descKey: 'buff_glass_desc', icon: '🧨', apply: () => { run.maxHealth = 1; run.health = 1; run.modifiers.goldMult += 2.0; run.modifiers.scoreMult += 2.0; } },
+  { id: 'glasscannon', nameKey: 'buff_glass_name', descKey: 'buff_glass_desc', icon: '🧨', apply: () => { run.modifiers.glassCannon = true; run.maxHealth = 1; run.health = 1; run.modifiers.goldMult += 2.0; run.modifiers.scoreMult += 2.0; } },
   { id: 'vampirism', nameKey: 'buff_vamp_name', descKey: 'buff_vamp_desc', icon: '🦇', apply: () => { run.modifiers.vampirism = true; } },
   { id: 'gambler', nameKey: 'buff_gambler_name', descKey: 'buff_gambler_desc', icon: '🎲', apply: () => { run.modifiers.gambler = true; } },
   { id: 'ninelives', nameKey: 'buff_nine_name', descKey: 'buff_nine_desc', icon: '🐱', apply: () => { run.modifiers.nineLives = true; } },
-  { id: 'timewarp', nameKey: 'buff_warp_name', descKey: 'buff_warp_desc', icon: '⏱️', apply: () => { run.modifiers.timeWarp = true; run.modifiers.scoreMult += 2.0; } }
+  { id: 'timewarp', nameKey: 'buff_warp_name', descKey: 'buff_warp_desc', icon: '⏱️', apply: () => { run.modifiers.timeMult = (run.modifiers.timeMult || 1.0) * 0.33; run.modifiers.scoreMult += 2.0; } },
+  { id: 'midas', nameKey: 'buff_midas_name', descKey: 'buff_midas_desc', icon: '✨', apply: () => { run.modifiers.goldMult += 4.0; run.modifiers.enemyDamageMult = (run.modifiers.enemyDamageMult || 1) * 2; } },
+  { id: 'slowmo', nameKey: 'buff_slowmo_name', descKey: 'buff_slowmo_desc', icon: '🐌', apply: () => { run.modifiers.timeMult = (run.modifiers.timeMult || 1.0) * 2.0; run.modifiers.scoreMult *= 0.5; } },
+  { id: 'berserk', nameKey: 'buff_berserk_name', descKey: 'buff_berserk_desc', icon: '💢', apply: () => { run.modifiers.berserk = true; run.modifiers.scoreMult += 0.5; MAX_TIME = Math.max(5, MAX_TIME - 5); } }
 ];
+let user = 'Hero';
 
 function loadState() {
+  const userStored = localStorage.getItem('mathQuestUser');
+  if (userStored) {
+    try { user = JSON.parse(userStored).user; } catch(e){}
+  }
+
   const saved = localStorage.getItem('mathQuestRogueStats');
   if (saved) {
     try {
@@ -156,7 +165,8 @@ function shuffleArray(array) {
 
 function startTimer() {
   clearInterval(timerInterval);
-  currentMaxTime = run.modifiers.timeWarp ? 5 : MAX_TIME;
+  let mult = run.modifiers.timeMult || 1.0;
+  currentMaxTime = MAX_TIME * mult;
   timeLeft = currentMaxTime;
   updateTimerUI();
 
@@ -226,8 +236,18 @@ function showRewardModal() {
   run.active = false;
   clearInterval(timerInterval);
   
-  const shuffled = shuffleArray([...buffPool]);
-  const choices = shuffled.slice(0, 3);
+  const funnyIds = ['bossrush', 'glasscannon', 'vampirism', 'gambler', 'ninelives', 'timewarp', 'midas', 'slowmo', 'berserk'];
+  const standardBuffs = buffPool.filter(b => !funnyIds.includes(b.id));
+  const funnyBuffs = buffPool.filter(b => funnyIds.includes(b.id));
+  
+  let choices = [];
+  if (Math.random() < 0.25) {
+    const crazy = shuffleArray([...funnyBuffs])[0];
+    choices = [crazy, ...shuffleArray([...standardBuffs]).slice(0, 2)];
+  } else {
+    choices = shuffleArray([...standardBuffs]).slice(0, 3);
+  }
+  choices = shuffleArray(choices);
   
   elements.rewardCardsContainer.innerHTML = '';
   choices.forEach(buff => {
@@ -240,6 +260,10 @@ function showRewardModal() {
     `;
     card.onclick = () => {
       buff.apply();
+      if (run.modifiers.glassCannon) {
+        run.maxHealth = 1;
+        run.health = 1;
+      }
       elements.lblHealth.textContent = `${run.health}/${run.maxHealth}`;
       updateStatsUI();
       elements.rewardModal.classList.add('hidden');
@@ -261,13 +285,14 @@ function nextQuestion() {
 
   if (!run.isBoss && (nextQ % 10 === 0 || run.modifiers.bossRush)) {
     run.isBoss = true;
-    run.bossStage = nextQ / 10;
+    run.bossesEncountered = (run.bossesEncountered || 0) + 1;
+    run.bossStage = run.modifiers.bossRush ? nextQ : (nextQ / 10);
     run.bossMaxHP = 100 * run.bossStage;
     run.bossHP = run.bossMaxHP;
     
     elements.bossHpContainer.classList.remove('hidden');
     elements.barBossHp.style.width = '100%';
-    elements.enemySprite.textContent = bossEmojis[(run.bossStage - 1) % bossEmojis.length];
+    elements.enemySprite.textContent = bossEmojis[(run.bossesEncountered - 1) % bossEmojis.length];
     
     elements.enemySprite.parentElement.classList.add('animate-float');
     elements.enemySprite.className = 'text-8xl drop-shadow-[0_0_30px_rgba(239,68,68,0.8)] transition-all duration-500 transform scale-110';
@@ -375,7 +400,8 @@ function submitAnswer(ans, isTimeout) {
     globalStats[op]++;
 
     if (run.isBoss) {
-      const timeRatio = timeLeft / currentMaxTime;
+      const timeTaken = currentMaxTime - timeLeft;
+      const timeRatio = Math.max(0, 1 - (timeTaken / MAX_TIME));
       const baseDmg = getRandomInt(15, 25);
       const timeMultiplier = 1 + (timeRatio * 2); 
       const damage = Math.floor(baseDmg * timeMultiplier);
@@ -436,6 +462,10 @@ function submitAnswer(ans, isTimeout) {
         scoreGain = Math.floor(scoreGain * 0.2);
       }
 
+      if (run.modifiers.berserk) {
+        run.health = Math.min(Number(run.maxHealth), Number(run.health) + 10);
+      }
+
       run.goldEarned += gold;
       currency += gold;
       totalGoldEarned += gold;
@@ -455,7 +485,9 @@ function submitAnswer(ans, isTimeout) {
       baseDamage = Math.floor(10 + (run.questionsAnswered * 0.5));
     }
     
-    const damage = Math.max(1, baseDamage - run.modifiers.dmgReduction);
+    const damageMult = run.modifiers.enemyDamageMult || 1;
+    let damage = Math.floor(baseDamage * damageMult) - run.modifiers.dmgReduction;
+    if (damage < 1) damage = 1;
     
     run.health = Math.max(0, run.health - damage);
     elements.lblHealth.textContent = `${run.health}/${run.maxHealth}`;
@@ -520,6 +552,25 @@ function endRun(msg) {
   clearInterval(timerInterval);
   totalRuns++;
   saveState();
+  
+  if (run.score > 0) {
+    let leaderboard = [];
+    try {
+      const stored = localStorage.getItem('mathQuestLeaderboard');
+      if (stored) leaderboard = JSON.parse(stored);
+    } catch(e) {}
+    
+    leaderboard.push({
+      name: user,
+      score: Math.floor(run.score),
+      date: new Date().toLocaleDateString()
+    });
+    
+    leaderboard.sort((a, b) => b.score - a.score);
+    leaderboard = leaderboard.slice(0, 100);
+    
+    localStorage.setItem('mathQuestLeaderboard', JSON.stringify(leaderboard));
+  }
   
   elements.runOverMessage.textContent = msg;
   elements.finalScore.textContent = Math.floor(run.score);

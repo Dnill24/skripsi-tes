@@ -14,7 +14,7 @@
     tailwind.config = { theme: { extend: { colors: { primary: '#0f172a', secondary: '#1e293b', accent: '#8b5cf6' } } } }
   </script>
 </head>
-<body class="bg-retro min-h-screen flex items-center justify-center p-4">
+<body class="bg-retro min-h-screen w-full flex flex-col items-center justify-center text-slate-100 p-4">
   <div class="w-full max-w-md animate-float">
     <div class="glass-panel p-8 rounded-2xl text-center relative overflow-hidden">
       <h1 class="text-3xl font-minecraft text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-blue-400 mb-2 drop-shadow-lg" data-i18n="title_hub">Game Hub</h1>
@@ -24,6 +24,8 @@
         <button id="btnStartRun" class="big-button w-full" data-i18n="btn_start">Start Run</button>
         <button id="btnShop" class="button-outlined w-full" data-i18n="btn_shop">Skin Shop</button>
         <button id="btnAchievements" class="button-outlined w-full" data-i18n="btn_achievements">Achievements</button>
+        <button id="btnLeaderboard" class="button-outlined w-full" data-i18n="btn_leaderboard">Leaderboard</button>
+        <button id="btnVersus" class="button-outlined w-full" style="border-color: #ec4899; color: #ec4899;" data-i18n="btn_versus">Versus Mode</button>
         <button id="btnSettings" class="button-outlined w-full" data-i18n="btn_settings">Settings</button>
         <button id="btnBackToTitle" class="exit-button w-full mt-4" data-i18n="btn_logout">Logout</button>
       </div>
@@ -59,7 +61,7 @@
         </div>
         <div class="bg-slate-800/50 p-4 rounded-xl border border-slate-700">
           <h3 class="text-slate-400 text-sm" data-i18n="stat_bosses">Bosses Defeated</h3>
-          <p id="statBosses" class="text-2xl text-purple-400 font-bold">0</p>
+          <p id="statBosses" class="text-2xl text-red-400 font-bold">0</p>
         </div>
         <div class="bg-slate-800/50 p-4 rounded-xl border border-slate-700">
           <h3 class="text-slate-400 text-sm" data-i18n="stat_runs">Total Runs</h3>
@@ -71,6 +73,32 @@
       <div id="achievementsList" class="flex flex-col gap-4"></div>
 
       <button id="closeAchievementsModal" class="button-outlined w-full mt-6" data-i18n="btn_close">Close</button>
+    </div>
+  </div>
+
+  <!-- Leaderboard Modal -->
+  <div class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center hidden z-50" id="leaderboardModal">
+    <div class="glass-panel p-8 w-[90%] max-w-2xl rounded-2xl relative max-h-[80vh] overflow-y-auto custom-scrollbar">
+      <button id="xCloseLeaderboard" class="absolute top-4 right-6 text-slate-400 hover:text-white text-3xl font-bold">&times;</button>
+      <h2 class="text-2xl font-minecraft text-white mb-6 text-center" data-i18n="modal_leaderboard">Top Scores</h2>
+      
+      <div class="bg-slate-800/50 rounded-xl border border-slate-700 overflow-hidden">
+        <table class="w-full text-left text-sm">
+          <thead class="bg-slate-900/50 text-slate-400 font-minecraft border-b border-slate-700">
+            <tr>
+              <th class="px-4 py-3 text-center w-16" data-i18n="col_rank">Rank</th>
+              <th class="px-4 py-3" data-i18n="col_name">Hero</th>
+              <th class="px-4 py-3 text-right" data-i18n="col_score">Score</th>
+              <th class="px-4 py-3 text-right" data-i18n="col_date">Date</th>
+            </tr>
+          </thead>
+          <tbody id="leaderboardList" class="divide-y divide-slate-700/50">
+            <!-- Populated by JS -->
+          </tbody>
+        </table>
+      </div>
+
+      <button id="closeLeaderboardModal" class="button-outlined w-full mt-6" data-i18n="btn_close">Close</button>
     </div>
   </div>
 

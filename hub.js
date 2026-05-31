@@ -13,7 +13,6 @@ const elements = {
   closeShopModal: document.getElementById('closeShopModal'),
   xCloseShop: document.getElementById('xCloseShop'),
   achievementsModal: document.getElementById('achievementsModal'),
-  closeAchievementsModal: document.getElementById('closeAchievementsModal'),
   xCloseAchievements: document.getElementById('xCloseAchievements'),
   leaderboardModal: document.getElementById('leaderboardModal'),
   closeLeaderboardModal: document.getElementById('closeLeaderboardModal'),
@@ -29,6 +28,11 @@ const elements = {
   volumeValue: document.getElementById('volumeValue'),
   languageSelect: document.getElementById('languageSelect'),
   
+  btnBuffIndex: document.getElementById('btnBuffIndex'),
+  buffIndexModal: document.getElementById('buffIndexModal'),
+  xCloseBuffIndex: document.getElementById('xCloseBuffIndex'),
+  buffIndexList: document.getElementById('buffIndexList'),
+
   shopList: document.getElementById('shopList'),
   statBestScore: document.getElementById('statBestScore'),
   statTotalGold: document.getElementById('statTotalGold'),
@@ -50,27 +54,27 @@ let selectedSkin = 'rainbow';
 let globalStats = { '+': 0, '-': 0, '*': 0, '/': 0, fastestTime: 999, bossRushBosses: 0, glassCannonBosses: 0, comboGod: 0 };
 
 let skins = [
-  { id: 'rainbow', name: 'Default Hero', cost: 0, unlocked: true, detail: 'The standard hero.', icon: '🧍' },
-  { id: 'peasant', name: 'Peasant Boy', cost: 50, unlocked: false, detail: 'A humble beginning.', icon: '👦' },
-  { id: 'adventurer', name: 'Adventurer', cost: 100, unlocked: false, detail: 'Ready for a journey.', icon: '🎒' },
-  { id: 'stone', name: 'Stone Armor', cost: 250, unlocked: false, detail: 'Solid and blocky.', icon: '🗿' },
-  { id: 'knight', name: 'Iron Knight', cost: 500, unlocked: false, detail: 'Sturdy iron defenses.', icon: '🛡️' },
-  { id: 'mage', name: 'Apprentice Mage', cost: 750, unlocked: false, detail: 'Mystical powers.', icon: '🧙' },
-  { id: 'glow', name: 'Neon Miner', cost: 1000, unlocked: false, detail: 'A glowing run style.', icon: '⚡' },
-  { id: 'ninja', name: 'Shadow Ninja', cost: 1500, unlocked: false, detail: 'Swift and silent.', icon: '🥷' },
-  { id: 'robot', name: 'Mecha Suit', cost: 2000, unlocked: false, detail: 'Futuristic combat armor.', icon: '🤖' },
-  { id: 'gold', name: 'Golden Knight', cost: 3000, unlocked: false, detail: 'Shiny and expensive.', icon: '👑' },
-  { id: 'diamond', name: 'Diamond Armor', cost: 5000, unlocked: false, detail: 'Unbreakable.', icon: '💎' },
-  { id: 'fire', name: 'Flame Lord', cost: 7500, unlocked: false, detail: 'Burns with inner fire.', icon: '🔥' },
-  { id: 'ice', name: 'Frost Warden', cost: 10000, unlocked: false, detail: 'Cold as ice.', icon: '❄️' },
-  { id: 'phantom', name: 'Phantom Assassin', cost: 15000, unlocked: false, detail: 'Barely visible.', icon: '👻' },
-  { id: 'alien', name: 'Extraterrestrial', cost: 20000, unlocked: false, detail: 'From another world.', icon: '👽' },
-  { id: 'demon', name: 'Demon King', cost: 25000, unlocked: false, detail: 'Fearsome ruler.', icon: '👹' },
-  { id: 'angel', name: 'Seraphim', cost: 30000, unlocked: false, detail: 'Divine presence.', icon: '👼' },
-  { id: 'dragon', name: 'Dragon Tamer', cost: 40000, unlocked: false, detail: 'Commands the beasts.', icon: '🐉' },
-  { id: 'void', name: 'Void Walker', cost: 50000, unlocked: false, detail: 'Consumes light.', icon: '🌌' },
-  { id: 'celestial', name: 'Celestial Being', cost: 75000, unlocked: false, detail: 'Made of stardust.', icon: '🌟' },
-  { id: 'god', name: 'Math God', cost: 100000, unlocked: false, detail: 'The ultimate form.', icon: '♾️' }
+  { id: 'rainbow', nameKey: 'skin_rainbow_name', descKey: 'skin_rainbow_desc', cost: 0, unlocked: true, icon: '🧍' },
+  { id: 'peasant', nameKey: 'skin_peasant_name', descKey: 'skin_peasant_desc', cost: 50, unlocked: false, icon: '🧑‍🌾' },
+  { id: 'adventurer', nameKey: 'skin_adv_name', descKey: 'skin_adv_desc', cost: 100, unlocked: false, icon: '🧝' },
+  { id: 'stone', nameKey: 'skin_stone_name', descKey: 'skin_stone_desc', cost: 250, unlocked: false, icon: '🗿' },
+  { id: 'knight', nameKey: 'skin_knight_name', descKey: 'skin_knight_desc', cost: 500, unlocked: false, icon: '🛡️' },
+  { id: 'mage', nameKey: 'skin_mage_name', descKey: 'skin_mage_desc', cost: 750, unlocked: false, icon: '🧙' },
+  { id: 'glow', nameKey: 'skin_glow_name', descKey: 'skin_glow_desc', cost: 1000, unlocked: false, icon: '💡' },
+  { id: 'ninja', nameKey: 'skin_ninja_name', descKey: 'skin_ninja_desc', cost: 1500, unlocked: false, icon: '🥷' },
+  { id: 'robot', nameKey: 'skin_robot_name', descKey: 'skin_robot_desc', cost: 2000, unlocked: false, icon: '🤖' },
+  { id: 'gold', nameKey: 'skin_gold_name', descKey: 'skin_gold_desc', cost: 3000, unlocked: false, icon: '🪙' },
+  { id: 'diamond', nameKey: 'skin_diamond_name', descKey: 'skin_diamond_desc', cost: 5000, unlocked: false, icon: '💎' },
+  { id: 'fire', nameKey: 'skin_fire_name', descKey: 'skin_fire_desc', cost: 7500, unlocked: false, icon: '🔥' },
+  { id: 'ice', nameKey: 'skin_ice_name', descKey: 'skin_ice_desc', cost: 10000, unlocked: false, icon: '❄️' },
+  { id: 'phantom', nameKey: 'skin_phantom_name', descKey: 'skin_phantom_desc', cost: 15000, unlocked: false, icon: '👻' },
+  { id: 'alien', nameKey: 'skin_alien_name', descKey: 'skin_alien_desc', cost: 20000, unlocked: false, icon: '👽' },
+  { id: 'demon', nameKey: 'skin_demon_name', descKey: 'skin_demon_desc', cost: 25000, unlocked: false, icon: '👿' },
+  { id: 'angel', nameKey: 'skin_angel_name', descKey: 'skin_angel_desc', cost: 30000, unlocked: false, icon: '👼' },
+  { id: 'dragon', nameKey: 'skin_dragon_name', descKey: 'skin_dragon_desc', cost: 40000, unlocked: false, icon: '🐉' },
+  { id: 'void', nameKey: 'skin_void_name', descKey: 'skin_void_desc', cost: 50000, unlocked: false, icon: '🌌' },
+  { id: 'celestial', nameKey: 'skin_celestial_name', descKey: 'skin_celestial_desc', cost: 75000, unlocked: false, icon: '🌠' },
+  { id: 'god', nameKey: 'skin_god_name', descKey: 'skin_god_desc', cost: 100000, unlocked: false, icon: '🕉️' }
 ];
 
 const achievementsData = [
@@ -143,13 +147,47 @@ function loadState() {
   if (leaderboardStored) {
     try { leaderboard = JSON.parse(leaderboardStored); } catch(e){}
   }
+  
+  if (typeof db !== 'undefined') {
+    db.ref('leaderboard').orderByChild('score').limitToLast(100).on('value', snap => {
+      if (snap.exists()) {
+        const data = snap.val();
+        leaderboard = Object.values(data);
+        if (elements.leaderboardModal.classList.contains('show')) {
+          renderLeaderboard();
+        }
+      }
+    });
+  }
 }
 
 function saveState() {
-  localStorage.setItem('mathQuestRogueStats', JSON.stringify({
+  const saved = localStorage.getItem('mathQuestRogueStats');
+  let stats = {};
+  if (saved) { try { stats = JSON.parse(saved); } catch(e){} }
+  
+  Object.assign(stats, {
     currency, bestRunScore, totalGoldEarned, totalBossesDefeated, totalRuns, selectedSkin, globalStats,
     skins: skins.map(s => ({ id: s.id, unlocked: s.unlocked }))
-  }));
+  });
+
+  localStorage.setItem('mathQuestRogueStats', JSON.stringify(stats));
+  
+  if (typeof db !== 'undefined' && user !== 'Hero' && user !== 'Guest') {
+    const cleanName = user.trim().replace(/[.#$[\]\s/]/g, '_').toLowerCase();
+    const firebaseData = JSON.parse(JSON.stringify(stats, (k, v) => (typeof v === 'number' && isNaN(v)) ? 0 : v));
+    if (firebaseData.globalStats) {
+      firebaseData.globalStats['add'] = firebaseData.globalStats['+'] || 0;
+      firebaseData.globalStats['sub'] = firebaseData.globalStats['-'] || 0;
+      firebaseData.globalStats['mul'] = firebaseData.globalStats['*'] || 0;
+      firebaseData.globalStats['div'] = firebaseData.globalStats['/'] || 0;
+      delete firebaseData.globalStats['+'];
+      delete firebaseData.globalStats['-'];
+      delete firebaseData.globalStats['*'];
+      delete firebaseData.globalStats['/'];
+    }
+    db.ref('users/' + cleanName + '/stats').update(firebaseData).catch(e => console.error("Firebase Sync Error", e));
+  }
 }
 
 function updateUI() {
@@ -168,25 +206,24 @@ function renderLeaderboard() {
   elements.leaderboardList.innerHTML = '';
   
   if (!leaderboard || leaderboard.length === 0) {
-    elements.leaderboardList.innerHTML = `<tr><td colspan="4" class="text-center py-4 text-slate-400">${getTranslation('txt_empty_leaderboard', settings.language)}</td></tr>`;
+    elements.leaderboardList.innerHTML = `<tr><td colspan="4" style="text-align:center; padding:20px; font-family:'Comic Neue',cursive; font-weight:700; color:#9ca3af;">${getTranslation('txt_empty_leaderboard', settings.language)}</td></tr>`;
     return;
   }
   
   const sorted = [...leaderboard].sort((a, b) => b.score - a.score).slice(0, 100);
   sorted.forEach((entry, idx) => {
     const tr = document.createElement('tr');
-    tr.className = 'hover:bg-slate-800/50 transition-colors';
-    
-    let rankColor = 'text-slate-400';
-    if (idx === 0) rankColor = 'text-yellow-400 font-bold text-lg drop-shadow-md';
-    else if (idx === 1) rankColor = 'text-slate-300 font-bold';
-    else if (idx === 2) rankColor = 'text-amber-600 font-bold';
+    tr.style.borderBottom = '4px solid var(--panel-border)';
+    tr.style.background = idx % 2 === 0 ? 'rgba(0,0,0,0.2)' : 'rgba(0,0,0,0.1)';
     
     tr.innerHTML = `
-      <td class="px-4 py-3 text-center ${rankColor}">#${idx + 1}</td>
-      <td class="px-4 py-3 font-bold text-white">${entry.name}</td>
-      <td class="px-4 py-3 text-right text-emerald-400 font-minecraft">${entry.score.toLocaleString()}</td>
-      <td class="px-4 py-3 text-right text-slate-500 text-xs">${entry.date}</td>
+      <td style="padding:12px; text-align:center; font-family:'Press Start 2P',monospace; font-size:0.65rem; color:#fff;">#${idx + 1}</td>
+      <td style="padding:12px; font-family:'Press Start 2P',monospace; font-size:0.65rem; color:#fff;">
+        <span style="font-size:1.2rem; margin-right:8px; vertical-align:middle;">${entry.skin || '🧍'}</span>
+        ${entry.name}
+      </td>
+      <td style="padding:12px; text-align:right; font-family:'Press Start 2P',monospace; font-size:0.65rem; color:#69f0ae;">${entry.score.toLocaleString()}</td>
+      <td style="padding:12px; text-align:right; font-family:'Press Start 2P',monospace; font-size:0.6rem; color:#9ca3af;">${entry.date}</td>
     `;
     elements.leaderboardList.appendChild(tr);
   });
@@ -200,20 +237,21 @@ function renderAchievements() {
     const progressPercent = Math.min(100, (current / ach.target) * 100);
     
     const card = document.createElement('div');
-    card.className = `bg-slate-800/50 border ${isComplete ? 'border-yellow-400' : 'border-slate-700'} rounded-xl p-4`;
-    
+    card.className = 'stone-panel';
+    card.style.display = 'flex';
+    card.style.alignItems = 'center';
+    card.style.gap = '16px';
+    card.style.padding = '12px';
+    if (!isComplete) card.style.filter = 'grayscale(1) brightness(0.7)';
+
     card.innerHTML = `
-      <div class="flex justify-between items-start mb-2">
-        <div>
-          <h4 class="font-bold ${isComplete ? 'text-yellow-400' : 'text-white'}">${getTranslation(ach.nameKey, settings.language)} ${isComplete ? '🌟' : ''}</h4>
-          <p class="text-xs text-slate-400 mt-1">${getTranslation(ach.descKey, settings.language)}</p>
+      <div style="font-size:2.5rem; filter:drop-shadow(2px 2px 0 rgba(0,0,0,1));">${isComplete ? '🏆' : '🔒'}</div>
+      <div style="flex:1;">
+        <div style="font-family:'Press Start 2P',monospace; font-size:0.7rem; color:var(--text-gold); margin-bottom:8px; text-shadow:1px 1px 0 rgba(0,0,0,1);">${getTranslation(ach.nameKey, settings.language)}</div>
+        <div style="font-family:'Comic Neue',cursive; font-size:0.9rem; color:#ccc; margin-bottom:8px;">${getTranslation(ach.descKey, settings.language)}</div>
+        <div style="width:100%; height:12px; background:#263238; border-radius:6px; overflow:hidden; border:2px solid var(--panel-border);">
+          <div style="width:${progressPercent}%; height:100%; background:${isComplete ? '#4caf50' : '#ffa000'}; border-right:2px solid var(--panel-border);"></div>
         </div>
-        <span class="text-sm font-minecraft ${isComplete ? 'text-emerald-400' : 'text-slate-500'}">
-          ${Math.min(current, ach.target)}/${ach.target}
-        </span>
-      </div>
-      <div class="w-full bg-slate-900 rounded-full h-2 mt-2 border border-slate-700">
-        <div class="bg-gradient-to-r ${isComplete ? 'from-yellow-500 to-yellow-300' : 'from-blue-600 to-blue-400'} h-2 rounded-full" style="width: ${progressPercent}%"></div>
       </div>
     `;
     elements.achievementsList.appendChild(card);
@@ -224,27 +262,38 @@ function renderShop() {
   elements.shopList.innerHTML = '';
   skins.forEach(skin => {
     const card = document.createElement('div');
-    card.className = 'bg-slate-800/50 border border-slate-700 rounded-xl p-4 flex justify-between items-center';
+    const isActive = selectedSkin === skin.id;
+    card.className = 'stone-panel';
+    card.style.flex = '0 0 140px';
+    card.style.display = 'flex';
+    card.style.flexDirection = 'column';
+    card.style.alignItems = 'center';
+    card.style.padding = '12px';
+    if (isActive) card.style.borderColor = '#4caf50';
+    
+    const btnLabel = skin.unlocked
+      ? (isActive ? getTranslation('btn_equipped', settings.language) : getTranslation('btn_equip', settings.language))
+      : getTranslation('btn_buy', settings.language);
+      
     card.innerHTML = `
-      <div class="flex items-center gap-4">
-        <div class="text-4xl w-12 text-center">${skin.icon}</div>
-        <div>
-          <h3 class="text-white font-bold">${skin.name}</h3>
-          <p class="text-slate-400 text-sm">${skin.detail}</p>
-        </div>
-      </div>
-      <div class="text-right flex-shrink-0 ml-4">
-        <p class="text-yellow-400 font-bold mb-2">${skin.cost > 0 ? skin.cost + ' ' + getTranslation('gold_label', settings.language).replace(':', '') : getTranslation('txt_free', settings.language)}</p>
-        <button class="button-primary px-4 py-2 text-sm w-24">
-          ${skin.unlocked ? (selectedSkin === skin.id ? getTranslation('btn_equipped', settings.language) : getTranslation('btn_equip', settings.language)) : getTranslation('btn_buy', settings.language)}
-        </button>
-      </div>
+      <div style="font-size:4rem; margin-bottom:12px; filter:drop-shadow(3px 3px 0 rgba(0,0,0,0.8)); transform-origin:bottom; transition:transform 0.2s;" onmouseover="this.style.transform='scale(1.2)'" onmouseout="this.style.transform='scale(1)'">${skin.icon}</div>
+      <div style="font-family:'Press Start 2P',monospace; font-size:0.6rem; color:#fff; margin-bottom:8px; text-shadow:1px 1px 0 rgba(0,0,0,1); text-align:center; height:24px;">${getTranslation(skin.nameKey, settings.language)}</div>
+      ${!skin.unlocked ? `<div style="font-family:'Press Start 2P',monospace; font-size:0.7rem; color:var(--text-gold); margin-bottom:12px; text-shadow:1px 1px 0 rgba(0,0,0,1);">🪙 ${skin.cost}</div>` : '<div style="height:22px; margin-bottom:12px;"></div>'}
     `;
-    const btn = card.querySelector('button');
-    if (skin.unlocked && selectedSkin === skin.id) {
-      btn.classList.add('opacity-50', 'cursor-not-allowed');
+    
+    const btn = document.createElement('button');
+    btn.className = `wood-btn ${isActive ? 'success' : ''}`;
+    btn.style.width = '100%';
+    btn.style.padding = '8px 4px';
+    btn.style.fontSize = '0.7rem';
+    btn.textContent = btnLabel;
+    
+    if (!skin.unlocked && currency < skin.cost) {
       btn.disabled = true;
+      btn.style.filter = 'grayscale(1)';
+      btn.style.opacity = '0.6';
     }
+    card.appendChild(btn);
     btn.onclick = () => {
       if (!skin.unlocked) {
         if (currency >= skin.cost) {
@@ -267,8 +316,8 @@ function renderShop() {
 }
 
 // Mode Selection
-elements.btnStartRun.onclick = () => { elements.modeModal.classList.remove('hidden'); };
-elements.closeModeModal.onclick = () => { elements.modeModal.classList.add('hidden'); };
+elements.btnStartRun.onclick = () => { elements.modeModal.classList.add('show'); };
+elements.closeModeModal.onclick = () => { elements.modeModal.classList.remove('show'); };
 elements.xCloseMode.onclick = elements.closeModeModal.onclick;
 
 document.querySelectorAll('.btn-mode').forEach(btn => {
@@ -279,37 +328,49 @@ document.querySelectorAll('.btn-mode').forEach(btn => {
 });
 
 // Modals
-elements.btnShop.onclick = () => { elements.shopModal.classList.remove('hidden'); updateUI(); };
-elements.closeShopModal.onclick = () => { elements.shopModal.classList.add('hidden'); };
+elements.btnShop.onclick = () => { elements.shopModal.classList.add('show'); updateUI(); };
+elements.closeShopModal.onclick = () => { elements.shopModal.classList.remove('show'); };
 elements.xCloseShop.onclick = elements.closeShopModal.onclick;
 
 elements.btnAchievements.onclick = () => {
-  elements.achievementsModal.classList.remove('hidden');
+  elements.achievementsModal.classList.add('show');
 };
-elements.closeAchievementsModal.onclick = () => elements.achievementsModal.classList.add('hidden');
-elements.xCloseAchievements.onclick = () => elements.achievementsModal.classList.add('hidden');
+elements.xCloseAchievements.onclick = () => elements.achievementsModal.classList.remove('show');
 
 elements.btnLeaderboard.onclick = () => {
   renderLeaderboard();
-  elements.leaderboardModal.classList.remove('hidden');
+  elements.leaderboardModal.classList.add('show');
 };
-elements.closeLeaderboardModal.onclick = () => elements.leaderboardModal.classList.add('hidden');
-elements.xCloseLeaderboard.onclick = () => elements.leaderboardModal.classList.add('hidden');
+elements.closeLeaderboardModal.onclick = () => elements.leaderboardModal.classList.remove('show');
+elements.xCloseLeaderboard.onclick = () => elements.leaderboardModal.classList.remove('show');
+
+// Buff Index
+elements.btnBuffIndex.onclick = () => {
+  populateBuffIndex();
+  elements.buffIndexModal.classList.add('show');
+};
+elements.xCloseBuffIndex.onclick = () => elements.buffIndexModal.classList.remove('show');
 
 elements.btnVersus.onclick = () => {
   window.location.href = 'versus.html';
 };
 
 // Settings
-elements.btnSettings.onclick = () => { elements.settingsModal.classList.remove('hidden'); };
-elements.closeSettings.onclick = () => { elements.settingsModal.classList.add('hidden'); };
+elements.btnSettings.onclick = () => { elements.settingsModal.classList.add('show'); };
+elements.closeSettings.onclick = () => { elements.settingsModal.classList.remove('show'); };
 elements.xCloseSettings.onclick = elements.closeSettings.onclick;
 elements.volumeSlider.oninput = (e) => { elements.volumeValue.textContent = e.target.value + '%'; };
 elements.saveSettings.onclick = () => {
   settings.volume = parseInt(elements.volumeSlider.value);
   settings.language = elements.languageSelect.value;
   localStorage.setItem('mathQuestSettings', JSON.stringify(settings));
-  elements.settingsModal.classList.add('hidden');
+  
+  if (typeof db !== 'undefined' && user !== 'Hero' && user !== 'Guest') {
+    const cleanName = user.trim().replace(/[.#$[\]\s/]/g, '_').toLowerCase();
+    db.ref('users/' + cleanName + '/settings').set(settings).catch(e => console.error("Firebase Sync Error", e));
+  }
+  
+  elements.settingsModal.classList.remove('show');
   updateUI();
 };
 
@@ -319,3 +380,43 @@ window.onload = () => {
   loadState();
   updateUI();
 };
+
+// Buff Info for Index
+const buffPoolInfo = [
+  { id: 'heal', nameKey: 'buff_heal_name', descKey: 'buff_heal_desc', icon: '💖' },
+  { id: 'vitality', nameKey: 'buff_vit_name', descKey: 'buff_vit_desc', icon: '❤️‍🔥' },
+  { id: 'time', nameKey: 'buff_time_name', descKey: 'buff_time_desc', icon: '⏳' },
+  { id: 'greed', nameKey: 'buff_greed_name', descKey: 'buff_greed_desc', icon: '🤑' },
+  { id: 'scholar', nameKey: 'buff_scholar_name', descKey: 'buff_scholar_desc', icon: '🎓' },
+  { id: 'defense', nameKey: 'buff_def_name', descKey: 'buff_def_desc', icon: '🛡️' },
+  { id: 'bossrush', nameKey: 'buff_boss_name', descKey: 'buff_boss_desc', icon: '👹' },
+  { id: 'glasscannon', nameKey: 'buff_glass_name', descKey: 'buff_glass_desc', icon: '💥' },
+  { id: 'vampirism', nameKey: 'buff_vamp_name', descKey: 'buff_vamp_desc', icon: '🦇' },
+  { id: 'gambler', nameKey: 'buff_gambler_name', descKey: 'buff_gambler_desc', icon: '🎲' },
+  { id: 'ninelives', nameKey: 'buff_nine_name', descKey: 'buff_nine_desc', icon: '🐱' },
+  { id: 'timewarp', nameKey: 'buff_warp_name', descKey: 'buff_warp_desc', icon: '🌀' },
+  { id: 'midas', nameKey: 'buff_midas_name', descKey: 'buff_midas_desc', icon: '👑' },
+  { id: 'slowmo', nameKey: 'buff_slowmo_name', descKey: 'buff_slowmo_desc', icon: '🐌' },
+  { id: 'berserk', nameKey: 'buff_berserk_name', descKey: 'buff_berserk_desc', icon: '💢' }
+];
+
+function populateBuffIndex() {
+  elements.buffIndexList.innerHTML = '';
+  buffPoolInfo.forEach(buff => {
+    const card = document.createElement('div');
+    card.className = 'stone-panel';
+    card.style.display = 'flex';
+    card.style.flexDirection = 'column';
+    card.style.alignItems = 'center';
+    card.style.justifyContent = 'center';
+    card.style.padding = '16px';
+    card.style.textAlign = 'center';
+    
+    card.innerHTML = `
+      <div style="font-size:3rem; margin-bottom:8px; filter:drop-shadow(2px 2px 0 rgba(0,0,0,1));">${buff.icon}</div>
+      <div style="font-family:'Press Start 2P',monospace; font-size:0.7rem; color:var(--text-gold); margin-bottom:8px; text-shadow:1px 1px 0 rgba(0,0,0,1);">${getTranslation(buff.nameKey, settings.language)}</div>
+      <div style="font-family:'Comic Neue',cursive; font-size:0.9rem; color:#ccc; line-height:1.2;">${getTranslation(buff.descKey, settings.language)}</div>
+    `;
+    elements.buffIndexList.appendChild(card);
+  });
+}

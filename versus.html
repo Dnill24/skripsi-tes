@@ -5,35 +5,34 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Math Quest - Versus Mode</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://unpkg.com/peerjs@1.5.1/dist/peerjs.min.js"></script>
+  
   <link rel="stylesheet" href="styles.css" />
   <script>
     tailwind.config = { theme: { extend: { colors: { primary: '#0f172a', secondary: '#1e293b', accent: '#8b5cf6' } } } }
   </script>
 </head>
-<body class="bg-retro min-h-screen w-full flex flex-col text-slate-100 p-4">
+<body class="bg-arena min-h-screen w-full flex flex-col text-slate-100 p-4">
 
   <!-- Lobby Overlay -->
-  <div class="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center z-50 flex-col p-4" id="lobbyModal">
-    <div class="glass-panel p-8 w-full max-w-md rounded-2xl relative text-center animate-float">
-      <h2 class="text-3xl font-minecraft text-pink-400 mb-6 drop-shadow-md" data-i18n="modal_versus">Versus Lobby</h2>
+  <div class="terra-modal-overlay show" id="lobbyModal">
+    <div class="terra-modal-card">
+      <h2 data-i18n="modal_versus">Versus Lobby</h2>
       
       <div id="lobbySetup">
-        <button id="btnHost" class="big-button w-full mb-4 bg-pink-600 hover:bg-pink-500 border-pink-800" data-i18n="btn_host">Host Game</button>
+        <button id="btnHost" class="wood-btn success w-full mb-4" data-i18n="btn_host">Host Game</button>
         <div class="flex gap-2 mb-4">
-          <input type="text" id="joinCodeInput" class="w-full bg-slate-800/80 border-2 border-slate-600 rounded-lg px-4 py-3 text-white font-minecraft text-center uppercase focus:border-pink-500 focus:outline-none" placeholder="Enter Code">
+          <input type="text" id="joinCodeInput" placeholder="Enter Code">
         </div>
-        <button id="btnJoin" class="button-outlined w-full mb-6 text-pink-400 border-pink-500" data-i18n="btn_join">Join Game</button>
+        <button id="btnJoin" class="wood-btn w-full mb-6" data-i18n="btn_join">Join Game</button>
         
-        <button id="btnReturnHub" class="exit-button w-full mt-4" data-i18n="btn_return">Return to Hub</button>
+        <button id="btnReturnHub" class="wood-btn danger w-full mt-4" data-i18n="btn_return">Return to Hub</button>
       </div>
 
       <div id="lobbyWaiting" class="hidden flex flex-col items-center">
-        <div class="w-16 h-16 border-4 border-pink-500 border-t-transparent rounded-full animate-spin mb-4"></div>
-        <p class="text-slate-300 font-minecraft mb-4" data-i18n="lbl_room_code">Room Code:</p>
-        <h3 id="displayRoomCode" class="text-4xl text-white font-bold bg-slate-800 py-3 px-6 rounded-lg mb-6 tracking-widest border border-slate-600 shadow-inner select-all"></h3>
-        <p class="text-pink-400 animate-pulse" data-i18n="txt_waiting_opponent">Waiting for opponent...</p>
-        <button id="btnCancelHost" class="exit-button w-full mt-8">Cancel</button>
+        <p class="font-minecraft text-sm mb-4" data-i18n="lbl_room_code">Room Code:</p>
+        <h3 id="displayRoomCode" class="text-2xl text-white font-bold bg-slate-800 py-3 px-6 border-4 border-[#263238] mb-6 tracking-widest select-all"></h3>
+        <p class="text-orange-300 animate-pulse-glow" data-i18n="txt_waiting_opponent">Waiting for opponent...</p>
+        <button id="btnCancelHost" class="wood-btn danger w-full mt-8">Cancel</button>
       </div>
     </div>
   </div>
@@ -42,78 +41,99 @@
   <div id="gameArena" class="hidden flex-col h-full max-w-md mx-auto w-full flex-grow relative pt-4">
     
     <!-- Opponent Area (Top) -->
-    <div class="bg-red-900/40 border border-red-700/50 rounded-xl p-4 mb-4 relative overflow-hidden shadow-[0_0_15px_rgba(239,68,68,0.2)]">
-      <div class="flex justify-between items-center mb-2">
+    <div class="stone-panel p-3 mb-2 relative overflow-hidden" style="border-color:#b71c1c !important;">
+      <div class="flex justify-between items-center mb-1">
         <div class="flex items-center gap-2">
-          <span id="opponentSprite" class="text-2xl drop-shadow-md">🧍</span>
-          <h3 id="opponentName" class="text-red-200 font-minecraft text-sm">Opponent</h3>
+          <span id="opponentSprite" class="text-lg drop-shadow-md">🧍</span>
+          <h3 id="opponentName" class="text-red-200 font-minecraft text-xs">Opponent</h3>
         </div>
-        <span id="opponentCombo" class="text-orange-400 font-bold hidden text-sm"></span>
+        <span id="opponentCombo" class="text-orange-400 font-bold hidden text-xs"></span>
       </div>
       
-      <div class="w-full bg-slate-900 h-4 rounded-full border border-slate-700 overflow-hidden relative">
-        <div id="barOpponentHp" class="h-full bg-red-500 transition-all duration-300 w-full relative overflow-hidden">
-          <div class="absolute top-0 left-0 right-0 bottom-0 bg-white/20"></div>
-        </div>
+      <div class="bar-track h-4">
+        <div id="barOpponentHp" class="bar-fill bar-fill-hp h-full w-full"></div>
       </div>
-      <p class="text-center text-xs text-red-300 mt-1"><span data-i18n="txt_opponent_hp">Opponent HP:</span> <span id="lblOpponentHp">100/100</span></p>
+      <p class="text-center text-xs text-red-300 mt-1" style="font-family:'Press Start 2P',monospace; font-size:0.5rem;"><span data-i18n="txt_opponent_hp">Opponent HP:</span> <span id="lblOpponentHp">100/100</span></p>
       
       <div id="opponentDamageText" class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-2xl font-bold font-minecraft text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] opacity-0 transition-opacity duration-300 pointer-events-none z-10"></div>
     </div>
     
-    <!-- VS Divider -->
-    <div class="flex justify-center my-2 relative z-10">
-      <div class="bg-slate-900 rounded-full px-4 py-2 border-2 border-pink-500 text-pink-400 font-minecraft text-xl shadow-[0_0_15px_rgba(236,72,153,0.5)] z-10">VS</div>
-      <div class="absolute top-1/2 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-pink-500/50 to-transparent -z-10"></div>
+    <!-- Battle Arena (Middle - Horizontal Layout) -->
+    <div id="versusArena" class="w-full relative h-48 md:h-56 z-10 my-2 overflow-hidden" style="background:radial-gradient(circle at center, transparent 40%, rgba(0,0,0,0.6) 100%);">
+      <div class="arena-floor"></div>
+      <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-orange-400/20 font-minecraft text-4xl -z-10">VS</div>
+      
+      <!-- Countdown Overlay -->
+      <div id="countdownOverlay" class="absolute inset-0 bg-black/60 flex items-center justify-center z-40 hidden pointer-events-none">
+        <div id="countdownText" class="text-7xl md:text-8xl font-minecraft text-orange-400 drop-shadow-[4px_4px_0_rgba(0,0,0,1)] scale-50 opacity-0 transition-all duration-300">3</div>
+      </div>
+
+      <!-- Calculation Animation Container -->
+      <div id="calcAnimContainer" class="absolute inset-0 flex items-center justify-center z-40 pointer-events-none hidden transition-opacity duration-300">
+         <div id="calcAnimContent" class="stone-panel text-3xl font-minecraft font-bold text-white p-4 flex gap-3 flex-wrap justify-center items-center transition-all duration-500"></div>
+      </div>
+
+      <!-- Opponent (Right Side, on floor) -->
+      <div id="versusOpponentContainer" class="absolute bottom-6 right-8 flex flex-col items-center z-10 transition-transform duration-300">
+        <div id="versusOpponentVisual" class="text-6xl drop-shadow-[3px_3px_0_rgba(0,0,0,0.8)] transform origin-bottom scale-x-[-1]">👾</div>
+        <div class="w-[50px] h-[12px] bg-black/50 rounded-full absolute -bottom-[6px] blur-[2px] -z-10"></div>
+      </div>
+
+      <!-- Player (Left Side, on floor) -->
+      <div id="versusPlayerContainer" class="absolute bottom-6 left-8 flex flex-col items-center animate-float z-20">
+        <div id="versusPlayerVisual" class="text-[6rem] drop-shadow-[3px_3px_0_rgba(0,0,0,0.8)] transform origin-bottom">🧍</div>
+        <div class="w-[70px] h-[16px] bg-black/60 rounded-full absolute -bottom-[8px] blur-[3px] -z-10"></div>
+      </div>
+      
+      <!-- Combat Text Overlay -->
+      <div id="combatText" class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-4xl font-bold font-minecraft drop-shadow-[3px_3px_0_rgba(0,0,0,1)] opacity-0 transition-all duration-300 pointer-events-none z-30"></div>
     </div>
 
     <!-- Player Area (Bottom) -->
-    <div class="flex flex-col flex-grow justify-end mt-4">
+    <div class="stone-panel p-3 mt-2 flex flex-col flex-grow justify-end">
       <div class="flex justify-between items-center mb-2">
         <div class="flex gap-4">
-          <span class="text-slate-400 text-sm font-minecraft" data-i18n="lbl_health">Health</span>
-          <span id="lblHealth" class="text-emerald-400 text-sm font-minecraft">100/100</span>
+          <span class="text-slate-400 text-xs font-minecraft" data-i18n="lbl_health">Health</span>
+          <span id="lblHealth" class="text-emerald-400 text-xs font-minecraft">100/100</span>
         </div>
-        <div id="lblCombo" class="text-yellow-400 font-bold hidden animate-pop font-minecraft text-sm drop-shadow-md"></div>
+        <span id="lblCombo" class="text-orange-400 font-bold hidden text-xs transition-transform duration-200"></span>
       </div>
-      
-      <div class="w-full bg-slate-800 h-6 rounded-full border-2 border-slate-600 mb-6 overflow-hidden relative shadow-inner">
-        <div id="barPlayerHp" class="h-full bg-gradient-to-r from-emerald-500 to-emerald-400 transition-all duration-300 w-full relative">
-          <div class="absolute top-0 left-0 right-0 h-2 bg-white/20"></div>
-        </div>
+      <div class="bar-track h-4 mb-3">
+        <div id="barPlayerHp" class="bar-fill bar-fill-hp h-full w-full"></div>
       </div>
 
-      <!-- Combat Text Overlay -->
-      <div id="combatText" class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-4xl font-bold font-minecraft drop-shadow-[0_4px_4px_rgba(0,0,0,1)] opacity-0 transition-all duration-300 pointer-events-none z-10"></div>
-
-      <!-- Question Box -->
-      <div class="glass-panel p-8 rounded-2xl text-center relative mb-4">
-        <div class="w-full bg-slate-800 h-2 rounded-full mb-6 overflow-hidden">
-          <div id="barTimer" class="h-full bg-cyan-400 w-full transition-all duration-100 linear"></div>
+      <!-- Timer & Question -->
+      <div class="flex flex-col items-center mb-4">
+        <div class="bar-track h-2 w-full mb-2">
+          <div id="barTimer" class="bar-fill bar-fill-timer h-full w-full"></div>
         </div>
-        <h2 id="lblQuestion" class="text-5xl font-minecraft text-white drop-shadow-lg mb-2 tracking-widest font-bold">...</h2>
+        <h2 id="lblQuestion" class="text-3xl font-minecraft font-bold text-white text-center drop-shadow-[2px_2px_0_rgba(0,0,0,0.8)]">Waiting...</h2>
       </div>
 
       <!-- Answer Grid -->
-      <div id="answerGrid" class="grid grid-cols-2 gap-4 pb-4">
-        <!-- Buttons injected here -->
+      <div id="answerGrid" class="grid grid-cols-2 gap-3 mb-2">
+        <!-- Buttons injected here by JS -->
       </div>
     </div>
-
   </div>
 
-  <!-- End Game Modal -->
-  <div class="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center hidden z-50 flex-col" id="endGameModal">
-    <div class="glass-panel p-10 rounded-2xl text-center max-w-sm w-full animate-pop">
-      <h2 id="endTitle" class="text-5xl font-minecraft mb-4 drop-shadow-lg text-pink-500">...</h2>
-      <p id="endMessage" class="text-slate-300 mb-6 font-minecraft leading-relaxed text-sm">...</p>
-      <p id="rematchStatus" class="text-yellow-400 font-minecraft mb-4 hidden text-sm drop-shadow-md animate-pulse" data-i18n="txt_opponent_rematch">Opponent wants a rematch!</p>
-      <button id="btnPlayAgain" class="button-primary w-full mb-4" data-i18n="btn_rematch">Rematch</button>
-      <button id="btnReturnEnd" class="button-outlined w-full" data-i18n="btn_return">Return to Hub</button>
+  <!-- End Match Modal -->
+  <div class="terra-modal-overlay" id="endMatchModal">
+    <div class="terra-modal-card text-center">
+      <h2 id="endMatchTitle" class="text-4xl font-minecraft text-white mb-6 drop-shadow-[3px_3px_0_rgba(0,0,0,1)]">Victory!</h2>
+      <p id="endMatchMessage" class="text-lg text-slate-300 mb-8 font-minecraft"></p>
+      
+      <div class="flex gap-4">
+        <button id="btnPlayAgain" class="wood-btn success flex-1 py-4 text-sm" data-i18n="btn_rematch">Rematch</button>
+        <button id="btnExitMatch" class="wood-btn danger flex-1 py-4 text-sm" data-i18n="btn_leave">Leave</button>
+      </div>
     </div>
   </div>
 
+  <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-database-compat.js"></script>
+  <script src="firebase-config.js"></script>
   <script src="locales.js"></script>
   <script src="versus.js"></script>
-</body>
+<script src="drag-scroll.js"></script></body>
 </html>

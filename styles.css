@@ -1,195 +1,478 @@
-/* Google Fonts */
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Press+Start+2P&display=swap');
+/* ═══════════════════════════════════════════════════════
+   MATH QUEST — TERRARIA SANDBOX STYLE
+   Stone/Dirt Blocks, Wooden Planks, Horizontal Combat
+   ═══════════════════════════════════════════════════════ */
 
+@import url('https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&family=Press+Start+2P&display=swap');
+
+/* ─── CSS Variables ─────────────────────────────────── */
 :root {
-  --bg-primary: #0f172a;
-  --bg-secondary: #1e293b;
-  --accent-primary: #8b5cf6;
-  --accent-secondary: #3b82f6;
-  --success: #10b981;
-  --danger: #ef4444;
-  --warning: #f59e0b;
-  --text-main: #f8fafc;
-  --text-muted: #94a3b8;
+  --terra-sky:   #79a2ff;        /* daytime sky blue */
+  --terra-dirt:  #795548;        /* rich dirt brown */
+  --terra-stone: #607d8b;        /* blue-grey stone */
+  --terra-wood:  #8d6e63;        /* warm wood */
+  --terra-grass: #4caf50;        /* bright surface grass */
+  --terra-deep:  #1a1c29;        /* deep cavern blue-black */
+  
+  --panel-bg:    #37474f;        /* dark stone interior */
+  --panel-border:#263238;        /* dark stone edge */
+  --wood-bg:     #a1887f;        /* light wood */
+  --wood-border: #4e342e;        /* dark wood grain */
+  
+  --text-main:   #ffffff;        
+  --text-dim:    #b0bec5;        
+  --text-gold:   #ffb300;
+  
+  --shadow-block: inset -4px -4px 0 rgba(0,0,0,0.4), inset 4px 4px 0 rgba(255,255,255,0.15);
+  --shadow-btn:   inset -3px -3px 0 rgba(0,0,0,0.3), inset 3px 3px 0 rgba(255,255,255,0.2);
 }
 
+/* ─── Base ──────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; }
+
 body {
-  font-family: 'Outfit', sans-serif;
-  background-color: var(--bg-primary);
+  font-family: 'Comic Neue', 'Comic Sans MS', cursive, sans-serif;
+  background-color: var(--terra-deep);
   color: var(--text-main);
   overflow-x: hidden;
+}
+
+button, input, select, textarea {
+  font-family: 'Comic Neue', 'Comic Sans MS', cursive, sans-serif;
 }
 
 h1, h2, h3, h4, h5, h6, .font-minecraft {
   font-family: 'Press Start 2P', monospace;
 }
 
-/* Custom Scrollbar */
-::-webkit-scrollbar {
-  width: 8px;
+/* ─── Scrollbar ─────────────────────────────────────── */
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: var(--panel-border); }
+::-webkit-scrollbar-thumb { background: var(--terra-stone); border: 2px solid var(--panel-border); }
+::-webkit-scrollbar-thumb:hover { background: var(--terra-wood); }
+
+/* ─── Backgrounds ───────────────────────────────────── */
+.bg-hub {
+  background-image: url('terraria_hub_bright.png');
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  image-rendering: pixelated;
 }
-::-webkit-scrollbar-track {
-  background: var(--bg-primary);
+
+.bg-cave {
+  background-image: url('terraria_play_bg.png');
+  background-size: cover;
+  background-position: 0% center;
+  background-repeat: repeat-x;
+  background-attachment: fixed;
+  image-rendering: pixelated;
+  transition: background-position 1s ease-in-out;
 }
-::-webkit-scrollbar-thumb {
-  background: var(--bg-secondary);
+
+.bg-arena {
+  background-image: url('terraria_arena_bg.png');
+  background-size: cover;
+  background-position: center bottom;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  image-rendering: pixelated;
+}
+
+/* ─── Stone Panel (Modals, Hub Cards) ───────────────── */
+.stone-panel {
+  background: var(--panel-bg) !important;
+  border: 4px solid var(--panel-border) !important;
+  border-radius: 4px !important;
+  box-shadow: var(--shadow-block), 0 8px 24px rgba(0,0,0,0.6) !important;
+  color: var(--text-main) !important;
+  position: relative;
+}
+
+/* Add corner stone details */
+.stone-panel::before {
+  content: '';
+  position: absolute; top: -4px; left: -4px; right: -4px; bottom: -4px;
+  border: 4px solid rgba(255,255,255,0.05);
+  pointer-events: none;
   border-radius: 4px;
 }
-::-webkit-scrollbar-thumb:hover {
-  background: var(--accent-primary);
-}
 
-/* Retro Panel utility */
-.glass-panel {
-  background: rgba(15, 23, 42, 0.95);
-  border: 4px solid #475569;
-  box-shadow: 8px 8px 0px rgba(0, 0, 0, 0.6);
-  border-radius: 0 !important;
-}
+/* ─── Utility ───────────────────────────────────────── */
+.hidden { display: none !important; }
 
-/* Animations */
+/* ─── Animations ────────────────────────────────────── */
 @keyframes float {
-  0% { transform: translateY(0px); }
-  50% { transform: translateY(-10px); }
-  100% { transform: translateY(0px); }
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-4px); }
 }
-
-.animate-float {
-  animation: float 4s ease-in-out infinite;
-}
+.animate-float { animation: float 3s steps(4) infinite; }
 
 @keyframes pulse-glow {
-  0% { box-shadow: 0 0 0 0 rgba(139, 92, 246, 0.4); }
-  70% { box-shadow: 0 0 0 15px rgba(139, 92, 246, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(139, 92, 246, 0); }
+  0%, 100% { filter: drop-shadow(0 0 4px var(--text-gold)); }
+  50% { filter: drop-shadow(0 0 12px var(--text-gold)); }
 }
-
-.animate-pulse-glow {
-  animation: pulse-glow 2s infinite;
-}
+.animate-pulse-glow { animation: pulse-glow 2s infinite; }
 
 @keyframes shake {
   0%, 100% { transform: translateX(0); }
-  10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
-  20%, 40%, 60%, 80% { transform: translateX(5px); }
+  25% { transform: translateX(-4px); }
+  75% { transform: translateX(4px); }
 }
-
-.shake {
-  animation: shake 0.5s;
-}
+.shake { animation: shake 0.3s steps(2); }
 
 @keyframes pop {
   0% { transform: scale(1); }
-  50% { transform: scale(1.05); }
+  50% { transform: scale(1.1); }
   100% { transform: scale(1); }
 }
+.pop { animation: pop 0.2s steps(2); }
 
-.pop {
-  animation: pop 0.3s ease-out;
-}
-
-/* Buttons */
-.button-primary, .big-button {
+/* ─── BUTTONS — Wooden Plank Style ─────────────────── */
+.wood-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 0.75rem 1.5rem;
-  font-weight: 800;
-  color: white;
-  background: var(--accent-primary);
-  border: 4px solid #4c1d95;
-  box-shadow: 4px 4px 0px #000;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  cursor: pointer;
+  padding: 16px 24px;
   font-family: 'Press Start 2P', monospace;
-  font-size: 0.8rem;
-  transition: transform 0.1s, box-shadow 0.1s;
+  font-size: 0.85rem;
+  color: #fff;
+  background: var(--wood-bg);
+  border: 4px solid var(--wood-border);
+  border-radius: 0px;
+  box-shadow: var(--shadow-btn), 0 4px 0 var(--wood-border);
+  cursor: pointer;
+  text-transform: uppercase;
+  transition: transform 0.1s ease-out;
+  text-shadow: 1px 1px 0 rgba(0,0,0,0.8);
+  position: relative;
+}
+/* Wood grain overlay (simple CSS stripe) */
+.wood-btn::after {
+  content: ''; position: absolute; top:0; left:0; right:0; bottom:0;
+  background: repeating-linear-gradient(0deg, transparent, transparent 4px, rgba(0,0,0,0.08) 4px, rgba(0,0,0,0.08) 8px);
+  pointer-events: none;
+}
+.wood-btn:hover {
+  background: #aCA08b;
+  transform: translateY(2px);
+  box-shadow: var(--shadow-btn), 0 2px 0 var(--wood-border);
+}
+.wood-btn:active {
+  transform: translateY(4px);
+  box-shadow: var(--shadow-btn), 0 0 0 var(--wood-border);
+}
+.wood-btn.danger {
+  background: #d32f2f;
+  border-color: #880e4f;
+  box-shadow: var(--shadow-btn), 0 4px 0 #880e4f;
+}
+.wood-btn.danger:hover { background: #e53935; box-shadow: var(--shadow-btn), 0 2px 0 #880e4f; }
+.wood-btn.danger:active { box-shadow: var(--shadow-btn), 0 0 0 #880e4f; }
+
+.wood-btn.success {
+  background: #388e3c;
+  border-color: #1b5e20;
+  box-shadow: var(--shadow-btn), 0 4px 0 #1b5e20;
+}
+.wood-btn.success:hover { background: #43a047; box-shadow: var(--shadow-btn), 0 2px 0 #1b5e20; }
+.wood-btn.success:active { box-shadow: var(--shadow-btn), 0 0 0 #1b5e20; }
+
+/* ─── Playing Card Answer Buttons (Now Wood/Stone Blocks) ── */
+.math-answer-btn {
+  font-family: 'Press Start 2P', monospace !important;
+  font-size: clamp(0.9rem, 3.5vw, 1.3rem) !important;
+  border-radius: 4px !important;
+  border-width: 4px !important;
+  text-transform: none !important;
+  transition: transform 0.1s ease-out !important;
+  position: relative;
 }
 
-.button-primary:hover, .big-button:hover {
-  transform: translate(2px, 2px);
-  box-shadow: 2px 2px 0px #000;
-  background: #7c3aed;
+/* ─── HP / Progress Bars ────────────────────────────── */
+.bar-track {
+  background: #263238;
+  border: 3px solid #1c2327;
+  border-radius: 2px;
+  overflow: hidden;
+  box-shadow: inset 2px 2px 0 rgba(0,0,0,0.5);
+}
+.bar-fill-hp    { background: #e53935; border-top: 2px solid #ff8a80; }
+.bar-fill-timer { background: #ffb300; border-top: 2px solid #ffe57f; }
+.bar-fill-prog  { background: #42a5f5; border-top: 2px solid #90caf9; }
+.bar-fill-boss  { background: #8e24aa; border-top: 2px solid #ea80fc; }
+
+/* ─── Battle Animations (Horizontal Side-Scrolling) ─── */
+@keyframes shake-idle {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
 }
 
-.button-primary:active, .big-button:active {
-  transform: translate(4px, 4px);
-  box-shadow: 0px 0px 0px #000;
+@keyframes scale-up-glow {
+  0% { transform: scale(1); filter: brightness(1); }
+  50% { transform: scale(1.5); filter: brightness(1.5) drop-shadow(0 0 10px var(--text-gold)); color: var(--text-gold); }
+  100% { transform: scale(1.2); filter: brightness(1.2); color: var(--text-gold); }
+}
+.anim-scale-up-glow { animation: scale-up-glow 0.3s ease-out forwards; z-index: 50; }
+
+@keyframes merge-pop {
+  0% { transform: scale(0.5); opacity: 0; filter: drop-shadow(0 0 0 #4caf50); }
+  50% { transform: scale(1.4); opacity: 1; filter: drop-shadow(0 0 10px #4caf50); }
+  100% { transform: scale(1); opacity: 1; filter: drop-shadow(0 0 0 #4caf50); }
+}
+.anim-merge-pop { animation: merge-pop 0.3s ease-out forwards; }
+
+.calc-token {
+  transition: all 0.2s ease-out;
+  display: inline-block;
+  overflow: hidden;
+  white-space: nowrap;
+  vertical-align: middle;
 }
 
-.button-outlined, .ghost-button, .menu-button, .option-button, .exit-button {
-  display: inline-flex;
+/* Horizontal Attacks */
+@keyframes player-attack-horiz {
+  0% { transform: translateX(0) scale(1); }
+  30% { transform: translateX(-10px) scale(0.9); }
+  60% { transform: translateX(180px) scale(1.1); }
+  80% { transform: translateX(180px) scale(1.1); }
+  100% { transform: translateX(0) scale(1); }
+}
+.anim-player-attack { animation: player-attack-horiz 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; z-index: 50; }
+
+@keyframes enemy-attack-horiz {
+  0% { transform: translateX(0) scale(1); }
+  30% { transform: translateX(10px) scale(0.9); }
+  60% { transform: translateX(-180px) scale(1.1); }
+  80% { transform: translateX(-180px) scale(1.1); }
+  100% { transform: translateX(0) scale(1); }
+}
+.anim-enemy-attack { animation: enemy-attack-horiz 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; z-index: 50; }
+
+@keyframes boss-attack-horiz {
+  0% { transform: translateX(0) scale(1); filter: brightness(1); }
+  30% { transform: translateX(20px) scale(1.1); filter: brightness(1.5) drop-shadow(0 0 10px #e53935); }
+  60% { transform: translateX(-240px) scale(1); }
+  80% { transform: translateX(-240px) scale(1); }
+  100% { transform: translateX(0) scale(1); filter: brightness(1); }
+}
+.anim-boss-attack { animation: boss-attack-horiz 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 50; }
+
+@keyframes arena-shake {
+  0%, 100% { transform: translate(0, 0); }
+  25% { transform: translate(-6px, 4px); }
+  50% { transform: translate(6px, -4px); }
+  75% { transform: translate(-6px, -4px); }
+}
+.anim-arena-shake { animation: arena-shake 0.3s ease-in-out both; }
+
+@keyframes hit-flash {
+  0%, 100% { filter: brightness(1); }
+  50% { filter: brightness(2) drop-shadow(0 0 10px #ff0000); }
+}
+.anim-hit-flash { animation: hit-flash 0.3s ease-in-out forwards; }
+
+/* ─── Countdown ─────────────────────────────────────── */
+@keyframes countdown-pop {
+  0% { transform: scale(0.5); opacity: 0; }
+  50% { transform: scale(1.2); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+.anim-countdown-pop { animation: countdown-pop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+
+/* ─── Modals Overlay ─────────────────────────── */
+.terra-modal-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.7);
+  display: none;
   align-items: center;
   justify-content: center;
-  padding: 0.75rem 1.5rem;
-  font-weight: 800;
+  z-index: 50;
+}
+.terra-modal-overlay.show { display: flex; }
+
+.terra-modal-card {
+  background: var(--panel-bg);
+  border: 4px solid var(--panel-border);
+  border-radius: 4px;
+  box-shadow: var(--shadow-block), 0 12px 32px rgba(0,0,0,0.8);
+  padding: 24px 32px;
+  width: 95%;
+  max-width: 480px;
   color: var(--text-main);
-  background: var(--bg-secondary);
-  border: 4px solid #334155;
-  box-shadow: 4px 4px 0px #000;
-  cursor: pointer;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+}
+
+/* ── Utility Classes for Drag Scroll ── */
+.drag-scroll {
+  cursor: grab;
+}
+.drag-scroll:active {
+  cursor: grabbing;
+}
+.no-select {
+  user-select: none !important;
+}
+
+.terra-modal-card h2 {
   font-family: 'Press Start 2P', monospace;
-  font-size: 0.8rem;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
+  font-size: 0.9rem;
+  color: var(--text-gold);
+  text-shadow: 2px 2px 0 rgba(0,0,0,0.8);
+  text-align: center;
+  margin: 0 0 24px;
+}
+.terra-modal-card label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.6rem;
+  color: var(--text-dim);
+  display: block;
+  margin-bottom: 8px;
+  text-shadow: 1px 1px 0 rgba(0,0,0,0.8);
+}
+.terra-modal-card input, .terra-modal-card select {
   width: 100%;
-  transition: transform 0.1s, box-shadow 0.1s;
+  padding: 12px;
+  border: 4px solid var(--panel-border);
+  border-radius: 0;
+  background: #263238;
+  color: #fff;
+  font-family: 'Comic Neue', cursive;
+  font-size: 1.1rem;
+  font-weight: 700;
+  outline: none;
+  margin-bottom: 16px;
+  box-shadow: inset 2px 2px 0 rgba(0,0,0,0.5);
+}
+.terra-modal-card input:focus, .terra-modal-card select:focus {
+  border-color: var(--text-gold);
 }
 
-.button-outlined:hover, .ghost-button:hover, .menu-button:hover, .option-button:hover {
-  transform: translate(2px, 2px);
-  box-shadow: 2px 2px 0px #000;
-  background: #334155;
-  border-color: #475569;
+/* ─── Hub Stat / Item Cards ───────────────────────────── */
+.stone-chip {
+  background: #455a64;
+  border: 4px solid var(--panel-border);
+  border-radius: 0;
+  padding: 12px;
+  text-align: center;
+  box-shadow: var(--shadow-block);
+  transition: transform 0.1s steps(2);
+}
+.stone-chip:hover { transform: translateY(-2px); border-color: var(--text-gold); }
+.stone-chip .value {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 1rem;
+  display: block;
+  margin-bottom: 8px;
+  text-shadow: 2px 2px 0 rgba(0,0,0,0.8);
 }
 
-.exit-button {
-  background: rgba(239, 68, 68, 0.2);
-  color: #fca5a5;
-  border-color: rgba(239, 68, 68, 0.3);
+/* ── Mobile Scaling & Media Queries ── */
+@media (max-width: 640px) {
+  .wood-btn {
+    padding: 12px 16px;
+    font-size: 0.7rem;
+  }
+  .title-sign {
+    padding: 12px 16px;
+  }
+  .title-sign h1 {
+    font-size: 1.2rem;
+  }
+  .terra-modal-card {
+    padding: 16px 20px;
+    width: 98%;
+  }
+}
+.stone-chip .label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.55rem;
+  color: var(--text-dim);
+  display: block;
 }
 
-.exit-button:hover {
-  background: rgba(239, 68, 68, 0.4);
-  border-color: rgba(239, 68, 68, 0.5);
+/* ─── Divider ─────────────────────────────────── */
+.terra-divider {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.6rem;
+  color: var(--text-dim);
+  text-align: center;
+  margin: 16px 0;
+  text-shadow: 1px 1px 0 rgba(0,0,0,0.8);
+}
+/* Fancy Headers */
+.fancy-header {
+  background: linear-gradient(180deg, #5c4033 0%, #3e2723 100%);
+  border: 4px solid var(--wood-border);
+  box-shadow: inset 2px 2px 0 rgba(255,255,255,0.1), 0 4px 0 rgba(0,0,0,0.6);
+  padding: 12px 16px;
+  border-radius: 8px;
+  color: #ffb300;
+  text-shadow: 2px 2px 0 rgba(0,0,0,0.8);
+  font-family: 'Press Start 2P', monospace;
+  font-size: 1.1rem;
+  margin-bottom: 20px;
+  text-align: center;
+  position: relative;
+}
+/* Hub Layout Classes */
+.hub-title-container {
+  position: absolute;
+  top: clamp(16px,4vh,40px);
+  left: clamp(16px,4vw,48px);
+  z-index: 10;
+  transform-origin: top left;
 }
 
-.tab-button {
-  padding: 0.75rem 1.25rem;
-  border-radius: 0.5rem;
-  font-weight: 600;
-  color: var(--text-muted);
-  background: transparent;
-  transition: all 0.2s ease;
-  cursor: pointer;
-  border: 1px solid transparent;
-  font-family: 'Outfit', sans-serif;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
+.hub-panel-container {
+  position: absolute;
+  bottom: clamp(16px,4vh,48px);
+  right: clamp(16px,4vw,48px);
+  z-index: 20;
+  transform-origin: bottom right;
 }
 
-.tab-button:hover {
-  color: var(--text-main);
-  background: rgba(255, 255, 255, 0.05);
+@media (max-width: 768px) {
+  .hub-title-container {
+    transform: scale(0.85);
+  }
+  .hub-panel-container {
+    transform: scale(0.85);
+  }
 }
 
-.tab-button.active {
-  color: white;
-  background: var(--bg-secondary);
-  border-color: rgba(255, 255, 255, 0.1);
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+@media (max-width: 480px) {
+  .hub-title-container {
+    transform: scale(0.7);
+  }
+  .hub-panel-container {
+    transform: scale(0.7);
+  }
+}
+/* Coin Drop Animation */
+.coin-drop {
+  position: absolute;
+  font-size: 1.5rem;
+  pointer-events: none;
+  z-index: 1000;
+  animation: coinDrop 1s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+  filter: drop-shadow(2px 2px 0 rgba(0,0,0,0.8));
 }
 
-/* Background effects */
-.bg-retro {
-  background-color: #0f172a;
-  background-image: 
-    linear-gradient(45deg, #1e293b 25%, transparent 25%, transparent 75%, #1e293b 75%, #1e293b), 
-    linear-gradient(45deg, #1e293b 25%, transparent 25%, transparent 75%, #1e293b 75%, #1e293b);
-  background-size: 64px 64px;
-  background-position: 0 0, 32px 32px;
+@keyframes coinDrop {
+  0% {
+    transform: translate(0, 0) scale(0.5);
+    opacity: 1;
+  }
+  50% {
+    transform: translate(var(--tx), var(--ty)) scale(1.2);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(var(--tx), calc(var(--ty) + 100px)) scale(1);
+    opacity: 0;
+  }
 }
-
-/* Utilities */
-.hidden { display: none !important; }

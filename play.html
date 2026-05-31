@@ -35,7 +35,7 @@
     /* ── ARENA ── */
     #gameArenaWrapper {
       flex: 1; min-height: 0;
-      position: relative; overflow: hidden;
+      position: relative; overflow: hidden; z-index: 20;
     }
     /* Darken overlay for deep cave */
     #gameArenaWrapper::before {
@@ -186,6 +186,8 @@
     
     <!-- Combat Text -->
     <div id="combatText" style="opacity:0; position:absolute; inset:0; display:flex; align-items:center; justify-content:center; z-index:50; pointer-events:none;"></div>
+    
+    <span id="lblCombo" class="absolute top-12 left-1/2 -translate-x-1/2 font-minecraft font-bold text-yellow-300 text-3xl drop-shadow-[2px_2px_0_#000] hidden whitespace-nowrap z-50 transition-transform duration-200"></span>
     
     <!-- Calculation Animation Overlay -->
     <div id="calcAnimContainer" class="hidden" style="position:absolute; inset:0; z-index:40; display:flex; align-items:center; justify-content:center; background:rgba(0,0,0,0.6); backdrop-filter:blur(2px);">

@@ -224,33 +224,55 @@ function updateTimerUI() {
   }
 }
 
-function showCombatText(text, colorClass) {
-  if (!elements.combatText) return;
-  elements.combatText.textContent = text;
+function showCombatText(text, colorClass, target = 'center') {
+  const container = document.getElementById('gameArenaWrapper');
+  if (!container) return;
   
-  // Clear inline style to allow Tailwind classes to apply
-  elements.combatText.style.opacity = '';
+  const el = document.createElement('div');
+  el.textContent = text;
   
-  elements.combatText.className = `absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-4xl md:text-6xl font-minecraft font-bold opacity-100 transition-opacity duration-300 drop-shadow-lg text-center z-30 pointer-events-none ${colorClass}`;
+  let baseClasses = 'absolute transform -translate-x-1/2 -translate-y-1/2 font-minecraft font-bold drop-shadow-[3px_3px_0_rgba(0,0,0,1)] text-center z-50 pointer-events-none ';
   
-  if (colorClass.includes('red')) {
-    elements.playerSprite.parentElement.classList.add('shake');
-    elements.playerSprite.classList.add('anim-hit-flash');
-    setTimeout(() => {
-      elements.playerSprite.parentElement.classList.remove('shake');
-      elements.playerSprite.classList.remove('anim-hit-flash');
-    }, 500);
+  if (target === 'player') {
+    el.style.top = '60%';
+    el.style.left = '25%';
+    baseClasses += 'text-xl md:text-3xl ';
+  } else if (target === 'enemy') {
+    el.style.top = '60%';
+    el.style.left = '75%';
+    baseClasses += 'text-xl md:text-3xl ';
   } else {
-    elements.enemySprite.parentElement.classList.add('shake');
-    elements.enemySprite.classList.add('anim-hit-flash');
-    setTimeout(() => {
-      elements.enemySprite.parentElement.classList.remove('shake');
-      elements.enemySprite.classList.remove('anim-hit-flash');
-    }, 500);
+    el.style.top = '50%';
+    el.style.left = '50%';
+    baseClasses += 'text-4xl md:text-6xl ';
+  }
+  
+  el.className = baseClasses + colorClass;
+  el.style.animation = 'combatTextFloat 1s cubic-bezier(0.25, 1, 0.5, 1) forwards';
+  container.appendChild(el);
+  
+  if (target === 'player' || colorClass.includes('red') || colorClass.includes('blue')) {
+    if (elements.playerSprite && elements.playerSprite.parentElement) {
+      elements.playerSprite.parentElement.classList.add('shake');
+      elements.playerSprite.classList.add('anim-hit-flash');
+      setTimeout(() => {
+        elements.playerSprite.parentElement.classList.remove('shake');
+        elements.playerSprite.classList.remove('anim-hit-flash');
+      }, 500);
+    }
+  } else {
+    if (elements.enemySprite && elements.enemySprite.parentElement) {
+      elements.enemySprite.parentElement.classList.add('shake');
+      elements.enemySprite.classList.add('anim-hit-flash');
+      setTimeout(() => {
+        elements.enemySprite.parentElement.classList.remove('shake');
+        elements.enemySprite.classList.remove('anim-hit-flash');
+      }, 500);
+    }
   }
 
   setTimeout(() => {
-    elements.combatText.style.opacity = '0';
+    if (el.parentNode) el.remove();
   }, 1000);
 }
 
@@ -386,7 +408,7 @@ function nextQuestion() {
     elements.enemySprite.textContent = enemyEmojis[getRandomInt(0, enemyEmojis.length - 1)];
     
     elements.enemySprite.parentElement.classList.remove('animate-float');
-    elements.enemySprite.style.fontSize = 'clamp(3.5rem,10vw,5rem)';
+    elements.enemySprite.style.fontSize = 'clamp(2.5rem,8vw,4rem)';
     elements.enemySprite.style.filter = 'drop-shadow(0 0 15px rgba(239,68,68,0.6))';
     elements.enemySprite.style.transform = '';
   }
@@ -688,6 +710,10 @@ async function playCalculationAnimation(exprString) {
     }
     
     let opIndex = diffIndex + 1;
+    if (['+', '-', '*', '/'].includes(steps[s-1][diffIndex])) {
+      opIndex = diffIndex;
+    }
+    
     tokenElements[opIndex - 1].classList.add('anim-scale-up-glow');
     tokenElements[opIndex].classList.add('anim-scale-up-glow');
     tokenElements[opIndex + 1].classList.add('anim-scale-up-glow');
@@ -823,9 +849,14 @@ async function submitAnswer(ans, isTimeout) {
           setTimeout(showRewardModal, 1500);
         } else {
           if (timeRatio > 0.7) {
-            showCombatText(`${getTranslation('txt_crit', settings.language)} -${damage} HP!`, 'text-yellow-300');
+            if (elements.lblCombo) {
+              elements.lblCombo.textContent = "CRITICAL HIT!";
+              elements.lblCombo.classList.remove('hidden');
+              setTimeout(() => elements.lblCombo && elements.lblCombo.classList.add('hidden'), 1000);
+            }
+            showCombatText(`${getTranslation('txt_crit', settings.language)} -${damage} HP!`, 'text-yellow-300', 'enemy');
           } else {
-            showCombatText(`-${damage} HP!`, 'text-orange-400');
+            showCombatText(`-${damage} HP!`, 'text-orange-400', 'enemy');
           }
           setTimeout(() => {
             run.currentQuestion = createQuestion('boss');
@@ -835,8 +866,7 @@ async function submitAnswer(ans, isTimeout) {
         }
       }, 250); // wait for attack lunge to connect visually
     } else {
-      setTimeout(() => {
-        showCombatText(getTranslation('txt_hit', settings.language), 'text-emerald-400');
+      showCombatText(getTranslation('txt_hit', settings.language), 'text-emerald-400', 'enemy');
         
         let baseGold = getRandomInt(5, 10);
         let baseScore = 15;
@@ -868,7 +898,6 @@ async function submitAnswer(ans, isTimeout) {
         const enemyRect = elements.enemySprite.getBoundingClientRect();
         spawnCoins(Math.ceil(gold), enemyRect.left + enemyRect.width / 2, enemyRect.top + enemyRect.height / 2);
         setTimeout(nextQuestion, 1000);
-      }, 250);
     }
   } else {
     run.streak = 0;
@@ -898,9 +927,9 @@ async function submitAnswer(ans, isTimeout) {
       setTimeout(() => elements.battleArena.classList.remove('shadow-[inset_0_0_50px_rgba(239,68,68,0.5)]'), 300);
       
       if (isTimeout) {
-        showCombatText(`${getTranslation('txt_timeout', settings.language)} -${damage} HP`, 'text-red-500');
+        showCombatText(`${getTranslation('txt_timeout', settings.language)} -${damage} HP`, 'text-red-500', 'player');
       } else {
-        showCombatText(`${getTranslation('txt_miss', settings.language)} -${damage} HP`, 'text-red-400');
+        showCombatText(`${getTranslation('txt_miss', settings.language)} -${damage} HP`, 'text-red-400', 'player');
       }
       
       if (run.health === 0) {
@@ -1122,3 +1151,10 @@ window.onload = () => {
     nextQuestion();
   });
 };
+
+window.addEventListener('beforeunload', function (e) {
+  if (typeof run !== 'undefined' && run && run.active) {
+    e.preventDefault();
+    e.returnValue = '';
+  }
+});

@@ -38,7 +38,7 @@
   </div>
 
   <!-- Game Arena (Hidden until connected) -->
-  <div id="gameArena" class="hidden flex-col h-full max-w-md mx-auto w-full flex-grow relative pt-4">
+    <div id="gameArena" class="hidden flex-col h-full relative z-10 max-w-5xl w-full mx-auto justify-between pb-4 pt-12">
     
     <!-- Opponent Area (Top) -->
     <div class="stone-panel p-3 mb-2 relative overflow-hidden" style="border-color:#b71c1c !important;">
@@ -127,6 +127,7 @@
         <button id="btnPlayAgain" class="wood-btn success flex-1 py-4 text-sm" data-i18n="btn_rematch">Rematch</button>
         <button id="btnExitMatch" class="wood-btn danger flex-1 py-4 text-sm" data-i18n="btn_leave">Leave</button>
       </div>
+      <p id="rematchStatus" class="mt-4 text-sm font-minecraft text-orange-400 hidden"></p>
     </div>
   </div>
 

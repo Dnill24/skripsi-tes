@@ -163,6 +163,7 @@ function resetLobby() {
 }
 
 function setupConnection() {
+  conn.open = true;
   setTimeout(() => {
     conn.send({ type: 'handshake', name: user, skin: skinEmojis[selectedSkin] || '🤖' });
     
@@ -717,3 +718,10 @@ elements.btnPlayAgain.onclick = () => {
     elements.rematchStatus.classList.add('hidden');
   }
 };
+
+window.addEventListener('beforeunload', function (e) {
+  if (typeof gameActive !== 'undefined' && gameActive) {
+    e.preventDefault();
+    e.returnValue = '';
+  }
+});

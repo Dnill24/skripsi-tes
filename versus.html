@@ -46,6 +46,7 @@
         <div class="flex items-center gap-2">
           <span id="opponentSprite" class="text-lg drop-shadow-md">🧍</span>
           <h3 id="opponentName" class="text-red-200 font-minecraft text-xs">Opponent</h3>
+          <span id="lblOpponentMMR" class="text-blue-300 font-minecraft text-[0.6rem] ml-2"></span>
         </div>
         <span id="opponentCombo" class="text-orange-400 font-bold hidden text-xs"></span>
       </div>
@@ -95,6 +96,7 @@
         <div class="flex gap-4">
           <span class="text-slate-400 text-xs font-minecraft" data-i18n="lbl_health">Health</span>
           <span id="lblHealth" class="text-emerald-400 text-xs font-minecraft">100/100</span>
+          <span id="lblPlayerMMR" class="text-blue-300 font-minecraft text-[0.6rem] ml-2 mt-1"></span>
         </div>
         <span id="lblCombo" class="text-orange-400 font-bold hidden text-xs transition-transform duration-200"></span>
       </div>
@@ -135,6 +137,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-database-compat.js"></script>
   <script src="firebase-config.js"></script>
   <script src="locales.js"></script>
+  <script src="sfx.js"></script>
   <script src="versus.js"></script>
-<script src="drag-scroll.js"></script></body>
+  <script src="drag-scroll.js"></script></body>
 </html>

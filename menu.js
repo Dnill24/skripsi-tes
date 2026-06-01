@@ -1,6 +1,7 @@
 const state = {
   language: 'id',
-  volume: 50
+  sfxVolume: 70,
+  musicVolume: 50
 };
 
 // Validates username for Firebase NoSQL keys
@@ -69,8 +70,10 @@ const elements = {
   cancelSignup: document.getElementById('cancelSignup'),
   
   settingsModal: document.getElementById('settingsModal'),
-  volumeSlider: document.getElementById('volumeSlider'),
-  volumeValue: document.getElementById('volumeValue'),
+  sfxVolumeSlider: document.getElementById('sfxVolumeSlider'),
+  sfxVolumeValue: document.getElementById('sfxVolumeValue'),
+  musicVolumeSlider: document.getElementById('musicVolumeSlider'),
+  musicVolumeValue: document.getElementById('musicVolumeValue'),
   languageSelect: document.getElementById('languageSelect'),
   saveSettings: document.getElementById('saveSettings'),
   closeSettings: document.getElementById('closeSettings')
@@ -90,7 +93,8 @@ function loadSettings() {
 function saveSettings() {
   localStorage.setItem('mathQuestSettings', JSON.stringify({
     language: state.language,
-    volume: state.volume
+    sfxVolume: state.sfxVolume,
+    musicVolume: state.musicVolume
   }));
 }
 
@@ -114,19 +118,19 @@ function login() {
   const password = elements.passwordInput.value.trim();
   
   if (!username) {
-    alert(getTranslation('pickHeroName', state.language) || 'Please pick a hero name to start!');
+    showToast(getTranslation('pickHeroName', state.language) || 'Please pick a hero name to start!');
     return;
   }
   
   if (typeof db === 'undefined') {
-    alert("Firebase not connected. Logging in offline.");
+    showToast("Firebase not connected. Logging in offline.");
     localStorage.setItem('mathQuestUser', JSON.stringify({ user: username, isLoggedIn: true }));
     window.location.href = 'game.html';
     return;
   }
   
   const cleanName = sanitizeUsername(username);
-  if (!cleanName) return alert("Invalid Name!");
+  if (!cleanName) return showToast("Invalid Name!");
   
   const userRef = db.ref('users/' + cleanName);
   
@@ -161,10 +165,10 @@ function login() {
         
         window.location.href = 'game.html';
       } else {
-        alert("Incorrect Password!");
+        showToast("Incorrect Password!");
       }
     } else {
-      alert("Account not found! Please Sign Up instead.");
+      showToast("Account not found! Please Sign Up instead.");
     }
   });
 }
@@ -174,23 +178,23 @@ function signup() {
   const password = elements.signupPasswordInput.value.trim();
   
   if (!username || !password) {
-    alert("Please enter a username and password!");
+    showToast("Please enter a username and password!");
     return;
   }
   
   if (typeof db === 'undefined') {
-    alert("Firebase not connected.");
+    showToast("Firebase not connected.");
     return;
   }
   
   const cleanName = sanitizeUsername(username);
-  if (!cleanName) return alert("Invalid Name!");
+  if (!cleanName) return showToast("Invalid Name!");
   
   const userRef = db.ref('users/' + cleanName);
   
   userRef.once('value', snap => {
     if (snap.exists()) {
-      alert("Username is already taken! Please pick another one.");
+      showToast("Username is already taken! Please pick another one.");
     } else {
       userRef.set({
         originalName: username,
@@ -203,14 +207,15 @@ function signup() {
         localStorage.setItem('mathQuestUser', JSON.stringify({ user: username, isLoggedIn: true }));
         window.location.href = 'game.html';
       }).catch(err => {
-        alert("Error creating account: " + err.message);
+        showToast("Error creating account: " + err.message);
       });
     }
   });
 }
 
 function saveSettingsModal() {
-  state.volume = parseInt(elements.volumeSlider.value);
+  state.sfxVolume = parseInt(elements.sfxVolumeSlider.value);
+  state.musicVolume = parseInt(elements.musicVolumeSlider.value);
   const newLang = elements.languageSelect.value;
   if (newLang !== state.language) setLanguage(newLang);
   elements.settingsModal.classList.remove('show');
@@ -223,9 +228,34 @@ elements.loginSubmitButton.addEventListener('click', login);
 elements.signupSubmitButton.addEventListener('click', signup);
 elements.saveSettings.addEventListener('click', saveSettingsModal);
 
-// Volume slider update
-elements.volumeSlider.addEventListener('input', () => {
-  elements.volumeValue.textContent = elements.volumeSlider.value + '%';
+// Volume slider updates
+elements.musicVolumeSlider.addEventListener('input', () => {
+  elements.musicVolumeValue.textContent = elements.musicVolumeSlider.value + '%';
+  state.musicVolume = parseInt(elements.musicVolumeSlider.value);
+  localStorage.setItem('mathQuestSettings', JSON.stringify({
+    language: state.language,
+    sfxVolume: state.sfxVolume,
+    musicVolume: state.musicVolume
+  }));
+  if (typeof SFX !== 'undefined') SFX.updateBGMVolume();
+});
+
+document.addEventListener('click', () => {
+  if (typeof SFX !== 'undefined') SFX.playBGM('Menu Music.mp3');
+}, { once: true });
+
+elements.sfxVolumeSlider.addEventListener('input', () => {
+  elements.sfxVolumeValue.textContent = elements.sfxVolumeSlider.value + '%';
+  // Play a test sound, passing the immediate slider value as the temporary volume level
+  if (typeof SFX !== 'undefined') {
+    // SFX.hit expects (context, vol). The vol is read from localStorage inside sfx.js,
+    // so we need to either temporarily save it or we can just use the coin/btnclick sound.
+    // Wait, the SFX engine reads from localStorage dynamically each time!
+    // So if we save immediately, the sound will reflect it. Let's do that.
+    state.sfxVolume = parseInt(elements.sfxVolumeSlider.value);
+    saveSettings(); 
+    SFX.btnClick();
+  }
 });
 
 // Allow Enter key in forms
@@ -236,13 +266,15 @@ elements.signupPasswordInput.addEventListener('keydown', e => { if (e.key === 'E
 
 // Initialize
 loadSettings();
-if (elements.volumeSlider) {
-  elements.volumeSlider.value = state.volume;
-  elements.volumeValue.textContent = state.volume + '%';
+if (elements.sfxVolumeSlider) {
+  elements.sfxVolumeSlider.value = state.sfxVolume;
+  elements.sfxVolumeValue.textContent = state.sfxVolume + '%';
+  elements.musicVolumeSlider.value = state.musicVolume;
+  elements.musicVolumeValue.textContent = state.musicVolume + '%';
 }
 if (elements.languageSelect) {
   elements.languageSelect.value = state.language;
 }
 if (typeof applyTranslationsToDOM === 'function') {
   applyTranslationsToDOM(state.language);
-}
+}

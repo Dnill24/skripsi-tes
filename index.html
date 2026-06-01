@@ -14,6 +14,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-database-compat.js"></script>
   <script src="firebase-config.js"></script>
   <script src="locales.js"></script>
+  <script src="sfx.js"></script>
   <script>tailwind.config = { theme: { extend: {} } }</script>
   <style>
     *, *::before, *::after { box-sizing: border-box; }
@@ -144,12 +145,21 @@
     <h2 data-i18n="menu_settings">SETTINGS</h2>
     <div style="display:flex; flex-direction:column; gap:24px; margin-top:16px;">
       <div style="display:flex; align-items:center; justify-content:space-between;">
-        <label for="volumeSlider" style="margin:0;">
-          <span style="font-size:1.2rem; vertical-align:middle; margin-right:4px;">🔊</span><span data-i18n="lbl_volume">Volume</span>
+        <label for="musicVolumeSlider" style="margin:0;">
+          <span style="font-size:1.2rem; vertical-align:middle; margin-right:4px;">🎵</span><span data-i18n="lbl_music_volume">Music</span>
         </label>
         <div style="display:flex; align-items:center; gap:12px;">
-          <input type="range" id="volumeSlider" min="0" max="100" value="50" style="width:100px; accent-color:var(--text-gold); cursor:pointer;">
-          <span id="volumeValue" style="font-family:'Press Start 2P',monospace; font-size:0.6rem; color:var(--text-gold); min-width:3rem;">50%</span>
+          <input type="range" id="musicVolumeSlider" min="0" max="100" value="50" style="width:100px; accent-color:var(--text-gold); cursor:pointer;">
+          <span id="musicVolumeValue" style="font-family:'Press Start 2P',monospace; font-size:0.6rem; color:var(--text-gold); min-width:3rem;">50%</span>
+        </div>
+      </div>
+      <div style="display:flex; align-items:center; justify-content:space-between;">
+        <label for="sfxVolumeSlider" style="margin:0;">
+          <span style="font-size:1.2rem; vertical-align:middle; margin-right:4px;">🔊</span><span data-i18n="lbl_sfx_volume">SFX</span>
+        </label>
+        <div style="display:flex; align-items:center; gap:12px;">
+          <input type="range" id="sfxVolumeSlider" min="0" max="100" value="70" style="width:100px; accent-color:var(--text-gold); cursor:pointer;">
+          <span id="sfxVolumeValue" style="font-family:'Press Start 2P',monospace; font-size:0.6rem; color:var(--text-gold); min-width:3rem;">70%</span>
         </div>
       </div>
       <div style="display:flex; align-items:center; justify-content:space-between;">

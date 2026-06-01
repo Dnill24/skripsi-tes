@@ -13,6 +13,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-database-compat.js"></script>
   <script src="firebase-config.js"></script>
   <script src="locales.js"></script>
+  <script src="sfx.js"></script>
   <script>tailwind.config = { theme: { extend: {} } }</script>
   <style>
     *, *::before, *::after { box-sizing: border-box; }
@@ -64,6 +65,7 @@
     <div class="title-sign">
       <h1 data-i18n="title_hub">Base Camp</h1>
       <p data-i18n="welcome">Welcome back, <span id="playerNameDisplay">Hero</span>!</p>
+      <p style="font-family: 'Press Start 2P', monospace; font-size: 0.6rem; color: #64b5f6; margin-top: 4px; text-shadow: 1px 1px 0 rgba(0,0,0,0.8);">Rank: <span id="playerMMRDisplay">10</span></p>
     </div>
   </div>
 
@@ -146,6 +148,7 @@
           <tr>
             <th style="font-family:'Press Start 2P',monospace; font-size:0.55rem; color:var(--text-gold); padding:12px; text-shadow:1px 1px 0 rgba(0,0,0,0.8); text-align:center;" data-i18n="col_rank">Rank</th>
             <th style="font-family:'Press Start 2P',monospace; font-size:0.55rem; color:var(--text-gold); padding:12px; text-shadow:1px 1px 0 rgba(0,0,0,0.8);" data-i18n="col_name">Hero</th>
+            <th style="font-family:'Press Start 2P',monospace; font-size:0.55rem; color:#64b5f6; padding:12px; text-shadow:1px 1px 0 rgba(0,0,0,0.8); text-align:right;">Rank</th>
             <th style="font-family:'Press Start 2P',monospace; font-size:0.55rem; color:var(--text-gold); padding:12px; text-shadow:1px 1px 0 rgba(0,0,0,0.8); text-align:right;" data-i18n="col_score">Score</th>
             <th style="font-family:'Press Start 2P',monospace; font-size:0.55rem; color:var(--text-gold); padding:12px; text-shadow:1px 1px 0 rgba(0,0,0,0.8); text-align:right;" data-i18n="col_date">Date</th>
           </tr>
@@ -185,10 +188,17 @@
     </div>
     <div style="display:flex; flex-direction:column; gap:24px;">
       <div style="display:flex; align-items:center; justify-content:space-between;">
-        <label for="volumeSlider" style="margin:0;">🔊 Volume</label>
+        <label for="musicVolumeSlider" style="margin:0;"><span style="font-size:1.2rem; vertical-align:middle; margin-right:4px;">🎵</span> Music</label>
         <div style="display:flex; align-items:center; gap:12px;">
-          <input type="range" id="volumeSlider" min="0" max="100" value="50" style="width:100px; padding:0; height:12px; border:none; accent-color:var(--text-gold); cursor:pointer; box-shadow:none;">
-          <span id="volumeValue" style="font-family:'Press Start 2P',monospace; font-size:0.6rem; color:var(--text-gold); min-width:3rem; text-shadow:1px 1px 0 rgba(0,0,0,0.8);">50%</span>
+          <input type="range" id="musicVolumeSlider" min="0" max="100" value="50" style="width:100px; padding:0; height:12px; border:none; accent-color:var(--text-gold); cursor:pointer; box-shadow:none;">
+          <span id="musicVolumeValue" style="font-family:'Press Start 2P',monospace; font-size:0.6rem; color:var(--text-gold); min-width:3rem; text-shadow:1px 1px 0 rgba(0,0,0,0.8);">50%</span>
+        </div>
+      </div>
+      <div style="display:flex; align-items:center; justify-content:space-between;">
+        <label for="sfxVolumeSlider" style="margin:0;"><span style="font-size:1.2rem; vertical-align:middle; margin-right:4px;">🔊</span> SFX</label>
+        <div style="display:flex; align-items:center; gap:12px;">
+          <input type="range" id="sfxVolumeSlider" min="0" max="100" value="70" style="width:100px; padding:0; height:12px; border:none; accent-color:var(--text-gold); cursor:pointer; box-shadow:none;">
+          <span id="sfxVolumeValue" style="font-family:'Press Start 2P',monospace; font-size:0.6rem; color:var(--text-gold); min-width:3rem; text-shadow:1px 1px 0 rgba(0,0,0,0.8);">70%</span>
         </div>
       </div>
       <div style="display:flex; align-items:center; justify-content:space-between;">

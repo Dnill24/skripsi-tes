@@ -233,13 +233,45 @@ h1, h2, h3, h4, h5, h6, .font-minecraft {
 
 /* Horizontal Attacks */
 @keyframes player-attack-horiz {
-  0% { transform: translateX(0) scale(1); }
-  30% { transform: translateX(-10px) scale(0.9); }
-  60% { transform: translateX(180px) scale(1.1); }
-  80% { transform: translateX(180px) scale(1.1); }
-  100% { transform: translateX(0) scale(1); }
+  0%   { transform: translateX(0)   translateY(0)    scale(1);   }
+  20%  { transform: translateX(30px) translateY(-30px) scale(1.1); }
+  55%  { transform: translateX(200px) translateY(-10px) scale(1.15); }
+  70%  { transform: translateX(200px) translateY(0)   scale(1.1); }
+  100% { transform: translateX(0)   translateY(0)    scale(1);   }
 }
-.anim-player-attack { animation: player-attack-horiz 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; z-index: 50; }
+.anim-player-attack { animation: player-attack-horiz 0.45s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; z-index: 50; }
+
+/* Slash impact effect */
+@keyframes slash-impact {
+  0%   { opacity: 1; transform: translate(-50%, -50%) scale(0.3) rotate(-30deg); }
+  40%  { opacity: 1; transform: translate(-50%, -60%) scale(1.4) rotate(15deg); }
+  100% { opacity: 0; transform: translate(-50%, -80%) scale(0.8) rotate(30deg); }
+}
+.slash-effect {
+  position: absolute;
+  font-size: 3.5rem;
+  pointer-events: none;
+  z-index: 60;
+  animation: slash-impact 0.4s ease-out forwards;
+  text-shadow: 0 0 8px #fff, 0 0 16px #ffeb3b;
+  filter: drop-shadow(2px 2px 0 rgba(0,0,0,0.8));
+}
+
+/* Boss slash - bigger */
+@keyframes slash-impact-big {
+  0%   { opacity: 1; transform: translate(-50%, -50%) scale(0.4) rotate(-20deg); }
+  30%  { opacity: 1; transform: translate(-50%, -70%) scale(2.2) rotate(10deg); }
+  100% { opacity: 0; transform: translate(-50%, -100%) scale(1.2) rotate(25deg); }
+}
+.slash-effect-big {
+  position: absolute;
+  font-size: 4rem;
+  pointer-events: none;
+  z-index: 60;
+  animation: slash-impact-big 0.55s ease-out forwards;
+  text-shadow: 0 0 12px #ff5722, 0 0 24px #ffeb3b;
+  filter: drop-shadow(2px 2px 0 rgba(0,0,0,0.8));
+}
 
 @keyframes enemy-attack-horiz {
   0% { transform: translateX(0) scale(1); }
@@ -455,7 +487,7 @@ h1, h2, h3, h4, h5, h6, .font-minecraft {
 /* Coin Drop Animation */
 .coin-drop {
   position: absolute;
-  font-size: 1.5rem;
+  font-size: clamp(1rem, 3vw, 1.5rem);
   pointer-events: none;
   z-index: 1000;
   animation: coinDrop 1s cubic-bezier(0.25, 1, 0.5, 1) forwards;
@@ -477,3 +509,56 @@ h1, h2, h3, h4, h5, h6, .font-minecraft {
   }
 }
 @keyframes combatTextFloat { 0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); } 20% { opacity: 1; transform: translate(-50%, -70%) scale(1.2); } 100% { opacity: 0; transform: translate(-50%, -150%) scale(1); } }
+
+/* ─── TOAST NOTIFICATIONS ────────────────────────────── */
+#toast-container {
+  position: fixed;
+  top: clamp(10px, 4vw, 20px);
+  right: clamp(10px, 4vw, 20px);
+  display: flex;
+  flex-direction: column;
+  gap: clamp(6px, 2vw, 10px);
+  z-index: 9999;
+  pointer-events: none;
+}
+
+.terra-toast {
+  background: var(--panel-bg);
+  border: 4px solid var(--panel-border);
+  box-shadow: var(--shadow-block);
+  color: var(--text-main);
+  padding: clamp(8px, 3vw, 16px) clamp(12px, 4vw, 20px);
+  font-family: 'Press Start 2P', monospace;
+  font-size: clamp(0.5rem, 2vw, 0.65rem);
+  line-height: 1.5;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  gap: clamp(6px, 2vw, 12px);
+  animation: toastSlideIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+  max-width: clamp(240px, 80vw, 300px);
+  text-shadow: 1px 1px 0 rgba(0,0,0,0.8);
+}
+
+.terra-toast.error {
+  border-color: #b71c1c;
+  background: #c62828;
+}
+
+.terra-toast.success {
+  border-color: #1b5e20;
+  background: #2e7d32;
+}
+
+.terra-toast.fade-out {
+  animation: toastFadeOut 0.3s ease-in forwards;
+}
+
+@keyframes toastSlideIn {
+  0% { transform: translateX(120%); opacity: 0; }
+  100% { transform: translateX(0); opacity: 1; }
+}
+@keyframes toastFadeOut {
+  0% { transform: translateX(0); opacity: 1; }
+  100% { transform: translateX(120%); opacity: 0; }
+}

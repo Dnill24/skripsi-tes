@@ -137,6 +137,11 @@ const locales = {
     txt_free: "Free",
     txt_not_enough: "Not enough gold!",
     txt_confirm_flee: "Are you sure you want to flee? You'll lose your current progress!",
+    txt_yes: "Yes",
+    txt_no: "No",
+    btn_pause: "⏸️ Pause",
+    txt_paused: "PAUSED",
+    btn_resume: "Resume",
 
     // Buffs
     buff_heal_name: "Band-Aid", buff_heal_desc: "Get +50 Health.",
@@ -310,6 +315,11 @@ const locales = {
     txt_free: "Gratis",
     txt_not_enough: "Emas tidak cukup!",
     txt_confirm_flee: "Apakah kamu yakin ingin kabur? Kemajuanmu akan hilang!",
+    txt_yes: "Ya",
+    txt_no: "Tidak",
+    btn_pause: "⏸️ Jeda",
+    txt_paused: "JEDA",
+    btn_resume: "Lanjut",
 
     // Buffs
     buff_heal_name: "Plester Luka", buff_heal_desc: "Tambah 50 Darah.",
@@ -317,7 +327,6 @@ const locales = {
     buff_time_name: "Tambah Waktu", buff_time_desc: "Dapat ekstra 2 detik tiap pertanyaan.",
     buff_greed_name: "Magnet Emas", buff_greed_desc: "Monster menjatuhkan lebih banyak Emas!",
     buff_scholar_name: "Anak Pintar", buff_scholar_desc: "Dapat lebih banyak Skor saat menjawab benar!",
-    buff_def_name: "Perisai", buff_def_desc: "Monster memberikan kerusakan lebih kecil.",
     buff_boss_name: "Pesta Bos", buff_boss_desc: "Hanya lawan Bos besar! Hadiah super besar!",
     buff_glass_name: "Pahlawan Satu Nyawa", buff_glass_desc: "Darahmu cuma 1, tapi dapat SANGAT BANYAK Emas & Skor!",
     buff_vamp_name: "Sihir Penyedot", buff_vamp_desc: "Memulihkan 10% dari damage yang kamu berikan!",
@@ -363,3 +372,97 @@ function applyTranslationsToDOM(lang = 'en') {
     }
   });
 }
+
+// Global Toast Notification System
+window.showToast = function(message, type = 'error') {
+  let container = document.getElementById('toast-container');
+  if (!container) {
+    container = document.createElement('div');
+    container.id = 'toast-container';
+    document.body.appendChild(container);
+  }
+  
+  const toast = document.createElement('div');
+  toast.className = `terra-toast ${type}`;
+  toast.innerHTML = `<span style="font-size:1.2rem; filter:drop-shadow(1px 1px 0 rgba(0,0,0,0.8));">${type === 'error' ? '⚠️' : '✅'}</span> <span>${message}</span>`;
+  
+  container.appendChild(toast);
+  
+  if (typeof SFX !== 'undefined') {
+    if (type === 'error') SFX.btnDanger();
+    else SFX.btnClick();
+  }
+  
+  setTimeout(() => {
+    toast.classList.add('fade-out');
+    setTimeout(() => toast.remove(), 300);
+  }, 3000);
+};
+// Global Custom Confirm Dialog
+window.showConfirm = function(message) {
+  return new Promise((resolve) => {
+    if (typeof SFX !== 'undefined') SFX.btnDanger();
+    
+    const overlay = document.createElement('div');
+    overlay.className = 'terra-modal-overlay show';
+    overlay.style.zIndex = '10000';
+    
+    const card = document.createElement('div');
+    card.className = 'terra-modal-card';
+    card.style.textAlign = 'center';
+    card.style.maxWidth = '400px';
+    
+    const text = document.createElement('p');
+    text.style.fontFamily = "'Press Start 2P', monospace";
+    text.style.fontSize = '0.8rem';
+    text.style.lineHeight = '1.6';
+    text.style.marginBottom = '24px';
+    text.style.color = 'var(--text-main)';
+    text.textContent = message;
+    
+    const btnContainer = document.createElement('div');
+    btnContainer.style.display = 'flex';
+    btnContainer.style.gap = '12px';
+    
+    const btnYes = document.createElement('button');
+    btnYes.className = 'wood-btn danger';
+    btnYes.style.flex = '1';
+    const lang = (window.settings && window.settings.language) ? window.settings.language : 'en';
+    btnYes.textContent = getTranslation('txt_yes', lang) || 'YES';
+    
+    const btnNo = document.createElement('button');
+    btnNo.className = 'wood-btn';
+    btnNo.style.flex = '1';
+    btnNo.textContent = getTranslation('txt_no', lang) || 'NO';
+    
+    btnYes.onclick = () => {
+      overlay.remove();
+      resolve(true);
+    };
+    
+    btnNo.onclick = () => {
+      overlay.remove();
+      if (typeof SFX !== 'undefined') SFX.btnClick();
+      resolve(false);
+    };
+    
+    btnContainer.appendChild(btnYes);
+    btnContainer.appendChild(btnNo);
+    
+    card.appendChild(text);
+    card.appendChild(btnContainer);
+    overlay.appendChild(card);
+    
+    document.body.appendChild(overlay);
+  });
+};
+
+window.getRankFromMMR = function(mmr) {
+  if (!mmr || mmr < 20) return '🪨 Iron';
+  if (mmr < 40) return '🥉 Bronze';
+  if (mmr < 60) return '🥈 Silver';
+  if (mmr < 80) return '🥇 Gold';
+  if (mmr < 100) return '💎 Platinum';
+  if (mmr < 150) return '💠 Diamond';
+  return '👑 Master';
+};

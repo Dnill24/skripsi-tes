@@ -6,17 +6,21 @@ const skinEmojis = {
   'celestial': '🌟', 'god': '♾️'
 };
 let selectedSkin = 'rainbow';
+let playerMMR = 10;
 try {
   const statsStored = localStorage.getItem('mathQuestRogueStats');
   if (statsStored) {
     const parsed = JSON.parse(statsStored);
     selectedSkin = parsed.selectedSkin || 'rainbow';
+    playerMMR = (parsed.globalStats && parsed.globalStats.playerMMR) ? parsed.globalStats.playerMMR : 10;
   }
 } catch(e){}
 
 window.addEventListener('DOMContentLoaded', () => {
   const playerVisual = document.getElementById('versusPlayerVisual');
   if (playerVisual) playerVisual.textContent = skinEmojis[selectedSkin] || '🧍';
+  const lblPlayerMMR = document.getElementById('lblPlayerMMR');
+  if (lblPlayerMMR) lblPlayerMMR.textContent = window.getRankFromMMR ? window.getRankFromMMR(playerMMR) : '🪨 Iron';
 });
 
 let settings = { volume: 50, language: 'en' };
@@ -42,12 +46,14 @@ const elements = {
   gameArena: document.getElementById('gameArena'),
   opponentSprite: document.getElementById('opponentSprite'),
   opponentName: document.getElementById('opponentName'),
+  lblOpponentMMR: document.getElementById('lblOpponentMMR'),
   opponentCombo: document.getElementById('opponentCombo'),
   barOpponentHp: document.getElementById('barOpponentHp'),
   lblOpponentHp: document.getElementById('lblOpponentHp'),
   opponentDamageText: document.getElementById('opponentDamageText'),
   
   lblHealth: document.getElementById('lblHealth'),
+  lblPlayerMMR: document.getElementById('lblPlayerMMR'),
   lblCombo: document.getElementById('lblCombo'),
   barPlayerHp: document.getElementById('barPlayerHp'),
   combatText: document.getElementById('combatText'),
@@ -106,7 +112,7 @@ function generateRoomCode() {
 }
 
 elements.btnHost.onclick = () => {
-  if (typeof db === 'undefined') return alert("Firebase not connected!");
+  if (typeof db === 'undefined') return showToast("Firebase not connected!");
   roomCode = generateRoomCode();
   myRole = 'host';
   roomRef = db.ref('rooms/' + roomCode);
@@ -130,9 +136,9 @@ elements.btnHost.onclick = () => {
 };
 
 elements.btnJoin.onclick = () => {
-  if (typeof db === 'undefined') return alert("Firebase not connected!");
+  if (typeof db === 'undefined') return showToast("Firebase not connected!");
   const code = elements.joinCodeInput.value.trim().toUpperCase();
-  if (!code) return alert("Enter a room code!");
+  if (!code) return showToast("Enter a room code!");
   
   roomCode = code;
   myRole = 'client';
@@ -145,7 +151,7 @@ elements.btnJoin.onclick = () => {
       roomRef.update({ clientConnected: true, status: 'playing' });
       setupConnection();
     } else {
-      alert("Room not found or already full!");
+      showToast("Room not found or already full!");
     }
   });
 };
@@ -165,7 +171,7 @@ function resetLobby() {
 function setupConnection() {
   conn.open = true;
   setTimeout(() => {
-    conn.send({ type: 'handshake', name: user, skin: skinEmojis[selectedSkin] || '🤖' });
+    conn.send({ type: 'handshake', name: user, skin: skinEmojis[selectedSkin] || '🧍', mmr: Math.floor(playerMMR) });
     
     elements.lobbyModal.classList.remove('show');
     elements.gameArena.classList.remove('hidden');
@@ -188,6 +194,7 @@ function setupConnection() {
 function triggerPlayerAttack() {
   const sprite = document.getElementById('versusPlayerVisual');
   if (!sprite) return;
+  if (typeof SFX !== 'undefined') SFX.slash();
   sprite.classList.remove('anim-player-attack');
   void sprite.offsetWidth;
   sprite.classList.add('anim-player-attack');
@@ -196,6 +203,7 @@ function triggerPlayerAttack() {
 function triggerEnemyAttack() {
   const sprite = document.getElementById('versusOpponentVisual');
   if (!sprite) return;
+  if (typeof SFX !== 'undefined') SFX.slash();
   sprite.classList.remove('anim-enemy-attack');
   void sprite.offsetWidth;
   sprite.classList.add('anim-enemy-attack');
@@ -206,6 +214,7 @@ function handleNetworkData(data) {
     elements.opponentName.textContent = data.name;
     const oppSkin = data.skin || '🧍';
     elements.opponentSprite.textContent = oppSkin;
+    if (elements.lblOpponentMMR) elements.lblOpponentMMR.textContent = data.mmr ? (window.getRankFromMMR ? window.getRankFromMMR(data.mmr) : `MMR: ${data.mmr}`) : '🪨 Iron';
     const oppVisual = document.getElementById('versusOpponentVisual');
     if (oppVisual) oppVisual.textContent = oppSkin;
   } else if (data.type === 'update') {
@@ -331,8 +340,10 @@ function runCountdown(callback) {
     
     if (stepVal === 'START!') {
       text.className = 'text-7xl md:text-8xl font-minecraft text-yellow-400 drop-shadow-[0_6px_0_rgba(0,0,0,1)] scale-50 opacity-0 transition-all duration-300';
+      if (typeof SFX !== 'undefined') SFX.countdownStart();
     } else {
       text.className = 'text-7xl md:text-8xl font-minecraft text-pink-500 drop-shadow-[0_6px_0_rgba(0,0,0,1)] scale-50 opacity-0 transition-all duration-300';
+      if (typeof SFX !== 'undefined') SFX.countdownBeep(stepVal);
     }
     
     void text.offsetWidth;
@@ -423,6 +434,8 @@ async function playCalculationAnimation(exprString) {
     tokenElements[opIndex].classList.add('anim-scale-up-glow');
     tokenElements[opIndex + 1].classList.add('anim-scale-up-glow');
     
+    if (typeof SFX !== 'undefined') SFX.calcStep(s);
+    
     await wait(600);
     
     let mergedVal = steps[s][diffIndex];
@@ -459,6 +472,7 @@ async function playCalculationAnimation(exprString) {
   
   tokenElements[0].classList.add('anim-scale-up-glow', 'text-emerald-400');
   tokenElements[0].classList.remove('text-yellow-400');
+  if (typeof SFX !== 'undefined') SFX.calcResult(steps.length);
   await wait(800);
   
   container.classList.add('hidden');
@@ -589,6 +603,7 @@ function updateComboUI() {
 
 function takeDamage(amt) {
   if (!gameActive) return;
+  if (typeof SFX !== 'undefined') SFX.playerHurt();
   playerHP = Math.max(0, playerHP - amt);
   elements.lblHealth.textContent = `${playerHP}/100`;
   elements.barPlayerHp.style.width = `${playerHP}%`;
@@ -639,6 +654,7 @@ async function handleAnswer(selected) {
   await playCalculationAnimation(currentQuestion.q.replace(' = ?', ''));
   
   if (correct) {
+    if (typeof SFX !== 'undefined') SFX.correct();
     combo++;
     updateComboUI();
     
@@ -661,6 +677,7 @@ async function handleAnswer(selected) {
     broadcastUpdate();
     setTimeout(nextQuestion, 800);
   } else {
+    if (typeof SFX !== 'undefined') SFX.wrong();
     combo = 0;
     updateComboUI();
     showCombatText("MISS!", "text-red-400");
@@ -672,6 +689,10 @@ async function handleAnswer(selected) {
 function endGame(title, isWin) {
   gameActive = false;
   clearInterval(timerInterval);
+  if (typeof SFX !== 'undefined') {
+    if (isWin) SFX.bossDefeated();
+    else SFX.runOver();
+  }
   elements.endMatchModal.classList.add('show');
   elements.endTitle.textContent = title;
   elements.endTitle.className = isWin ? 'text-4xl font-minecraft mb-6 drop-shadow-[3px_3px_0_rgba(0,0,0,1)] text-emerald-400' : 'text-4xl font-minecraft mb-6 drop-shadow-[3px_3px_0_rgba(0,0,0,1)] text-red-500';
@@ -725,3 +746,4 @@ window.addEventListener('beforeunload', function (e) {
     e.returnValue = '';
   }
 });
+document.addEventListener('click', () => { if (typeof SFX !== 'undefined') SFX.playBGM('Versus Music.mp3'); }, { once: true });

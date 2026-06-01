@@ -8,11 +8,14 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&family=Press+Start+2P&display=swap" rel="stylesheet">
+  <script>window.onerror = function(msg, url, line) { 
+    var el = document.getElementById('lblQuestion'); 
+    if (el) el.textContent = msg + ' at line ' + line; 
+  };</script>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-database-compat.js"></script>
   <script src="firebase-config.js"></script>
-  <script src="locales.js"></script>
   <script>tailwind.config = { theme: { extend: {} } }</script>
   <style>
     *, *::before, *::after { box-sizing: border-box; }
@@ -24,8 +27,10 @@
       border-bottom: 4px solid var(--panel-border);
       box-shadow: 0 4px 16px rgba(0,0,0,0.6);
       flex-shrink: 0;
-      padding: 12px 16px;
+      padding: 10px 16px;
       position: relative; z-index: 10;
+      max-height: 38vh;
+      overflow: hidden;
     }
     #gameHeader::before {
       content: ''; position: absolute; top:0; left:0; right:0; bottom:0;
@@ -80,16 +85,15 @@
     /* ── HUD ELEMENTS ── */
     .hud-label {
       font-family: 'Press Start 2P', monospace;
-      font-size: 0.55rem;
+      font-size: clamp(0.35rem, 1.5vw, 0.55rem);
       color: var(--text-dim);
-      text-transform: uppercase;
       display: block;
       margin-bottom: 4px;
       text-shadow: 1px 1px 0 rgba(0,0,0,0.8);
     }
     .hud-value {
       font-family: 'Press Start 2P', monospace;
-      font-size: clamp(0.7rem, 2.5vw, 0.9rem);
+      font-size: clamp(0.5rem, 2vw, 0.9rem);
       color: var(--text-gold);
       text-shadow: 2px 2px 0 rgba(0,0,0,0.8);
     }
@@ -111,24 +115,23 @@
 
   <!-- ── TOP HEADER ─────────────────────────────────── -->
   <header id="gameHeader">
-    <div id="hudTop" class="stone-panel" style="background: linear-gradient(180deg, #4e342e 0%, #3e2723 100%) !important; border-bottom:4px solid var(--wood-border); padding:16px; flex-shrink:0; position:relative; z-index:10; box-shadow:0 4px 16px rgba(0,0,0,0.8);">
-      <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:16px;">
+    <div id="hudTop" class="stone-panel" style="background: linear-gradient(180deg, #4e342e 0%, #3e2723 100%) !important; border-bottom:4px solid var(--wood-border); padding:clamp(4px, 1.5vw, 10px) clamp(6px, 1.5vw, 14px); flex-shrink:0; position:relative; z-index:10; box-shadow:0 4px 16px rgba(0,0,0,0.8);">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:nowrap; gap:clamp(2px, 1vw, 16px);">
         <!-- Flee -->
-        <button id="btnFlee" class="wood-btn danger" style="padding:6px 12px; font-size:0.55rem; width:auto; flex-shrink:0;" data-i18n="btn_flee">🏃 Flee</button>
-
+        <button id="btnFlee" class="wood-btn danger" style="padding:clamp(2px, 1vw, 6px) clamp(4px, 1.5vw, 12px); font-size:clamp(0.4rem, 1.5vw, 0.55rem); flex-shrink:0;" data-i18n="btn_flee">🏃 Flee</button>
         <!-- Stage + Score + Gold -->
         <div style="text-align:center; flex:1; min-width:0;">
-          <div style="display:flex; align-items:center; justify-content:center; gap:12px; flex-wrap:wrap;">
+          <div style="display:flex; align-items:center; justify-content:center; gap:clamp(2px, 1vw, 12px); white-space:nowrap;">
             <div>
               <span class="hud-label" data-i18n="lbl_run" style="color:#fff;">Stage</span>
               <span class="hud-value" id="lblRunStage">1</span>
             </div>
-            <div style="width:2px; height:24px; background:var(--wood-border); box-shadow:1px 0 0 rgba(255,255,255,0.1);"></div>
+            <div style="width:2px; height:24px; background:var(--wood-border); box-shadow:1px 0 0 rgba(255,255,255,0.1); flex-shrink:0;"></div>
             <div>
               <span class="hud-label" data-i18n="lbl_score" style="color:#fff;">Score</span>
               <span class="hud-value" id="lblScore">0</span>
             </div>
-            <div style="width:2px; height:24px; background:var(--wood-border); box-shadow:1px 0 0 rgba(255,255,255,0.1);"></div>
+            <div style="width:2px; height:24px; background:var(--wood-border); box-shadow:1px 0 0 rgba(255,255,255,0.1); flex-shrink:0;"></div>
             <div>
               <span class="hud-label" data-i18n="gold_label" style="color:#fff;">Gold: </span>
               <span class="hud-value" id="lblRunGold" style="color:var(--text-gold);">0</span>
@@ -136,33 +139,33 @@
           </div>
           
           <!-- Active Buffs -->
-          <div id="activeBuffsContainer" style="display:flex; gap:8px; margin-top:8px; justify-content:center; min-height:24px; flex-wrap:wrap;"></div>
+          <div id="activeBuffsContainer" style="display:flex; gap:6px; margin-top:6px; justify-content:center; align-items:center; height:26px; overflow-x:auto; overflow-y:hidden; scrollbar-width:none; flex-shrink:0;"></div>
         </div>
 
         <!-- HP -->
         <div style="text-align:right; flex-shrink:0;">
           <span class="hud-label" data-i18n="lbl_hp" style="color:#fff;">HP</span>
-          <span class="hud-value green" id="lblHealth">3/3</span>
+          <span class="hud-value green" id="lblHealth">100/100</span>
         </div>
       </div>
     </div>
 
     <!-- Progress bars row -->
-    <div style="margin-top:12px; display:flex; flex-direction:column; gap:6px;">
+    <div style="margin-top:clamp(2px, 1vw, 6px); padding: 0 clamp(8px, 2vw, 16px) clamp(2px, 1vw, 6px); display:flex; flex-direction:column; gap:2px;">
       <!-- Stage progress -->
-      <div style="display:flex; align-items:center; gap:8px; margin-bottom:2px;">
-        <span class="hud-label" style="color:#64b5f6;" data-i18n="lbl_stage_progress">STAGE PROGRESS</span>
+      <div style="display:flex; align-items:center; gap:8px; margin-bottom:0;">
+        <span class="hud-label" style="color:#64b5f6; margin-bottom:2px;" data-i18n="lbl_stage_progress">STAGE PROGRESS</span>
       </div>
-      <div class="bar-track">
-        <div id="barProgress" class="bar-fill bar-fill-prog" style="width:0%;"></div>
+      <div class="bar-track" style="height:clamp(6px, 1.5vw, 12px);">
+        <div id="barProgress" class="bar-fill bar-fill-prog" style="width:0%; height:100%;"></div>
       </div>
       <!-- Boss HP -->
       <div id="bossHpContainer" style="display:none;">
-        <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px;">
-          <span class="hud-label" style="color:#ff5252; animation:pulse-glow 1.5s infinite;" data-i18n="lbl_boss_hp">BOSS HP</span>
+        <div style="display:flex; align-items:center; gap:8px; margin-bottom:0;">
+          <span class="hud-label" style="color:#ff5252; margin-bottom:2px; animation:pulse-glow 1.5s infinite;" data-i18n="lbl_boss_hp">BOSS HP</span>
         </div>
-        <div class="bar-track" style="height:12px;">
-          <div id="barBossHp" class="bar-fill bar-fill-boss" style="width:100%; height:12px;"></div>
+        <div class="bar-track" style="height:clamp(6px, 1.5vw, 12px);">
+          <div id="barBossHp" class="bar-fill bar-fill-boss" style="width:100%; height:100%;"></div>
         </div>
       </div>
     </div>
@@ -176,7 +179,7 @@
     <!-- Countdown Overlay -->
     <div id="countdownOverlay" style="display:none; position:absolute; inset:0; background:rgba(0,0,0,0.6); align-items:center; justify-content:center; z-index:40; pointer-events:none;">
       <div id="countdownText" class="font-minecraft"
-        style="font-size:clamp(5rem,20vw,9rem); color:var(--text-gold); text-shadow:4px 4px 0 rgba(0,0,0,0.9); opacity:0; transform:scale(0.5);">
+        style="font-size:clamp(2rem,15vw,9rem); color:var(--text-gold); text-shadow:4px 4px 0 rgba(0,0,0,0.9); opacity:0; transform:scale(0.5);">
         3
       </div>
     </div>
@@ -187,21 +190,23 @@
     <!-- Combat Text -->
     <div id="combatText" style="opacity:0; position:absolute; inset:0; display:flex; align-items:center; justify-content:center; z-index:50; pointer-events:none;"></div>
     
-    <span id="lblCombo" class="absolute top-12 left-1/2 -translate-x-1/2 font-minecraft font-bold text-yellow-300 text-3xl drop-shadow-[2px_2px_0_#000] hidden whitespace-nowrap z-50 transition-transform duration-200"></span>
+    <span id="lblCombo" class="absolute top-12 left-1/2 -translate-x-1/2 font-minecraft font-bold text-yellow-300 text-xl md:text-3xl drop-shadow-[2px_2px_0_#000] hidden whitespace-nowrap z-50 transition-transform duration-200"></span>
     
     <!-- Calculation Animation Overlay -->
     <div id="calcAnimContainer" class="hidden" style="position:absolute; inset:0; z-index:40; display:flex; align-items:center; justify-content:center; background:rgba(0,0,0,0.6); backdrop-filter:blur(2px);">
-      <div id="calcAnimContent" style="font-size:3rem; font-family:'Press Start 2P', monospace; text-shadow:2px 2px 0 #000; color:#fff;"></div>
+      <div id="calcAnimContent" style="font-size:clamp(1.2rem, 6vw, 3rem); font-family:'Press Start 2P', monospace; text-shadow:2px 2px 0 #000; color:#fff; text-align:center; display:flex; flex-wrap:wrap; justify-content:center; align-items:center; line-height:1.5;"></div>
     </div>
     
     <!-- Arena Canvas -->
     <div id="arenaContent" style="position:absolute; inset:0; z-index:10;">
       <!-- Hero -->
-      <div id="playerSprite" style="position:absolute; left:15%; bottom:20px; font-size:clamp(3rem,8vw,5rem); filter:drop-shadow(2px 4px 0 rgba(0,0,0,0.6)); transition:transform 0.1s; transform-origin:bottom center;">
-        🧍
+      <div id="playerSpriteContainer" style="position:absolute; left:5%; bottom:20px;">
+        <div id="playerSprite" style="font-size:clamp(4.5rem,12vw,7.5rem); filter:drop-shadow(2px 4px 0 rgba(0,0,0,0.6)); transition:transform 0.1s; transform-origin:bottom center;">
+          🧍
+        </div>
       </div>
       <!-- Enemy -->
-      <div id="enemyContainer" style="position:absolute; right:15%; bottom:20px; text-align:center;">
+      <div id="enemyContainer" style="position:absolute; right:5%; bottom:20px; text-align:center;">
         <div id="enemySprite" style="font-size:clamp(4rem,10vw,6rem); filter:drop-shadow(2px 4px 0 rgba(0,0,0,0.6)); transition:transform 0.2s; transform-origin:bottom center;">
           🦇
         </div>
@@ -216,7 +221,7 @@
   <!-- ── FOOTER UI ──────────────────────────────────── -->
   <footer id="questionFooter">
     <div id="lblQuestion" class="font-minecraft text-white text-center mb-4 text-2xl drop-shadow-md">
-      Loading...
+      Get Ready!
     </div>
     
     <div id="timerContainer" style="margin-bottom:16px;">
@@ -274,6 +279,8 @@
     </div>
   </div>
 
+<script src="locales.js"></script>
+<script src="sfx.js"></script>
 <script src="play.js"></script>
 </body>
 </html>

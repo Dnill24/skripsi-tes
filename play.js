@@ -41,10 +41,11 @@ let totalRuns = 0;
 let highestStreak = 0;
 let totalQuestionsAnswered = 0;
 let selectedSkin = 'rainbow';
-let globalStats = { '+': 0, '-': 0, '*': 0, '/': 0, fastestTime: 999, bossRushBosses: 0, glassCannonBosses: 0, comboGod: 0 };
+let globalStats = { '+': 0, '-': 0, '*': 0, '/': 0, fastestTime: 999, bossRushBosses: 0, glassCannonBosses: 0, comboGod: 0, playerMMR: 10 };
 
 let gameMode = localStorage.getItem('mathQuestMode') || 'normal';
 let settings = { volume: 50, language: 'en' };
+let currentQuestion = null;
 
 let timerInterval;
 let MAX_TIME = 15;
@@ -88,28 +89,28 @@ const skinEmojis = {
   'rainbow': '🧍', 'peasant': '👦', 'adventurer': '🎒', 'stone': '🗿',
   'knight': '🛡️', 'mage': '🧙', 'glow': '⚡', 'ninja': '🥷', 'robot': '🤖',
   'gold': '👑', 'diamond': '💎', 'fire': '🔥', 'ice': '❄️', 'phantom': '👻',
-  'alien': '👽', 'demon': '👹', 'angel': '👼', 'dragon': '🐉', 'void': '🌌',
-  'celestial': '🌟', 'god': '♾️'
+  'alien': '👽', 'demon': '👹', 'angel': '👼', 'dragon': '🐲', 'void': '🌌',
+  'celestial': '🌟', 'god': '⛩️'
 };
 
-const bossEmojis = ['🐉', '🧟', '🧛', '👹', '👽', '💀', '🤡', '🤖', '🦖', '🦍', '👁️', '🎃'];
+const bossEmojis = ['🐲', '🧟', '🧛', '👹', '👽', '💀', '🤡', '🤖', '🦖', '🦂', '👁️', '🎃'];
 const enemyEmojis = ['👾', '👻', '🦇', '🕷️', '🐍'];
 
 const buffPool = [
   { id: 'heal', nameKey: 'buff_heal_name', descKey: 'buff_heal_desc', icon: '❤️', apply: () => { run.health = Math.min(Number(run.maxHealth), Number(run.health) + 50); } },
   { id: 'vitality', nameKey: 'buff_vit_name', descKey: 'buff_vit_desc', icon: '💪', apply: () => { run.maxHealth = Number(run.maxHealth) + 25; run.health = Number(run.health) + 25; } },
-  { id: 'time', nameKey: 'buff_time_name', descKey: 'buff_time_desc', icon: '⏳', apply: () => { MAX_TIME += 2; } },
+  { id: 'time', nameKey: 'buff_time_name', descKey: 'buff_time_desc', icon: '⌛', apply: () => { MAX_TIME += 2; } },
   { id: 'greed', nameKey: 'buff_greed_name', descKey: 'buff_greed_desc', icon: '💰', apply: () => { run.modifiers.goldMult += 0.5; } },
   { id: 'scholar', nameKey: 'buff_scholar_name', descKey: 'buff_scholar_desc', icon: '📚', apply: () => { run.modifiers.scoreMult += 0.5; } },
   { id: 'defense', nameKey: 'buff_def_name', descKey: 'buff_def_desc', icon: '🛡️', apply: () => { run.modifiers.dmgReduction += 3; } },
   { id: 'bossrush', nameKey: 'buff_boss_name', descKey: 'buff_boss_desc', icon: '💀', apply: () => { run.modifiers.bossRush = true; run.modifiers.goldMult += 2.0; run.modifiers.scoreMult += 2.0; } },
-  { id: 'glasscannon', nameKey: 'buff_glass_name', descKey: 'buff_glass_desc', icon: '🧨', apply: () => { run.modifiers.glassCannon = true; run.maxHealth = 1; run.health = 1; run.modifiers.goldMult += 2.0; run.modifiers.scoreMult += 2.0; } },
+  { id: 'glasscannon', nameKey: 'buff_glass_name', descKey: 'buff_glass_desc', icon: '🧪', apply: () => { run.modifiers.glassCannon = true; run.maxHealth = 1; run.health = 1; run.modifiers.goldMult += 2.0; run.modifiers.scoreMult += 2.0; } },
   { id: 'vampirism', nameKey: 'buff_vamp_name', descKey: 'buff_vamp_desc', icon: '🦇', apply: () => { run.modifiers.vampirism = true; } },
   { id: 'gambler', nameKey: 'buff_gambler_name', descKey: 'buff_gambler_desc', icon: '🎲', apply: () => { run.modifiers.gambler = true; } },
   { id: 'ninelives', nameKey: 'buff_nine_name', descKey: 'buff_nine_desc', icon: '🐱', apply: () => { run.modifiers.nineLives = true; } },
-  { id: 'timewarp', nameKey: 'buff_warp_name', descKey: 'buff_warp_desc', icon: '⏱️', apply: () => { run.modifiers.timeMult = (run.modifiers.timeMult || 1.0) * 0.33; run.modifiers.scoreMult += 2.0; } },
+  { id: 'timewarp', nameKey: 'buff_warp_name', descKey: 'buff_warp_desc', icon: '⏳', apply: () => { run.modifiers.timeMult = (run.modifiers.timeMult || 1.0) * 0.33; run.modifiers.scoreMult += 2.0; } },
   { id: 'midas', nameKey: 'buff_midas_name', descKey: 'buff_midas_desc', icon: '✨', apply: () => { run.modifiers.goldMult += 4.0; run.modifiers.enemyDamageMult = (run.modifiers.enemyDamageMult || 1) * 2; } },
-  { id: 'slowmo', nameKey: 'buff_slowmo_name', descKey: 'buff_slowmo_desc', icon: '🐌', apply: () => { run.modifiers.timeMult = (run.modifiers.timeMult || 1.0) * 2.0; run.modifiers.scoreMult *= 0.5; } },
+  { id: 'slowmo', nameKey: 'buff_slowmo_name', descKey: 'buff_slowmo_desc', icon: '🐢', apply: () => { run.modifiers.timeMult = (run.modifiers.timeMult || 1.0) * 2.0; run.modifiers.scoreMult *= 0.5; } },
   { id: 'berserk', nameKey: 'buff_berserk_name', descKey: 'buff_berserk_desc', icon: '💢', apply: () => { run.modifiers.berserk = true; run.modifiers.scoreMult += 0.5; MAX_TIME = Math.max(5, MAX_TIME - 5); } }
 ];
 let user = 'Hero';
@@ -132,7 +133,8 @@ function loadState() {
       highestStreak = parsed.highestStreak ?? 0;
       totalQuestionsAnswered = parsed.totalQuestionsAnswered ?? 0;
       selectedSkin = parsed.selectedSkin || 'rainbow';
-      globalStats = parsed.globalStats || { '+': 0, '-': 0, '*': 0, '/': 0, fastestTime: 999, bossRushBosses: 0, glassCannonBosses: 0, comboGod: 0 };
+      globalStats = parsed.globalStats || { '+': 0, '-': 0, '*': 0, '/': 0, fastestTime: 999, bossRushBosses: 0, glassCannonBosses: 0, comboGod: 0, playerMMR: 10 };
+      globalStats.playerMMR = globalStats.playerMMR ?? 10;
     } catch(e){}
   }
   
@@ -188,6 +190,7 @@ function shuffleArray(array) {
   return array.sort(() => Math.random() - 0.5);
 }
 
+
 function startTimer() {
   clearInterval(timerInterval);
   let mult = run.modifiers.timeMult || 1.0;
@@ -213,14 +216,15 @@ function updateTimerUI() {
   
   if (percent > 50) {
     elements.barTimer.style.background = '#34d399';
+    elements.barTimer.style.animation = '';
   } else if (percent > 20) {
     elements.barTimer.style.background = '#fbbf24';
+    elements.barTimer.style.animation = '';
   } else {
     elements.barTimer.style.background = '#ef4444';
     elements.barTimer.style.animation = 'pulse 1s infinite';
-  }
-  if (percent > 20) {
-    elements.barTimer.style.animation = '';
+    // Tick every ~1 second while in the red
+    if (Math.round(timeLeft * 10) % 10 === 0) SFX.timerTick();
   }
 }
 
@@ -236,15 +240,15 @@ function showCombatText(text, colorClass, target = 'center') {
   if (target === 'player') {
     el.style.top = '60%';
     el.style.left = '25%';
-    baseClasses += 'text-xl md:text-3xl ';
+    baseClasses += 'text-sm md:text-3xl ';
   } else if (target === 'enemy') {
     el.style.top = '60%';
     el.style.left = '75%';
-    baseClasses += 'text-xl md:text-3xl ';
+    baseClasses += 'text-sm md:text-3xl ';
   } else {
     el.style.top = '50%';
     el.style.left = '50%';
-    baseClasses += 'text-4xl md:text-6xl ';
+    baseClasses += 'text-2xl md:text-6xl ';
   }
   
   el.className = baseClasses + colorClass;
@@ -290,8 +294,9 @@ function updateComboUI() {
 
 function updateStatsUI() {
   if (elements.lblRunGold) elements.lblRunGold.textContent = Math.floor(run.goldEarned);
+  if (elements.lblScore) elements.lblScore.textContent = Math.floor(run.score);
   if (elements.activeBuffsContainer) {
-    elements.activeBuffsContainer.innerHTML = run.activeBuffs.map(icon => `<span style="font-size:1.2rem; filter:drop-shadow(1px 1px 0 #000); cursor:help;" title="Active Buff">${icon}</span>`).join('');
+    elements.activeBuffsContainer.innerHTML = run.activeBuffs.map(icon => `<span style="font-size:1.1rem; filter:drop-shadow(1px 1px 0 #000); cursor:help;" title="Active Buff">${icon}</span>`).join('');
   }
   if (elements.lblDefense) elements.lblDefense.textContent = run.modifiers.dmgReduction;
   if (elements.lblGoldMod) elements.lblGoldMod.textContent = run.modifiers.goldMult.toFixed(1) + 'x';
@@ -357,6 +362,7 @@ function showRewardModal() {
       <div style="font-family:'Comic Neue',cursive; font-size:1rem; color:#ccc; text-align:center; line-height:1.2;">${getTranslation(buff.descKey, settings.language)}</div>
     `;
     card.onclick = () => {
+      SFX.buffPick();
       buff.apply();
       run.activeBuffs.push(buff.icon);
       if (run.modifiers.glassCannon) {
@@ -378,7 +384,8 @@ function showRewardModal() {
 let bgPositionX = 0;
 
 function nextQuestion() {
-  if (!run.active) return;
+  if (elements.runOverModal.classList.contains('show')) return;
+  run.active = true;
   
   // Scroll background to simulate walking deeper
   bgPositionX -= 20;
@@ -400,9 +407,10 @@ function nextQuestion() {
     elements.enemySprite.textContent = bossEmojis[(run.bossesEncountered - 1) % bossEmojis.length];
     
     elements.enemySprite.parentElement.classList.add('animate-float');
-    elements.enemySprite.style.fontSize = 'clamp(4rem,13vw,6rem)';
+    elements.enemySprite.style.fontSize = 'clamp(6rem,19.5vw,9rem)';
     elements.enemySprite.style.filter = 'drop-shadow(0 0 30px rgba(239,68,68,0.8))';
     elements.enemySprite.style.transform = 'scale(1.1)';
+    if (typeof SFX !== 'undefined') SFX.playBGM('Boss Music.mp3');
   } else if (!run.isBoss) {
     elements.bossHpContainer.style.display = 'none';
     elements.enemySprite.textContent = enemyEmojis[getRandomInt(0, enemyEmojis.length - 1)];
@@ -411,11 +419,27 @@ function nextQuestion() {
     elements.enemySprite.style.fontSize = 'clamp(2.5rem,8vw,4rem)';
     elements.enemySprite.style.filter = 'drop-shadow(0 0 15px rgba(239,68,68,0.6))';
     elements.enemySprite.style.transform = '';
+    if (typeof SFX !== 'undefined') SFX.playBGM('Battle Music.mp3');
   }
 
   run.currentQuestion = createQuestion(run.isBoss ? 'boss' : 'enemy');
   renderQuestion();
   startTimer();
+}
+
+function calculateEquationWeight(exprStr) {
+  let tokens = exprStr.split(' ');
+  let weight = 0;
+  let opMult = 1.0;
+  for (let t of tokens) {
+    if (['+', '-'].includes(t)) opMult += 0.2;
+    else if (['*', '/'].includes(t)) opMult += 1.5;
+    else {
+      let v = Math.abs(parseInt(t));
+      weight += (v.toString().length * 2) + (v * 0.1);
+    }
+  }
+  return weight * opMult;
 }
 
 function createQuestion(type) {
@@ -425,138 +449,89 @@ function createQuestion(type) {
   }
 
   const primaryOp = ops[getRandomInt(0, ops.length - 1)];
-  const diffMultiplier = run.difficultyLevel;
+  const targetMMR = (globalStats.playerMMR || 10) + (run.difficultyLevel * 2);
   
-  const stage = Math.floor(run.questionsAnswered / 10) + 1;
   let numTerms = 2;
-  
-  if (primaryOp === '+' || primaryOp === '-') {
-    if (stage === 2) numTerms = 3;
-    else if (stage >= 3) numTerms = 4;
-  } else if (gameMode === 'normal' && primaryOp !== '/') {
-    // Allows mixed questions to have 3 terms slightly later
-    if (stage >= 3) numTerms = 3;
+  if ((primaryOp === '+' || primaryOp === '-') && targetMMR > 30 && Math.random() > 0.5) {
+    numTerms = 3;
+    if (targetMMR > 50 && Math.random() > 0.5) numTerms = 4;
+  } else if (gameMode === 'normal' && primaryOp !== '/' && targetMMR > 40 && Math.random() > 0.5) {
+    numTerms = 3;
   }
 
-  let text = "";
-  let answer = 0;
+  let bestExpr = null;
+  let bestDiff = 999999;
+  let bestAns = 0;
 
-  function buildMixed() {
+  for (let attempt = 0; attempt < 50; attempt++) {
+    let exprStr = "";
+    let answer = 0;
+    
+    let bound = Math.max(5, targetMMR * 1.5);
+    if (primaryOp === '*' || primaryOp === '/') bound = Math.max(3, targetMMR * 0.4);
+
+    if (numTerms > 2 && (gameMode === 'normal' && primaryOp !== '/')) {
       let terms = [];
       let expOps = [primaryOp];
       for(let i=1; i<numTerms-1; i++) {
-          expOps.push(['+', '-', '*'][getRandomInt(0, 2)]);
+        expOps.push(['+', '-', '*'][getRandomInt(0, 2)]);
       }
       expOps = shuffleArray(expOps);
 
       for(let i=0; i<numTerms; i++) {
-          terms.push(getRandomInt(2, Math.floor(8 + diffMultiplier * 2)));
+        terms.push(getRandomInt(2, Math.floor(bound)));
       }
       
-      let exprStr = terms[0].toString();
+      exprStr = terms[0].toString();
       for(let i=0; i<expOps.length; i++) {
-          exprStr += " " + expOps[i] + " " + terms[i+1];
+        exprStr += " " + expOps[i] + " " + terms[i+1];
       }
-      
-      let val = new Function('return ' + exprStr)();
-      if (val < 0 || !Number.isInteger(val)) return null;
-      
-      return { text: exprStr, answer: val };
-  }
-
-  if (numTerms > 2) {
-      if (gameMode === 'normal' && primaryOp !== '/') {
-          let mixed = null;
-          let attempts = 0;
-          while (!mixed && attempts < 10) {
-              mixed = buildMixed();
-              attempts++;
-          }
-          if (mixed) {
-              text = mixed.text;
-              answer = mixed.answer;
-          }
-      } 
-      
-      if (!text) {
-          if (primaryOp === '/') {
-              let terms = [];
-              let ans = getRandomInt(2, Math.floor(5 + diffMultiplier));
-              for(let i=1; i<numTerms; i++) {
-                  terms.push(getRandomInt(2, Math.floor(3 + diffMultiplier * 0.5)));
-              }
-              let A = ans;
-              for(let i=0; i<terms.length; i++) A *= terms[i];
-              
-              text = A.toString();
-              for(let i=0; i<terms.length; i++) {
-                  text += " / " + terms[i];
-              }
-              answer = ans;
-          } else if (primaryOp === '*') {
-              let prod = 1;
-              let terms = [];
-              for(let i=0; i<numTerms; i++) {
-                  let v = getRandomInt(2, Math.floor(4 + diffMultiplier * 0.5));
-                  terms.push(v);
-                  prod *= v;
-              }
-              text = terms.join(" * ");
-              answer = prod;
-          } else if (primaryOp === '+') {
-              let sum = 0;
-              let terms = [];
-              for(let i=0; i<numTerms; i++) {
-                  let v = getRandomInt(5, Math.floor(15 * diffMultiplier));
-                  terms.push(v);
-                  sum += v;
-              }
-              text = terms.join(" + ");
-              answer = sum;
-          } else if (primaryOp === '-') {
-              let terms = [];
-              let first = getRandomInt(20 * numTerms, Math.floor(30 * diffMultiplier * numTerms));
-              terms.push(first);
-              let current = first;
-              for(let i=1; i<numTerms; i++) {
-                  let v = getRandomInt(2, Math.floor(15 * diffMultiplier));
-                  if (current - v < 0) v = current;
-                  terms.push(v);
-                  current -= v;
-              }
-              text = terms.join(" - ");
-              answer = current;
-          }
-      }
-  } else {
+      answer = new Function('return ' + exprStr)();
+    } else {
       let a, b;
       if (primaryOp === '+') {
-        a = getRandomInt(10, Math.floor(20 * diffMultiplier));
-        b = getRandomInt(5, Math.floor(15 * diffMultiplier));
+        a = getRandomInt(2, Math.floor(bound));
+        b = getRandomInt(2, Math.floor(bound));
         answer = a + b;
       } else if (primaryOp === '-') {
-        a = getRandomInt(10, Math.floor(25 * diffMultiplier));
-        b = getRandomInt(5, Math.min(a, Math.floor(15 * diffMultiplier)));
+        a = getRandomInt(10, Math.floor(bound * 2));
+        b = getRandomInt(2, Math.min(a, Math.floor(bound)));
         answer = a - b;
       } else if (primaryOp === '*') {
-        a = getRandomInt(2, Math.floor(8 + (diffMultiplier * 2)));
-        b = getRandomInt(2, Math.floor(8 + (diffMultiplier * 2)));
+        a = getRandomInt(2, Math.floor(bound));
+        b = getRandomInt(2, Math.floor(bound));
         answer = a * b;
       } else if (primaryOp === '/') {
-        answer = getRandomInt(2, Math.floor(8 + (diffMultiplier * 2)));
-        b = getRandomInt(2, Math.floor(8 + (diffMultiplier * 2)));
+        answer = getRandomInt(2, Math.floor(bound));
+        b = getRandomInt(2, Math.floor(bound));
         a = answer * b;
       }
-      text = `${a} ${primaryOp} ${b}`;
+      exprStr = `${a} ${primaryOp} ${b}`;
+    }
+
+    if (answer >= 0 && Number.isInteger(answer)) {
+      let weight = calculateEquationWeight(exprStr);
+      let diff = Math.abs(weight - targetMMR);
+      if (diff < bestDiff) {
+        bestDiff = diff;
+        bestExpr = exprStr;
+        bestAns = answer;
+      }
+    }
+  }
+  
+  if (!bestExpr) {
+    bestExpr = "2 + 2";
+    bestAns = 4;
   }
 
-  const options = [answer];
+  const options = [bestAns];
   while (options.length < 4) {
-    const wrong = answer + (Math.random() < 0.5 ? 1 : -1) * getRandomInt(1, Math.floor(10 * diffMultiplier));
-    if (!options.includes(wrong) && wrong >= 0 && wrong !== answer) options.push(wrong);
+    const wrong = bestAns + (Math.random() < 0.5 ? 1 : -1) * getRandomInt(1, Math.max(5, Math.floor(targetMMR * 0.2)));
+    if (!options.includes(wrong) && wrong >= 0 && wrong !== bestAns) options.push(wrong);
   }
 
-  return { text: text, answers: shuffleArray(options), correct: answer, operator: primaryOp };
+  return { text: bestExpr, answers: shuffleArray(options), correct: bestAns, operator: primaryOp };
 }
 
 function renderQuestion() {
@@ -577,8 +552,8 @@ function renderQuestion() {
       box-shadow: inset -3px -3px 0 rgba(0,0,0,0.3), inset 3px 3px 0 rgba(255,255,255,0.2), 0 4px 0 #4e342e;
       cursor: pointer;
       width: 100%;
-      min-height: 54px;
-      max-height: 72px;
+      min-height: clamp(36px, 8vh, 54px);
+      max-height: clamp(48px, 12vh, 72px);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -612,11 +587,55 @@ function renderQuestion() {
 
 
 
+// ——— SOUND ENGINE (Web Audio API — no files needed) ————————————————
+// The SFX engine is now loaded globally from sfx.js
+
+// ——— SLASH VFX ——————————————————————————————————————————————————————
+function spawnSlashAt(targetEl, isBoss = false) {
+  const arena = document.getElementById('gameArenaWrapper');
+  if (!arena || !targetEl) return;
+  const arenaRect = arena.getBoundingClientRect();
+  const tRect = targetEl.getBoundingClientRect();
+  const cx = tRect.left + tRect.width / 2 - arenaRect.left;
+  const cy = tRect.top + tRect.height / 2 - arenaRect.top;
+
+  const slashSymbols = ['⚔️', '✨', '💥', '⚡'];
+  const sym = slashSymbols[Math.floor(Math.random() * slashSymbols.length)];
+
+  const el = document.createElement('div');
+  el.textContent = sym;
+  el.className = isBoss ? 'slash-effect-big' : 'slash-effect';
+  el.style.left = cx + 'px';
+  el.style.top = cy + 'px';
+  arena.appendChild(el);
+  setTimeout(() => el.remove(), 600);
+}
+
 function triggerPlayerAttack() {
   const sprite = elements.playerSprite;
   sprite.classList.remove('anim-player-attack');
   void sprite.offsetWidth;
   sprite.classList.add('anim-player-attack');
+
+  SFX.slash();
+
+  // Spawn slash at enemy after lunge reaches ~55% of animation
+  setTimeout(() => {
+    SFX.hit();
+    if (run.isBoss) {
+      spawnSlashAt(elements.enemySprite, true);
+      SFX.bossHit();
+    } else {
+      spawnSlashAt(elements.enemySprite, false);
+    }
+    // Enemy flash on impact
+    if (elements.enemySprite) {
+      elements.enemySprite.classList.remove('anim-hit-flash');
+      void elements.enemySprite.offsetWidth;
+      elements.enemySprite.classList.add('anim-hit-flash');
+      setTimeout(() => elements.enemySprite.classList.remove('anim-hit-flash'), 300);
+    }
+  }, 250);
 }
 
 function triggerEnemyAttack() {
@@ -630,9 +649,16 @@ function triggerEnemyAttack() {
     void elements.battleArena.offsetWidth;
     setTimeout(() => {
       elements.battleArena.classList.add('anim-arena-shake');
+      SFX.playerHurt();
+      // Enemy slash on player
+      spawnSlashAt(elements.playerSprite, false);
     }, 350);
   } else {
     sprite.classList.add('anim-enemy-attack');
+    setTimeout(() => {
+      SFX.playerHurt();
+      spawnSlashAt(elements.playerSprite, false);
+    }, 250);
   }
 }
 
@@ -701,6 +727,7 @@ async function playCalculationAnimation(exprString) {
   await wait(500);
   
   for (let s = 1; s < steps.length; s++) {
+    const stepIndex = s - 1; // for pitch ladder
     let diffIndex = -1;
     for (let i = 0; i < steps[s-1].length; i++) {
       if (steps[s-1][i] !== steps[s][i]) {
@@ -718,6 +745,7 @@ async function playCalculationAnimation(exprString) {
     tokenElements[opIndex].classList.add('anim-scale-up-glow');
     tokenElements[opIndex + 1].classList.add('anim-scale-up-glow');
     
+    SFX.calcStep(stepIndex);
     await wait(600);
     
     let mergedVal = steps[s][diffIndex];
@@ -754,13 +782,16 @@ async function playCalculationAnimation(exprString) {
   
   tokenElements[0].classList.add('anim-scale-up-glow', 'text-emerald-400');
   tokenElements[0].classList.remove('text-yellow-400');
+  // Play the final "result reveal" tone — highest pitch in the ladder
+  SFX.calcResult(steps.length - 1);
   await wait(800);
   
   container.classList.add('hidden');
 }
 
-async function submitAnswer(ans, isTimeout) {
+async function submitAnswer(ans, isTimeout = false) {
   if (!run.active) return;
+  run.active = false;
   clearInterval(timerInterval);
   
   run.questionsAnswered++;
@@ -795,9 +826,15 @@ async function submitAnswer(ans, isTimeout) {
     const timeTaken = currentMaxTime - timeLeft;
     if (timeTaken < globalStats.fastestTime) globalStats.fastestTime = timeTaken;
     
-    spawnCelebrationParticles('playerSpriteContainer');
+    // spawnCelebrationParticles('playerSpriteContainer');
+    SFX.correct();
     
     const timeRatio = Math.max(0, 1 - (timeTaken / MAX_TIME));
+    
+    let mmrGain = 0.5 + (timeRatio * 1.5);
+    if (run.isBoss) mmrGain *= 1.5;
+    globalStats.playerMMR = (globalStats.playerMMR || 10) + mmrGain;
+    
     const baseDmg = getRandomInt(15, 25);
     const timeMultiplier = 1 + (timeRatio * 2); 
     const damage = Math.floor(baseDmg * timeMultiplier);
@@ -820,6 +857,11 @@ async function submitAnswer(ans, isTimeout) {
       
       run.bossHP = Math.max(0, run.bossHP - damage);
       elements.barBossHp.style.width = `${(run.bossHP / run.bossMaxHP) * 100}%`;
+
+      // Award score per hit on boss (scaled by time bonus)
+      const hitScore = Math.floor((10 + run.bossStage * 5) * (1 + timeRatio) * run.modifiers.scoreMult);
+      run.score += hitScore;
+      updateStatsUI();
       
       setTimeout(() => {
         if (run.bossHP === 0) {
@@ -844,6 +886,8 @@ async function submitAnswer(ans, isTimeout) {
           
           const enemyRect = elements.enemySprite.getBoundingClientRect();
           spawnCoins(Math.ceil(rewardGold), enemyRect.left + enemyRect.width / 2, enemyRect.top + enemyRect.height / 2);
+          SFX.bossDefeated();
+          setTimeout(() => SFX.coin(), 200);
           run.isBoss = false;
           
           setTimeout(showRewardModal, 1500);
@@ -855,10 +899,13 @@ async function submitAnswer(ans, isTimeout) {
               setTimeout(() => elements.lblCombo && elements.lblCombo.classList.add('hidden'), 1000);
             }
             showCombatText(`${getTranslation('txt_crit', settings.language)} -${damage} HP!`, 'text-yellow-300', 'enemy');
+            SFX.crit();
           } else {
             showCombatText(`-${damage} HP!`, 'text-orange-400', 'enemy');
           }
           setTimeout(() => {
+            if (elements.runOverModal.classList.contains('show')) return;
+            run.active = true;
             run.currentQuestion = createQuestion('boss');
             renderQuestion();
             startTimer();
@@ -897,9 +944,16 @@ async function submitAnswer(ans, isTimeout) {
         
         const enemyRect = elements.enemySprite.getBoundingClientRect();
         spawnCoins(Math.ceil(gold), enemyRect.left + enemyRect.width / 2, enemyRect.top + enemyRect.height / 2);
+        SFX.coin();
         setTimeout(nextQuestion, 1000);
     }
   } else {
+    SFX.wrong();
+    
+    let mmrLoss = 1.0;
+    if (isTimeout) mmrLoss = 1.5;
+    globalStats.playerMMR = Math.max(1, (globalStats.playerMMR || 10) - mmrLoss);
+    
     run.streak = 0;
     updateComboUI();
     const baseDifficulty = 1.0 + (run.questionsAnswered * 0.05);
@@ -940,6 +994,8 @@ async function submitAnswer(ans, isTimeout) {
           elements.lblHealth.textContent = `${run.health}/${run.maxHealth}`;
           if (run.isBoss) {
             setTimeout(() => {
+              if (elements.runOverModal.classList.contains('show')) return;
+              run.active = true;
               run.currentQuestion = createQuestion('boss');
               renderQuestion();
               startTimer();
@@ -953,6 +1009,8 @@ async function submitAnswer(ans, isTimeout) {
       } else {
         if (run.isBoss) {
           setTimeout(() => {
+            if (elements.runOverModal.classList.contains('show')) return;
+            run.active = true;
             run.currentQuestion = createQuestion('boss');
             renderQuestion();
             startTimer();
@@ -1001,6 +1059,8 @@ function endRun(msg) {
     try {
       leaderboard.push({
         name: user,
+        skin: skinEmojis[selectedSkin] || '🏃',
+        mmr: globalStats.playerMMR,
         score: Math.floor(run.score),
         date: new Date().toLocaleDateString()
       });
@@ -1018,6 +1078,8 @@ function endRun(msg) {
       if (typeof db !== 'undefined') {
         db.ref('leaderboard').push({
           name: user,
+          skin: skinEmojis[selectedSkin] || '🏃',
+          mmr: globalStats.playerMMR,
           score: Math.floor(run.score),
           date: new Date().toLocaleDateString(),
           timestamp: firebase.database.ServerValue.TIMESTAMP
@@ -1045,16 +1107,35 @@ function endRun(msg) {
   }
 
   elements.runOverModal.classList.add('show');
+  SFX.runOver();
 }
 
 if (elements.btnFlee) {
-  elements.btnFlee.addEventListener('click', (e) => {
+  elements.btnFlee.addEventListener('click', async (e) => {
     e.preventDefault();
-    if (confirm(getTranslation('txt_confirm_flee', settings.language))) {
+    const wasActive = run.active;
+    run.active = false;
+    clearInterval(timerInterval);
+    if (await showConfirm(getTranslation('txt_confirm_flee', settings.language))) {
       endRun(getTranslation('txt_fled', settings.language));
+    } else {
+      run.active = wasActive;
+      if (wasActive) {
+        timerInterval = setInterval(() => {
+          if(!run.active) return clearInterval(timerInterval);
+          timeLeft -= 0.1;
+          updateTimerUI();
+          if (timeLeft <= 0) {
+            clearInterval(timerInterval);
+            submitAnswer(null, true);
+          }
+        }, 100);
+      }
     }
   });
 }
+
+
 
 function runCountdown(callback) {
   const overlay = document.getElementById('countdownOverlay');
@@ -1085,9 +1166,11 @@ function runCountdown(callback) {
     if (stepVal === 'START!') {
       text.style.color = '#f5c842';
       text.style.textShadow = '0 0 40px rgba(245,200,66,0.9), 0 0 80px rgba(245,200,66,0.5), 4px 4px 0 rgba(0,0,0,1)';
+      SFX.countdownStart();
     } else {
       text.style.color = '#ff4d6d';
       text.style.textShadow = '0 0 40px rgba(255,77,109,0.9), 0 0 80px rgba(255,77,109,0.5), 4px 4px 0 rgba(0,0,0,1)';
+      SFX.countdownBeep(stepVal);
     }
     text.style.opacity = '0';
     text.style.transform = 'scale(0.5)';
@@ -1139,8 +1222,38 @@ function spawnCelebrationParticles(containerId) {
 }
 
 elements.btnReturnHub.onclick = () => {
+  SFX.btnClick();
   window.location.href = 'game.html';
 };
+
+// â”€â”€â”€ GLOBAL BUTTON SFX â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// Use mousedown (fires immediately on press, no delay vs click)
+document.addEventListener('mousedown', (e) => {
+  const btn = e.target.closest('button');
+  if (!btn || btn.disabled) return;
+  if (btn.classList.contains('danger') || btn.id === 'btnFlee') {
+    SFX.btnDanger();
+  } else {
+    SFX.btnClick();
+  }
+});
+// Also handle touch devices
+document.addEventListener('touchstart', (e) => {
+  const btn = e.target.closest('button');
+  if (!btn || btn.disabled) return;
+  if (btn.classList.contains('danger') || btn.id === 'btnFlee') {
+    SFX.btnDanger();
+  } else {
+    SFX.btnClick();
+  }
+}, { passive: true });
+// Reward cards (divs, not buttons)
+document.addEventListener('mousedown', (e) => {
+  const card = e.target.closest('.stone-panel');
+  if (card && card.style.cursor === 'pointer') {
+    SFX.buffPick();
+  }
+});
 
 window.onload = () => {
   loadState();
@@ -1151,6 +1264,12 @@ window.onload = () => {
     nextQuestion();
   });
 };
+
+document.addEventListener('click', () => {
+  if (typeof SFX !== 'undefined' && run) {
+    SFX.playBGM(run.isBoss ? 'Boss Music.mp3' : 'Battle Music.mp3');
+  }
+}, { once: true });
 
 window.addEventListener('beforeunload', function (e) {
   if (typeof run !== 'undefined' && run && run.active) {

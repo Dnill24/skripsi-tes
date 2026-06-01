@@ -1,5 +1,6 @@
 const elements = {
   playerNameDisplay: document.getElementById('playerNameDisplay'),
+  playerMMRDisplay: document.getElementById('playerMMRDisplay'),
   shopGoldDisplay: document.getElementById('shopGoldDisplay'),
   btnStartRun: document.getElementById('btnStartRun'),
   btnShop: document.getElementById('btnShop'),
@@ -24,8 +25,10 @@ const elements = {
   closeSettings: document.getElementById('closeSettings'),
   xCloseSettings: document.getElementById('xCloseSettings'),
   saveSettings: document.getElementById('saveSettings'),
-  volumeSlider: document.getElementById('volumeSlider'),
-  volumeValue: document.getElementById('volumeValue'),
+  sfxVolumeSlider: document.getElementById('sfxVolumeSlider'),
+  sfxVolumeValue: document.getElementById('sfxVolumeValue'),
+  musicVolumeSlider: document.getElementById('musicVolumeSlider'),
+  musicVolumeValue: document.getElementById('musicVolumeValue'),
   languageSelect: document.getElementById('languageSelect'),
   
   btnBuffIndex: document.getElementById('btnBuffIndex'),
@@ -51,7 +54,7 @@ let totalGoldEarned = 0;
 let totalBossesDefeated = 0;
 let totalRuns = 0;
 let selectedSkin = 'rainbow';
-let globalStats = { '+': 0, '-': 0, '*': 0, '/': 0, fastestTime: 999, bossRushBosses: 0, glassCannonBosses: 0, comboGod: 0 };
+let globalStats = { '+': 0, '-': 0, '*': 0, '/': 0, fastestTime: 999, bossRushBosses: 0, glassCannonBosses: 0, comboGod: 0, playerMMR: 10 };
 
 let skins = [
   { id: 'rainbow', nameKey: 'skin_rainbow_name', descKey: 'skin_rainbow_desc', cost: 0, unlocked: true, icon: '🧍' },
@@ -99,7 +102,7 @@ const achievementsData = [
   { id: 'true_hero', nameKey: 'ach_m5_name', descKey: 'ach_m5_desc', getProgress: () => skins.find(s => s.id === 'god').unlocked ? 1 : 0, target: 1 }
 ];
 
-let settings = { volume: 50, language: 'en' };
+let settings = { sfxVolume: 70, musicVolume: 50, language: 'en' };
 
 function loadState() {
   const userStored = localStorage.getItem('mathQuestUser');
@@ -114,8 +117,12 @@ function loadState() {
     try { settings = { ...settings, ...JSON.parse(savedSettings) }; } catch(e){}
   }
   
-  elements.volumeSlider.value = settings.volume;
-  elements.volumeValue.textContent = settings.volume + '%';
+  if (elements.sfxVolumeSlider) {
+    elements.sfxVolumeSlider.value = settings.sfxVolume || 70;
+    elements.sfxVolumeValue.textContent = (settings.sfxVolume || 70) + '%';
+    elements.musicVolumeSlider.value = settings.musicVolume || 50;
+    elements.musicVolumeValue.textContent = (settings.musicVolume || 50) + '%';
+  }
   elements.languageSelect.value = settings.language;
 
   const saved = localStorage.getItem('mathQuestRogueStats');
@@ -134,6 +141,7 @@ function loadState() {
       globalStats.bossRushBosses = globalStats.bossRushBosses ?? 0;
       globalStats.glassCannonBosses = globalStats.glassCannonBosses ?? 0;
       globalStats.comboGod = globalStats.comboGod ?? 0;
+      globalStats.playerMMR = globalStats.playerMMR ?? 10;
       if (Array.isArray(parsed.skins)) {
         skins = skins.map(s => {
           const savedSkin = parsed.skins.find(ps => ps.id === s.id);
@@ -193,6 +201,7 @@ function saveState() {
 function updateUI() {
   applyTranslationsToDOM(settings.language);
   elements.playerNameDisplay.textContent = user;
+  if (elements.playerMMRDisplay) elements.playerMMRDisplay.textContent = window.getRankFromMMR ? window.getRankFromMMR(globalStats.playerMMR) : Math.floor(globalStats.playerMMR);
   elements.shopGoldDisplay.textContent = currency;
   elements.statBestScore.textContent = bestRunScore;
   elements.statTotalGold.textContent = totalGoldEarned;
@@ -200,13 +209,24 @@ function updateUI() {
   elements.statRuns.textContent = totalRuns;
   renderShop();
   renderAchievements();
+  
+  if (user === 'Guest') {
+    ['btnShop', 'btnAchievements', 'btnVersus'].forEach(id => {
+      const btn = elements[id];
+      if (!btn.textContent.includes('🔒')) {
+        btn.textContent = '🔒 ' + btn.textContent.replace('🛍️', '').replace('🏆', '').replace('⚡', '').trim();
+        btn.removeAttribute('data-i18n');
+        btn.style.opacity = '0.7';
+      }
+    });
+  }
 }
 
 function renderLeaderboard() {
   elements.leaderboardList.innerHTML = '';
   
   if (!leaderboard || leaderboard.length === 0) {
-    elements.leaderboardList.innerHTML = `<tr><td colspan="4" style="text-align:center; padding:20px; font-family:'Comic Neue',cursive; font-weight:700; color:#9ca3af;">${getTranslation('txt_empty_leaderboard', settings.language)}</td></tr>`;
+    elements.leaderboardList.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:20px; font-family:'Comic Neue',cursive; font-weight:700; color:#9ca3af;">${getTranslation('txt_empty_leaderboard', settings.language)}</td></tr>`;
     return;
   }
   
@@ -217,13 +237,14 @@ function renderLeaderboard() {
     tr.style.background = idx % 2 === 0 ? 'rgba(0,0,0,0.2)' : 'rgba(0,0,0,0.1)';
     
     tr.innerHTML = `
-      <td style="padding:12px; text-align:center; font-family:'Press Start 2P',monospace; font-size:0.65rem; color:#fff;">#${idx + 1}</td>
-      <td style="padding:12px; font-family:'Press Start 2P',monospace; font-size:0.65rem; color:#fff;">
-        <span style="font-size:1.2rem; margin-right:8px; vertical-align:middle;">${entry.skin || '🧍'}</span>
+      <td style="padding:clamp(4px, 1vw, 12px); text-align:center; font-family:'Press Start 2P',monospace; font-size:clamp(0.45rem, 1.5vw, 0.65rem); color:#fff;">#${idx + 1}</td>
+      <td style="padding:clamp(4px, 1vw, 12px); font-family:'Press Start 2P',monospace; font-size:clamp(0.45rem, 1.5vw, 0.65rem); color:#fff;">
+        <span style="font-size:clamp(0.8rem, 2vw, 1.2rem); margin-right:4px; vertical-align:middle;">${entry.skin || '🧍'}</span>
         ${entry.name}
       </td>
-      <td style="padding:12px; text-align:right; font-family:'Press Start 2P',monospace; font-size:0.65rem; color:#69f0ae;">${entry.score.toLocaleString()}</td>
-      <td style="padding:12px; text-align:right; font-family:'Press Start 2P',monospace; font-size:0.6rem; color:#9ca3af;">${entry.date}</td>
+      <td style="padding:clamp(4px, 1vw, 12px); text-align:right; font-family:'Press Start 2P',monospace; font-size:clamp(0.45rem, 1.5vw, 0.65rem); color:#64b5f6;">${entry.mmr ? (window.getRankFromMMR ? window.getRankFromMMR(entry.mmr) : Math.floor(entry.mmr)) : '🪨 Iron'}</td>
+      <td style="padding:clamp(4px, 1vw, 12px); text-align:right; font-family:'Press Start 2P',monospace; font-size:clamp(0.45rem, 1.5vw, 0.65rem); color:#69f0ae;">${entry.score.toLocaleString()}</td>
+      <td style="padding:clamp(4px, 1vw, 12px); text-align:right; font-family:'Press Start 2P',monospace; font-size:clamp(0.4rem, 1vw, 0.6rem); color:#9ca3af;">${entry.date}</td>
     `;
     elements.leaderboardList.appendChild(tr);
   });
@@ -240,15 +261,15 @@ function renderAchievements() {
     card.className = 'stone-panel';
     card.style.display = 'flex';
     card.style.alignItems = 'center';
-    card.style.gap = '16px';
-    card.style.padding = '12px';
+    card.style.gap = 'clamp(8px, 2vw, 16px)';
+    card.style.padding = 'clamp(8px, 2vw, 12px)';
     if (!isComplete) card.style.filter = 'grayscale(1) brightness(0.7)';
 
     card.innerHTML = `
-      <div style="font-size:2.5rem; filter:drop-shadow(2px 2px 0 rgba(0,0,0,1));">${isComplete ? '🏆' : '🔒'}</div>
+      <div style="font-size:clamp(1.5rem, 5vw, 2.5rem); filter:drop-shadow(2px 2px 0 rgba(0,0,0,1));">${isComplete ? '🏆' : '🔒'}</div>
       <div style="flex:1;">
-        <div style="font-family:'Press Start 2P',monospace; font-size:0.7rem; color:var(--text-gold); margin-bottom:8px; text-shadow:1px 1px 0 rgba(0,0,0,1);">${getTranslation(ach.nameKey, settings.language)}</div>
-        <div style="font-family:'Comic Neue',cursive; font-size:0.9rem; color:#ccc; margin-bottom:8px;">${getTranslation(ach.descKey, settings.language)}</div>
+        <div style="font-family:'Press Start 2P',monospace; font-size:clamp(0.5rem, 2vw, 0.7rem); color:var(--text-gold); margin-bottom:clamp(4px, 1vw, 8px); text-shadow:1px 1px 0 rgba(0,0,0,1);">${getTranslation(ach.nameKey, settings.language)}</div>
+        <div style="font-family:'Comic Neue',cursive; font-size:clamp(0.7rem, 2.5vw, 0.9rem); color:#ccc; margin-bottom:8px;">${getTranslation(ach.descKey, settings.language)}</div>
         <div style="width:100%; height:12px; background:#263238; border-radius:6px; overflow:hidden; border:2px solid var(--panel-border);">
           <div style="width:${progressPercent}%; height:100%; background:${isComplete ? '#4caf50' : '#ffa000'}; border-right:2px solid var(--panel-border);"></div>
         </div>
@@ -264,11 +285,11 @@ function renderShop() {
     const card = document.createElement('div');
     const isActive = selectedSkin === skin.id;
     card.className = 'stone-panel';
-    card.style.flex = '0 0 140px';
+    card.style.flex = '0 0 clamp(110px, 30vw, 140px)';
     card.style.display = 'flex';
     card.style.flexDirection = 'column';
     card.style.alignItems = 'center';
-    card.style.padding = '12px';
+    card.style.padding = 'clamp(8px, 2vw, 12px)';
     if (isActive) card.style.borderColor = '#4caf50';
     
     const btnLabel = skin.unlocked
@@ -276,9 +297,9 @@ function renderShop() {
       : getTranslation('btn_buy', settings.language);
       
     card.innerHTML = `
-      <div style="font-size:4rem; margin-bottom:12px; filter:drop-shadow(3px 3px 0 rgba(0,0,0,0.8)); transform-origin:bottom; transition:transform 0.2s;" onmouseover="this.style.transform='scale(1.2)'" onmouseout="this.style.transform='scale(1)'">${skin.icon}</div>
-      <div style="font-family:'Press Start 2P',monospace; font-size:0.6rem; color:#fff; margin-bottom:8px; text-shadow:1px 1px 0 rgba(0,0,0,1); text-align:center; height:24px;">${getTranslation(skin.nameKey, settings.language)}</div>
-      ${!skin.unlocked ? `<div style="font-family:'Press Start 2P',monospace; font-size:0.7rem; color:var(--text-gold); margin-bottom:12px; text-shadow:1px 1px 0 rgba(0,0,0,1);">🪙 ${skin.cost}</div>` : '<div style="height:22px; margin-bottom:12px;"></div>'}
+      <div style="font-size:clamp(2.5rem, 8vw, 4rem); margin-bottom:12px; filter:drop-shadow(3px 3px 0 rgba(0,0,0,0.8)); transform-origin:bottom; transition:transform 0.2s;" onmouseover="this.style.transform='scale(1.2)'" onmouseout="this.style.transform='scale(1)'">${skin.icon}</div>
+      <div style="font-family:'Press Start 2P',monospace; font-size:clamp(0.45rem, 2vw, 0.6rem); color:#fff; margin-bottom:8px; text-shadow:1px 1px 0 rgba(0,0,0,1); text-align:center; height:24px;">${getTranslation(skin.nameKey, settings.language)}</div>
+      ${!skin.unlocked ? `<div style="font-family:'Press Start 2P',monospace; font-size:clamp(0.55rem, 2vw, 0.7rem); color:var(--text-gold); margin-bottom:12px; text-shadow:1px 1px 0 rgba(0,0,0,1);">🪙 ${skin.cost}</div>` : '<div style="height:22px; margin-bottom:12px;"></div>'}
     `;
     
     const btn = document.createElement('button');
@@ -300,13 +321,15 @@ function renderShop() {
           currency -= skin.cost;
           skin.unlocked = true;
           selectedSkin = skin.id;
+          if (typeof SFX !== 'undefined') SFX.purchase();
           saveState();
           updateUI();
         } else {
-          alert(getTranslation('txt_not_enough', settings.language));
+          showToast(getTranslation('txt_not_enough', settings.language));
         }
       } else {
         selectedSkin = skin.id;
+        if (typeof SFX !== 'undefined') SFX.equip();
         saveState();
         updateUI();
       }
@@ -328,11 +351,24 @@ document.querySelectorAll('.btn-mode').forEach(btn => {
 });
 
 // Modals
-elements.btnShop.onclick = () => { elements.shopModal.classList.add('show'); updateUI(); };
+function checkGuestFeature() {
+  if (user === 'Guest') {
+    showToast("Please return to the title screen and login or sign up to unlock this feature!");
+    return true; // is guest
+  }
+  return false;
+}
+
+elements.btnShop.onclick = () => { 
+  if (checkGuestFeature()) return;
+  elements.shopModal.classList.add('show'); 
+  updateUI(); 
+};
 elements.closeShopModal.onclick = () => { elements.shopModal.classList.remove('show'); };
 elements.xCloseShop.onclick = elements.closeShopModal.onclick;
 
 elements.btnAchievements.onclick = () => {
+  if (checkGuestFeature()) return;
   elements.achievementsModal.classList.add('show');
 };
 elements.xCloseAchievements.onclick = () => elements.achievementsModal.classList.remove('show');
@@ -352,6 +388,7 @@ elements.btnBuffIndex.onclick = () => {
 elements.xCloseBuffIndex.onclick = () => elements.buffIndexModal.classList.remove('show');
 
 elements.btnVersus.onclick = () => {
+  if (checkGuestFeature()) return;
   window.location.href = 'versus.html';
 };
 
@@ -359,9 +396,27 @@ elements.btnVersus.onclick = () => {
 elements.btnSettings.onclick = () => { elements.settingsModal.classList.add('show'); };
 elements.closeSettings.onclick = () => { elements.settingsModal.classList.remove('show'); };
 elements.xCloseSettings.onclick = elements.closeSettings.onclick;
-elements.volumeSlider.oninput = (e) => { elements.volumeValue.textContent = e.target.value + '%'; };
+elements.musicVolumeSlider.oninput = (e) => { 
+  elements.musicVolumeValue.textContent = e.target.value + '%'; 
+  settings.musicVolume = parseInt(e.target.value);
+  localStorage.setItem('mathQuestSettings', JSON.stringify(settings));
+  if (typeof SFX !== 'undefined') SFX.updateBGMVolume();
+};
+
+document.addEventListener('click', () => {
+  if (typeof SFX !== 'undefined') SFX.playBGM('Menu Music.mp3');
+}, { once: true });
+elements.sfxVolumeSlider.oninput = (e) => { 
+  elements.sfxVolumeValue.textContent = e.target.value + '%'; 
+  if (typeof SFX !== 'undefined') {
+    settings.sfxVolume = parseInt(e.target.value);
+    localStorage.setItem('mathQuestSettings', JSON.stringify(settings));
+    SFX.btnClick();
+  }
+};
 elements.saveSettings.onclick = () => {
-  settings.volume = parseInt(elements.volumeSlider.value);
+  settings.sfxVolume = parseInt(elements.sfxVolumeSlider.value);
+  settings.musicVolume = parseInt(elements.musicVolumeSlider.value);
   settings.language = elements.languageSelect.value;
   localStorage.setItem('mathQuestSettings', JSON.stringify(settings));
   
@@ -409,13 +464,13 @@ function populateBuffIndex() {
     card.style.flexDirection = 'column';
     card.style.alignItems = 'center';
     card.style.justifyContent = 'center';
-    card.style.padding = '16px';
+    card.style.padding = 'clamp(8px, 2vw, 12px)';
     card.style.textAlign = 'center';
     
     card.innerHTML = `
-      <div style="font-size:3rem; margin-bottom:8px; filter:drop-shadow(2px 2px 0 rgba(0,0,0,1));">${buff.icon}</div>
-      <div style="font-family:'Press Start 2P',monospace; font-size:0.7rem; color:var(--text-gold); margin-bottom:8px; text-shadow:1px 1px 0 rgba(0,0,0,1);">${getTranslation(buff.nameKey, settings.language)}</div>
-      <div style="font-family:'Comic Neue',cursive; font-size:0.9rem; color:#ccc; line-height:1.2;">${getTranslation(buff.descKey, settings.language)}</div>
+      <div style="font-size:clamp(2rem, 6vw, 3rem); filter:drop-shadow(2px 2px 0 rgba(0,0,0,1)); margin-bottom:8px;">${buff.icon}</div>
+      <div style="font-family:'Press Start 2P',monospace; font-size:clamp(0.5rem, 2vw, 0.7rem); color:var(--text-gold); margin-bottom:8px; text-shadow:1px 1px 0 rgba(0,0,0,1);">${getTranslation(buff.nameKey, settings.language)}</div>
+      <div style="font-family:'Comic Neue',cursive; font-size:clamp(0.7rem, 2.5vw, 0.9rem); color:#ccc; line-height:1.2;">${getTranslation(buff.descKey, settings.language)}</div>
     `;
     elements.buffIndexList.appendChild(card);
   });

@@ -3,7 +3,16 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Math Quest Adventure - Play</title>
+  <title>MathQuest: Rogue - Play</title>
+  <script>
+    window.onerror = function(msg, url, line, col, error) {
+      if (msg === "Script error.") return;
+      alert("CRASH: " + msg + "\nLine: " + line + "\nURL: " + url + "\n" + (error ? error.stack : ""));
+    };
+    window.addEventListener("unhandledrejection", function(e) {
+      alert("PROMISE CRASH: " + e.reason);
+    });
+  </script>
   <link rel="stylesheet" href="styles.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

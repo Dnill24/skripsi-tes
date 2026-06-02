@@ -4,6 +4,15 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Math Quest Adventure - Hub</title>
+  <script>
+    window.onerror = function(msg, url, line, col, error) {
+      if (msg === "Script error.") return;
+      alert("CRASH: " + msg + "\nLine: " + line + "\nURL: " + url + "\n" + (error ? error.stack : ""));
+    };
+    window.addEventListener("unhandledrejection", function(e) {
+      alert("PROMISE CRASH: " + e.reason);
+    });
+  </script>
   <link rel="stylesheet" href="styles.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -17,19 +26,14 @@
   <script>tailwind.config = { theme: { extend: {} } }</script>
   <style>
     *, *::before, *::after { box-sizing: border-box; }
-    html, body { height: 100%; margin: 0; padding: 0; overflow: hidden; }
+    html, body { min-height: 100%; margin: 0; padding: 0; overflow-x: hidden; overflow-y: auto; }
 
     /* Title Signpost */
     .title-sign {
       background: var(--wood-bg); border: 6px solid var(--wood-border);
       box-shadow: var(--shadow-block), 0 12px 24px rgba(0,0,0,0.6);
-      padding: 20px 28px; position: relative; text-align: center;
-      transform: rotate(-1deg);
-      animation: float 3s ease-in-out infinite;
-      transition: transform 0.3s ease-out;
-    }
-    .title-sign:hover {
-      transform: rotate(2deg) scale(1.05);
+      padding: 16px 20px; position: relative; text-align: center;
+      /* Removed rotation and float animation so it aligns perfectly with the panel below */
     }
     .title-sign::before, .title-sign::after {
       content: ''; position: absolute; top: 8px; width: 10px; height: 10px;
@@ -55,26 +59,53 @@
       font-family: 'Press Start 2P', monospace;
     }
     .modal-close-btn:hover { color: #ef5350; }
+
+    /* Mobile Text Scaling */
+    @media (max-width: 640px) {
+      .title-sign h1 { font-size: clamp(0.45rem, 3vw, 1.5rem) !important; }
+      .title-sign p { font-size: 0.5rem !important; }
+      #playerMMRDisplay { font-size: 0.3rem !important; }
+      .title-sign p[style*="0.6rem"] { font-size: 0.3rem !important; }
+      #btnToggleQuests { font-size: 0.45rem !important; }
+      #questsToggleIcon { font-size: 0.4rem !important; }
+      #dailyQuestTimer { font-size: 0.35rem !important; }
+    }
   </style>
 </head>
 <body class="bg-hub">
-<div style="display:flex; align-items:stretch; justify-content:flex-end; padding:clamp(16px,4vw,48px); height:100%;">
+<div style="display:flex; flex-direction:column; align-items:flex-start; justify-content:space-between; padding:clamp(16px,4vw,48px); min-height:100vh; gap:40px; margin: 0 auto; width: 100%; max-width: 1400px;">
 
-  <!-- Title Card (top-left) -->
-  <div class="hub-title-container">
-    <div class="title-sign">
-      <h1 data-i18n="title_hub">Base Camp</h1>
-      <p data-i18n="welcome">Welcome back, <span id="playerNameDisplay">Hero</span>!</p>
-      <p style="font-family: 'Press Start 2P', monospace; font-size: 0.6rem; color: #64b5f6; margin-top: 4px; text-shadow: 1px 1px 0 rgba(0,0,0,0.8);">Rank: <span id="playerMMRDisplay">10</span></p>
+  <!-- Left Column: Title and Missions -->
+  <div class="hub-left-column" style="display:flex; flex-direction:column; align-items:stretch; width:100%; max-width:340px; min-width:280px; box-sizing:border-box;">
+    <!-- Title Card -->
+    <div class="hub-title-container" style="text-align:center; z-index: 2;">
+      <div class="title-sign" style="width:100%; box-sizing:border-box; border-bottom: none; border-radius: 4px 4px 0 0;">
+        <h1 data-i18n="title_hub">Base Camp</h1>
+        <p data-i18n="welcome">Welcome back, <span id="playerNameDisplay">Hero</span>!</p>
+        <p style="font-family: 'Press Start 2P', monospace; font-size: 0.6rem; color: #64b5f6; margin-top: 4px; text-shadow: 1px 1px 0 rgba(0,0,0,0.8);">Rank: <span id="playerMMRDisplay">10</span></p>
+      </div>
+    </div>
+    
+    <!-- Daily Missions Panel -->
+    <div class="stone-panel quests-panel" style="padding:12px; width:100%; box-sizing:border-box; overflow:hidden; border-top: none !important; border-radius: 0 0 4px 4px !important; transition: all 0.3s ease;">
+      <h2 id="btnToggleQuests" class="fancy-header" style="margin:0; font-size:0.9rem; text-align:center; cursor:pointer; display:flex; justify-content:space-between; align-items:center; user-select:none;">
+        <span data-i18n="modal_quests">📜 Daily Mission</span>
+        <span id="questsToggleIcon" style="font-size:0.8rem; transition:transform 0.2s; color:#ffb300;">▼</span>
+      </h2>
+      <div id="dailyQuestTimer" style="text-align:center; font-size:0.75rem; color:#888; margin-top:4px; font-family: 'Press Start 2P', monospace;"></div>
+      <div id="questsListContainer" style="display:none; margin-top:12px; animation: pop 0.2s ease-out;">
+        <div id="questsList" style="display:flex; flex-direction:column; gap:8px;"></div>
+      </div>
     </div>
   </div>
 
-  <!-- Hub Panel (bottom-right) -->
+  <!-- Right Column: Hub Panel -->
   <div class="hub-panel-container">
-    <div class="stone-panel" style="padding:20px 18px; min-width:240px; max-width:280px; width:86vw;">
-      <div style="display:flex; flex-direction:column; gap:10px;">
-        <button id="btnStartRun" class="wood-btn success" data-i18n="btn_start">⚔️ Enter Cave</button>
-        <button id="btnShop"         class="wood-btn" data-i18n="btn_shop">🛍️ Merchant</button>
+    <div class="stone-panel" style="padding:16px 14px; min-width:280px; max-width:360px; width:90vw;">
+      <div class="hub-btn-grid">
+        <button id="btnStartRun" class="wood-btn success btn-full" data-i18n="btn_start">⚔️ Enter Cave</button>
+        <button id="btnShop"         class="wood-btn" data-i18n="btn_shop">🛒 Skins</button>
+        <button id="btnUpgrades"     class="wood-btn" data-i18n="btn_upgrades">⚒️ Upgrades</button>
         <button id="btnAchievements" class="wood-btn" data-i18n="btn_achievements">🏆 Trophies</button>
         <button id="btnBuffIndex"    class="wood-btn" data-i18n="btn_buff_index">📖 Buff Index</button>
         <button id="btnLeaderboard"  class="wood-btn" data-i18n="btn_leaderboard">📊 Rankings</button>
@@ -93,7 +124,7 @@
   <div class="terra-modal-card" style="max-width:640px;">
     <button id="xCloseShop" class="modal-close-btn" style="position:sticky; top:0; float:right; z-index:20; background:var(--panel-bg); padding:4px 8px; border-radius:8px; box-shadow:0 0 10px rgba(0,0,0,0.5);">X</button>
     <div style="margin-bottom:16px;">
-      <h2 class="fancy-header" style="margin:0;" data-i18n="modal_shop">🛍️ Merchant</h2>
+      <h2 class="fancy-header" style="margin:0;" data-i18n="modal_shop">🛒 Skins</h2>
     </div>
     <p style="text-align:center; font-size:1.1rem; margin-bottom:20px;">
       <span data-i18n="gold_label" style="font-family:'Press Start 2P',monospace; font-size:0.6rem;">Coins: </span>
@@ -102,6 +133,23 @@
     </p>
     <div id="shopList" style="display:flex; flex-direction:row; gap:12px; overflow-x:auto; padding-bottom:16px; scroll-snap-type:x mandatory;"></div>
     <button id="closeShopModal" class="wood-btn" style="margin-top:16px; width:100%;" data-i18n="btn_close">Close</button>
+  </div>
+</div>
+
+<!-- ── UPGRADES MODAL ─────────────────────────────────── -->
+<div class="terra-modal-overlay" id="upgradesModal">
+  <div class="terra-modal-card" style="max-width:540px;">
+    <button id="xCloseUpgrades" class="modal-close-btn" style="position:sticky; top:0; float:right; z-index:20; background:var(--panel-bg); padding:4px 8px; border-radius:8px; box-shadow:0 0 10px rgba(0,0,0,0.5);">X</button>
+    <div style="margin-bottom:16px;">
+      <h2 class="fancy-header" style="margin:0;" data-i18n="modal_upgrades">⚒️ Upgrades</h2>
+    </div>
+    <p style="text-align:center; font-size:1.1rem; margin-bottom:20px;">
+      <span data-i18n="gold_label" style="font-family:'Press Start 2P',monospace; font-size:0.6rem;">Coins: </span>
+      <span id="upgradesGoldDisplay" style="font-family:'Press Start 2P',monospace; font-size:0.8rem; color:var(--text-gold); text-shadow:2px 2px 0 rgba(0,0,0,0.8);">0</span>
+      <span style="margin-left:4px;">🪙</span>
+    </p>
+    <div id="upgradesList" style="display:flex; flex-direction:column; gap:12px; padding-bottom:16px;"></div>
+    <button id="closeUpgradesModal" class="wood-btn" style="margin-top:16px; width:100%;" data-i18n="btn_close">Close</button>
   </div>
 </div>
 

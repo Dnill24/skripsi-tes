@@ -121,6 +121,8 @@ function playAsGuest() {
   localStorage.removeItem('mathQuestRogueStats'); // Start fresh
   localStorage.removeItem('mathQuestTutorialHub');
   localStorage.removeItem('mathQuestTutorialPlay');
+  localStorage.removeItem('mathQuestTutorialHub_Guest');
+  localStorage.removeItem('mathQuestTutorialPlay_Guest');
   window.location.href = 'game.html';
 }
 
@@ -237,8 +239,8 @@ function signup() {
       }).then(() => {
         localStorage.removeItem('mathQuestRogueStats'); // Start fresh for new accounts
         localStorage.removeItem('mathQuestSettings');
-        localStorage.removeItem('mathQuestTutorialHub');
-        localStorage.removeItem('mathQuestTutorialPlay');
+        localStorage.removeItem('mathQuestTutorialHub_' + username);
+        localStorage.removeItem('mathQuestTutorialPlay_' + username);
         localStorage.setItem('mathQuestUser', JSON.stringify({ user: username, isLoggedIn: true }));
         window.location.href = 'game.html';
       }).catch(err => {

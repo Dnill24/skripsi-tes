@@ -134,9 +134,9 @@ h1, h2, h3, h4, h5, h6, .font-minecraft {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 16px 24px;
+  padding: 12px 16px;
   font-family: 'Press Start 2P', monospace;
-  font-size: 0.85rem;
+  font-size: 0.75rem;
   color: #fff;
   background: var(--wood-bg);
   border: 4px solid var(--wood-border);
@@ -146,6 +146,9 @@ h1, h2, h3, h4, h5, h6, .font-minecraft {
   text-transform: uppercase;
   transition: transform 0.1s ease-out;
   text-shadow: 1px 1px 0 rgba(0,0,0,0.8);
+  white-space: normal;
+  text-align: center;
+  word-break: break-word;
   position: relative;
 }
 /* Wood grain overlay (simple CSS stripe) */
@@ -467,9 +470,6 @@ h1, h2, h3, h4, h5, h6, .font-minecraft {
 }
 /* Hub Layout Classes */
 .hub-title-container {
-  position: absolute;
-  top: clamp(16px,4vh,40px);
-  left: clamp(16px,4vw,48px);
   z-index: 10;
   transform-origin: top left;
 }
@@ -481,19 +481,37 @@ h1, h2, h3, h4, h5, h6, .font-minecraft {
   z-index: 20;
   transform-origin: bottom right;
 }
+.hub-btn-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
 
 @media (max-width: 768px) {
-  .hub-title-container {
-    transform: scale(0.85);
+  .hub-left-column {
+    transform: scale(0.65);
+    transform-origin: top left;
   }
   .hub-panel-container {
     transform: scale(0.85);
   }
+  .hub-btn-grid {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+  }
+  .hub-btn-grid .btn-full {
+    grid-column: span 2;
+  }
+  .hub-btn-grid .wood-btn {
+    padding: 10px 8px;
+    font-size: 0.65rem;
+  }
 }
 
 @media (max-width: 480px) {
-  .hub-title-container {
-    transform: scale(0.7);
+  .hub-left-column {
+    transform: scale(0.5);
   }
   .hub-panel-container {
     transform: scale(0.7);
@@ -644,7 +662,7 @@ h1, h2, h3, h4, h5, h6, .font-minecraft {
   padding: 16px 24px;
   color: var(--text-main);
   width: 90vw;
-  max-width: 320px;
+  max-width: 400px;
   text-align: center;
   font-family: 'Comic Neue', cursive;
   animation: pop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
@@ -656,12 +674,14 @@ h1, h2, h3, h4, h5, h6, .font-minecraft {
   color: var(--text-gold);
   margin: 0 0 12px;
   text-shadow: 1px 1px 0 rgba(0,0,0,0.8);
+  word-break: break-word;
 }
 
 .tutorial-popup p {
   font-size: 1.1rem;
   margin: 0 0 16px;
   line-height: 1.4;
+  word-break: break-word;
 }
 
 .tutorial-controls {

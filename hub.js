@@ -13,6 +13,16 @@ const elements = {
   shopModal: document.getElementById('shopModal'),
   closeShopModal: document.getElementById('closeShopModal'),
   xCloseShop: document.getElementById('xCloseShop'),
+  btnUpgrades: document.getElementById('btnUpgrades'),
+  upgradesModal: document.getElementById('upgradesModal'),
+  closeUpgradesModal: document.getElementById('closeUpgradesModal'),
+  xCloseUpgrades: document.getElementById('xCloseUpgrades'),
+  upgradesList: document.getElementById('upgradesList'),
+  upgradesGoldDisplay: document.getElementById('upgradesGoldDisplay'),
+  btnToggleQuests: document.getElementById('btnToggleQuests'),
+  questsListContainer: document.getElementById('questsListContainer'),
+  questsToggleIcon: document.getElementById('questsToggleIcon'),
+  questsList: document.getElementById('questsList'),
   achievementsModal: document.getElementById('achievementsModal'),
   xCloseAchievements: document.getElementById('xCloseAchievements'),
   leaderboardModal: document.getElementById('leaderboardModal'),
@@ -56,6 +66,34 @@ let totalBossesDefeated = 0;
 let totalRuns = 0;
 let selectedSkin = 'rainbow';
 let globalStats = { '+': 0, '-': 0, '*': 0, '/': 0, fastestTime: 999, bossRushBosses: 0, glassCannonBosses: 0, comboGod: 0, playerMMR: 10, notifiedAchievements: [] };
+
+let upgrades = {
+  maxHealth: { level: 0, maxLevel: 5, baseCost: 100, nameKey: 'upg_hp', descKey: 'upg_hp_desc' },
+  time: { level: 0, maxLevel: 3, baseCost: 200, nameKey: 'upg_time', descKey: 'upg_time_desc' },
+  goldMult: { level: 0, maxLevel: 5, baseCost: 150, nameKey: 'upg_gold', descKey: 'upg_gold_desc' }
+};
+
+let dailyQuests = {
+  lastReset: '',
+  quests: []
+};
+
+function generateQuests() {
+  const templates = [
+    { type: 'bosses', target: 3, reward: 200, text: 'Defeat 3 Bosses' },
+    { type: 'questions', target: 50, reward: 150, text: 'Answer 50 Questions' },
+    { type: 'runs', target: 3, reward: 100, text: 'Play 3 Runs' },
+    { type: 'combo', target: 20, reward: 100, text: 'Reach 20x Combo' },
+    { type: 'gold', target: 500, reward: 250, text: 'Collect 500 Gold' }
+  ];
+  const selected = shuffleArray([...templates]).slice(0, 3);
+  dailyQuests.quests = selected.map(q => ({ ...q, progress: 0, completed: false, claimed: false }));
+  dailyQuests.lastReset = new Date().toDateString();
+}
+
+function shuffleArray(array) {
+  return array.sort(() => Math.random() - 0.5);
+}
 
 let skins = [
   { id: 'rainbow', nameKey: 'skin_rainbow_name', descKey: 'skin_rainbow_desc', cost: 0, unlocked: true, icon: '🧍' },
@@ -163,6 +201,8 @@ function loadState() {
       totalRuns = parsed.totalRuns ?? totalRuns;
       selectedSkin = parsed.selectedSkin || selectedSkin;
       globalStats = parsed.globalStats || globalStats;
+      if (parsed.upgrades) upgrades = parsed.upgrades;
+      if (parsed.dailyQuests) dailyQuests = parsed.dailyQuests;
       // ensure new keys exist
       globalStats.fastestTime = globalStats.fastestTime ?? 999;
       globalStats.bossRushBosses = globalStats.bossRushBosses ?? 0;
@@ -195,6 +235,12 @@ function loadState() {
       }
     });
   }
+  
+  const today = new Date().toDateString();
+  if (dailyQuests.lastReset !== today) {
+    generateQuests();
+    saveState();
+  }
 }
 
 function saveState() {
@@ -203,7 +249,7 @@ function saveState() {
   if (saved) { try { stats = JSON.parse(saved); } catch(e){} }
   
   Object.assign(stats, {
-    currency, bestRunScore, totalGoldEarned, totalBossesDefeated, totalRuns, selectedSkin, globalStats,
+    currency, bestRunScore, totalGoldEarned, totalBossesDefeated, totalRuns, selectedSkin, globalStats, upgrades, dailyQuests,
     skins: skins.map(s => ({ id: s.id, unlocked: s.unlocked }))
   });
 
@@ -222,6 +268,16 @@ function saveState() {
       delete firebaseData.globalStats['*'];
       delete firebaseData.globalStats['/'];
     }
+    if (firebaseData.run && firebaseData.run.stats) {
+      firebaseData.run.stats['add'] = firebaseData.run.stats['+'] || {correct:0,total:0};
+      firebaseData.run.stats['sub'] = firebaseData.run.stats['-'] || {correct:0,total:0};
+      firebaseData.run.stats['mul'] = firebaseData.run.stats['*'] || {correct:0,total:0};
+      firebaseData.run.stats['div'] = firebaseData.run.stats['/'] || {correct:0,total:0};
+      delete firebaseData.run.stats['+'];
+      delete firebaseData.run.stats['-'];
+      delete firebaseData.run.stats['*'];
+      delete firebaseData.run.stats['/'];
+    }
     db.ref('users/' + cleanName + '/stats').update(firebaseData).catch(e => console.error("Firebase Sync Error", e));
   }
 }
@@ -231,27 +287,58 @@ function updateUI() {
   elements.playerNameDisplay.textContent = user;
   if (elements.playerMMRDisplay) elements.playerMMRDisplay.textContent = window.getRankFromMMR ? window.getRankFromMMR(globalStats.playerMMR) : Math.floor(globalStats.playerMMR);
   elements.shopGoldDisplay.textContent = currency;
+  if (elements.upgradesGoldDisplay) elements.upgradesGoldDisplay.textContent = currency;
   elements.statBestScore.textContent = bestRunScore;
   elements.statTotalGold.textContent = totalGoldEarned;
   elements.statBosses.textContent = totalBossesDefeated;
   elements.statRuns.textContent = totalRuns;
   renderShop();
+  renderUpgrades();
+  renderQuests();
   renderAchievements();
   
   if (user === 'Guest') {
-    ['btnShop', 'btnAchievements', 'btnVersus'].forEach(id => {
+    ['btnShop', 'btnUpgrades', 'btnAchievements', 'btnVersus'].forEach(id => {
       const btn = elements[id];
-      if (!btn.textContent.includes('🔒')) {
-        btn.textContent = '🔒 ' + btn.textContent.replace('🛍️', '').replace('🏆', '').replace('⚡', '').trim();
+      if (btn && !btn.textContent.includes('🔒')) {
+        btn.textContent = '🔒 ' + btn.textContent.replace('🔒', '').replace('🛒', '').replace('🔨', '').replace('🏆', '').replace('⚡', '').trim();
         btn.removeAttribute('data-i18n');
         btn.style.opacity = '0.7';
       }
+      if (btn) btn.onclick = () => {
+        if (typeof window.showToast === 'function') {
+          window.showToast("Not available for Guest. Please create an account to save progress!", "error");
+        } else {
+          alert("Not available for Guest. Please create an account to save progress!");
+        }
+      };
     });
+    
+    if (elements.btnToggleQuests) {
+      elements.btnToggleQuests.style.opacity = '0.5';
+      elements.btnToggleQuests.style.filter = 'grayscale(1)';
+      elements.btnToggleQuests.title = 'Create an account to unlock Daily Missions';
+      elements.btnToggleQuests.onclick = () => {
+        if (typeof window.showToast === 'function') {
+          window.showToast("Not available for Guest. Please create an account to save progress!", "error");
+        } else {
+          alert("Not available for Guest. Please create an account to save progress!");
+        }
+      };
+    }
     
     elements.btnBackToTitle.textContent = '🚪 ' + getTranslation('btn_main_menu', settings.language);
     elements.btnBackToTitle.removeAttribute('data-i18n');
   } else {
     elements.btnBackToTitle.textContent = '🚪 ' + getTranslation('btn_logout', settings.language);
+  }
+  
+  if (localStorage.getItem('mathQuestSavedRun')) {
+    elements.btnStartRun.textContent = getTranslation('btn_resume_run', settings.language);
+    elements.btnStartRun.onclick = () => { window.location.href = 'play.html'; };
+  } else {
+    elements.btnStartRun.textContent = getTranslation('btn_start', settings.language);
+    elements.btnStartRun.onclick = () => { elements.modeModal.classList.add('show'); };
   }
   
   checkAchievements();
@@ -426,8 +513,111 @@ function renderShop() {
   });
 }
 
+function renderUpgrades() {
+  if (!elements.upgradesList) return;
+  elements.upgradesList.innerHTML = '';
+  
+  for (const key in upgrades) {
+    const upg = upgrades[key];
+    const cost = upg.baseCost * (upg.level + 1);
+    const isMax = upg.level >= upg.maxLevel;
+    
+    const card = document.createElement('div');
+    card.className = 'stone-panel';
+    card.style.display = 'flex';
+    card.style.alignItems = 'center';
+    card.style.gap = 'clamp(8px, 2vw, 16px)';
+    card.style.padding = 'clamp(8px, 2vw, 12px)';
+    
+    card.innerHTML = `
+      <div style="flex:1;">
+        <div style="font-family:'Press Start 2P',monospace; font-size:clamp(0.5rem, 2vw, 0.7rem); color:var(--text-gold); margin-bottom:clamp(4px, 1vw, 8px); text-shadow:1px 1px 0 rgba(0,0,0,1);">${getTranslation(upg.nameKey, settings.language)} (Lv. ${upg.level}/${upg.maxLevel})</div>
+        <div style="font-family:'Comic Neue',cursive; font-size:clamp(0.7rem, 2.5vw, 0.9rem); color:#ccc; margin-bottom:8px;">${getTranslation(upg.descKey, settings.language)}</div>
+        <div style="width:100%; height:12px; background:#263238; border-radius:6px; overflow:hidden; border:2px solid var(--panel-border);">
+          <div style="width:${(upg.level / upg.maxLevel) * 100}%; height:100%; background:#4caf50; border-right:2px solid var(--panel-border);"></div>
+        </div>
+      </div>
+      <div>
+        ${isMax ? `<button class="wood-btn" disabled style="opacity:0.5; filter:grayscale(1);">MAX</button>` : `<button class="wood-btn" id="btnBuyUpg_${key}">🪙 ${cost}</button>`}
+      </div>
+    `;
+    elements.upgradesList.appendChild(card);
+    
+    if (!isMax) {
+      const btn = card.querySelector(`#btnBuyUpg_${key}`);
+      if (currency < cost) {
+        btn.disabled = true;
+        btn.style.opacity = '0.5';
+        btn.style.filter = 'grayscale(1)';
+      } else {
+        btn.onclick = () => {
+          currency -= cost;
+          upg.level++;
+          if (typeof SFX !== 'undefined') SFX.purchase();
+          saveState();
+          updateUI();
+        };
+      }
+    }
+  }
+}
+
+function renderQuests() {
+  if (!elements.questsList) return;
+  elements.questsList.innerHTML = '';
+  
+  if (!dailyQuests || !Array.isArray(dailyQuests.quests)) return;
+
+  dailyQuests.quests.forEach((q, idx) => {
+    const isComplete = q.progress >= q.target;
+    
+    const card = document.createElement('div');
+    card.className = 'stone-panel';
+    card.style.display = 'flex';
+    card.style.alignItems = 'center';
+    card.style.flexWrap = 'wrap';
+    card.style.gap = 'clamp(8px, 2vw, 16px)';
+    card.style.padding = 'clamp(8px, 2vw, 12px)';
+    
+    let btnHtml = '';
+    if (q.claimed) {
+      btnHtml = `<button class="wood-btn success" disabled style="padding: 8px 12px; font-size: 0.6rem;">Claimed</button>`;
+      card.style.opacity = '0.7';
+    } else if (isComplete) {
+      btnHtml = `<button class="wood-btn success" id="btnClaimQuest_${idx}" style="padding: 8px 12px; font-size: 0.6rem;">Claim 🪙 ${q.reward}</button>`;
+    } else {
+      btnHtml = `<button class="wood-btn" disabled style="opacity:0.5; filter:grayscale(1); padding: 8px 12px; font-size: 0.6rem;">🪙 ${q.reward}</button>`;
+    }
+    
+    card.innerHTML = `
+      <div style="flex:1; min-width: 140px; word-break: break-word;">
+        <div style="font-family:'Press Start 2P',monospace; font-size:clamp(0.5rem, 2vw, 0.7rem); color:var(--text-gold); margin-bottom:clamp(4px, 1vw, 8px); text-shadow:1px 1px 0 rgba(0,0,0,1);">Bounty</div>
+        <div style="font-family:'Comic Neue',cursive; font-size:clamp(0.7rem, 2.5vw, 0.9rem); color:#ccc; margin-bottom:8px;">${q.text}</div>
+        <div style="width:100%; height:12px; background:#263238; border-radius:6px; overflow:hidden; border:2px solid var(--panel-border); margin-bottom:4px;">
+          <div style="width:${Math.min(100, (q.progress / q.target) * 100)}%; height:100%; background:${isComplete ? '#4caf50' : '#ffa000'}; border-right:2px solid var(--panel-border);"></div>
+        </div>
+        <div style="font-family:'Press Start 2P',monospace; font-size:0.4rem; color:#aaa;">${Math.min(q.progress, q.target)} / ${q.target}</div>
+      </div>
+      <div>
+        ${btnHtml}
+      </div>
+    `;
+    elements.questsList.appendChild(card);
+    
+    if (isComplete && !q.claimed) {
+      const btn = card.querySelector(`#btnClaimQuest_${idx}`);
+      btn.onclick = () => {
+        currency += q.reward;
+        q.claimed = true;
+        if (typeof SFX !== 'undefined') SFX.purchase();
+        saveState();
+        updateUI();
+      };
+    }
+  });
+}
+
 // Mode Selection
-elements.btnStartRun.onclick = () => { elements.modeModal.classList.add('show'); };
 elements.closeModeModal.onclick = () => { elements.modeModal.classList.remove('show'); };
 elements.xCloseMode.onclick = elements.closeModeModal.onclick;
 
@@ -454,6 +644,28 @@ elements.btnShop.onclick = () => {
 };
 elements.closeShopModal.onclick = () => { elements.shopModal.classList.remove('show'); };
 elements.xCloseShop.onclick = elements.closeShopModal.onclick;
+
+elements.btnUpgrades.onclick = () => {
+  if (checkGuestFeature()) return;
+  elements.upgradesModal.classList.add('show');
+  updateUI();
+};
+elements.closeUpgradesModal.onclick = () => elements.upgradesModal.classList.remove('show');
+elements.xCloseUpgrades.onclick = elements.closeUpgradesModal.onclick;
+
+if (elements.btnToggleQuests) {
+  elements.btnToggleQuests.onclick = () => {
+    if (elements.questsListContainer.style.display === 'none') {
+      elements.questsListContainer.style.display = 'block';
+      elements.questsToggleIcon.style.transform = 'rotate(180deg)';
+      if (typeof SFX !== 'undefined') SFX.click();
+    } else {
+      elements.questsListContainer.style.display = 'none';
+      elements.questsToggleIcon.style.transform = 'rotate(0deg)';
+      if (typeof SFX !== 'undefined') SFX.click();
+    }
+  };
+}
 
 elements.btnAchievements.onclick = () => {
   if (checkGuestFeature()) return;
@@ -519,9 +731,34 @@ elements.saveSettings.onclick = () => {
 
 elements.btnBackToTitle.onclick = () => { window.location.href = 'index.html'; };
 
+function updateQuestTimer() {
+  const timerEl = document.getElementById('dailyQuestTimer');
+  if (!timerEl) return;
+  
+  const now = new Date();
+  const tomorrow = new Date(now);
+  tomorrow.setHours(24, 0, 0, 0); // Next midnight
+  const diff = tomorrow - now;
+  
+  const h = Math.floor((diff / (1000 * 60 * 60)) % 24);
+  const m = Math.floor((diff / 1000 / 60) % 60);
+  const s = Math.floor((diff / 1000) % 60);
+  
+  timerEl.textContent = `Resets in: ${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+  
+  if (dailyQuests.lastReset !== now.toDateString()) {
+    generateQuests();
+    saveState();
+    updateUI();
+  }
+}
+
+setInterval(updateQuestTimer, 1000);
+
 window.onload = () => {
   loadState();
   updateUI();
+  saveState();
   
   if (elements.btnReplayTutorial) {
     elements.btnReplayTutorial.onclick = () => {
@@ -532,7 +769,7 @@ window.onload = () => {
 
   const isGuest = (user === 'Guest');
   const isNew = (totalRuns === 0);
-  if ((isGuest || isNew) && !localStorage.getItem('mathQuestTutorialHub')) {
+  if ((isGuest || isNew) && !localStorage.getItem('mathQuestTutorialHub_' + user)) {
     setTimeout(() => {
       startHubTutorial();
     }, 500);
@@ -542,13 +779,18 @@ window.onload = () => {
 function startHubTutorial() {
   const hubSteps = [
     { target: '.hub-panel-container', titleKey: 'tut_hub_welcome', descKey: 'tut_hub_welcome_desc' },
+    { target: '.quests-panel', titleKey: 'tut_hub_quests', descKey: 'tut_hub_quests_desc' },
     { target: '#btnStartRun', titleKey: 'tut_hub_cave', descKey: 'tut_hub_cave_desc' },
     { target: '#btnShop', titleKey: 'tut_hub_shop', descKey: 'tut_hub_shop_desc' },
+    { target: '#btnUpgrades', titleKey: 'tut_hub_upg', descKey: 'tut_hub_upg_desc' },
     { target: '#btnAchievements', titleKey: 'tut_hub_ach', descKey: 'tut_hub_ach_desc' },
     { target: '#btnBuffIndex', titleKey: 'tut_hub_buff', descKey: 'tut_hub_buff_desc' },
-    { target: '#btnSettings', titleKey: 'tut_hub_settings', descKey: 'tut_hub_settings_desc' }
+    { target: '#btnLeaderboard', titleKey: 'tut_hub_leaderboard', descKey: 'tut_hub_leaderboard_desc' },
+    { target: '#btnVersus', titleKey: 'tut_hub_versus', descKey: 'tut_hub_versus_desc' },
+    { target: '#btnSettings', titleKey: 'tut_hub_settings', descKey: 'tut_hub_settings_desc' },
+    { target: '#btnBackToTitle', titleKey: 'tut_hub_logout', descKey: 'tut_hub_logout_desc' }
   ];
-  const tut = new TutorialSystem(hubSteps, 'mathQuestTutorialHub');
+  const tut = new TutorialSystem(hubSteps, 'mathQuestTutorialHub_' + user);
   tut.start();
 }
 

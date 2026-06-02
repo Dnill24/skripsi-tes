@@ -94,11 +94,11 @@ let run = {
 };
 
 const skinEmojis = {
-  'rainbow': '🧍', 'peasant': '👦', 'adventurer': '🎒', 'stone': '🗿',
-  'knight': '🛡️', 'mage': '🧙', 'glow': '⚡', 'ninja': '🥷', 'robot': '🤖',
-  'gold': '👑', 'diamond': '💎', 'fire': '🔥', 'ice': '❄️', 'phantom': '👻',
-  'alien': '👽', 'demon': '👹', 'angel': '👼', 'dragon': '🐲', 'void': '🌌',
-  'celestial': '🌟', 'god': '⛩️'
+  'rainbow': '🧍', 'peasant': '🧑‍🌾', 'adventurer': '🧝', 'stone': '🗿',
+  'knight': '🛡️', 'mage': '🧙', 'glow': '💡', 'ninja': '🥷', 'robot': '🤖',
+  'gold': '🪙', 'diamond': '💎', 'fire': '🔥', 'ice': '❄️', 'phantom': '👻',
+  'alien': '👽', 'demon': '👿', 'angel': '👼', 'dragon': '🐉', 'void': '🌌',
+  'celestial': '🌠', 'god': '🕉️'
 };
 
 const bossEmojis = ['🐲', '🧟', '🧛', '👹', '👽', '💀', '🤡', '🤖', '🦖', '🦂', '👁️', '🎃'];
@@ -133,6 +133,14 @@ function loadState() {
   if (saved) {
     try {
       const parsed = JSON.parse(saved);
+      // Added safely loading run from saved state
+      if (parsed.run && parsed.run.active) {
+        run = parsed.run;
+        if (typeof run.difficultyLevel !== 'number' || isNaN(run.difficultyLevel)) {
+          run.difficultyLevel = 1.0;
+        }
+      }
+      
       currency = parsed.currency ?? 0;
       bestRunScore = parsed.bestRunScore ?? 0;
       totalGoldEarned = parsed.totalGoldEarned ?? 0;
@@ -141,6 +149,7 @@ function loadState() {
       highestStreak = parsed.highestStreak ?? 0;
       totalQuestionsAnswered = parsed.totalQuestionsAnswered ?? 0;
       selectedSkin = parsed.selectedSkin || 'rainbow';
+      if (parsed.dailyQuests) window.dailyQuests = parsed.dailyQuests;
       globalStats = parsed.globalStats || { '+': 0, '-': 0, '*': 0, '/': 0, fastestTime: 999, bossRushBosses: 0, glassCannonBosses: 0, comboGod: 0, playerMMR: 10 };
       globalStats.playerMMR = globalStats.playerMMR ?? 10;
     } catch(e){}
@@ -175,6 +184,8 @@ function saveState() {
     parsed.highestStreak = Math.max(highestStreak, run.streak);
     parsed.totalQuestionsAnswered = totalQuestionsAnswered;
     parsed.globalStats = globalStats;
+    parsed.run = run; // Save run state properly
+    if (window.dailyQuests) parsed.dailyQuests = window.dailyQuests;
     
     localStorage.setItem('mathQuestRogueStats', JSON.stringify(parsed));
     
@@ -191,10 +202,38 @@ function saveState() {
         delete firebaseData.globalStats['*'];
         delete firebaseData.globalStats['/'];
       }
+      if (firebaseData.run && firebaseData.run.stats) {
+        firebaseData.run.stats['add'] = firebaseData.run.stats['+'] || {correct:0,total:0};
+        firebaseData.run.stats['sub'] = firebaseData.run.stats['-'] || {correct:0,total:0};
+        firebaseData.run.stats['mul'] = firebaseData.run.stats['*'] || {correct:0,total:0};
+        firebaseData.run.stats['div'] = firebaseData.run.stats['/'] || {correct:0,total:0};
+        delete firebaseData.run.stats['+'];
+        delete firebaseData.run.stats['-'];
+        delete firebaseData.run.stats['*'];
+        delete firebaseData.run.stats['/'];
+      }
       db.ref('users/' + cleanName + '/stats').update(firebaseData).catch(e => console.error("Firebase Sync Error", e));
     }
   } catch (err) {
     console.error("Error saving state:", err);
+  }
+}
+
+function updateQuestProgress(type, amount, isReplace = false) {
+  if (window.dailyQuests && window.dailyQuests.quests) {
+    window.dailyQuests.quests.forEach(q => {
+      if (q.type === type && !q.completed) {
+        if (isReplace) {
+          q.progress = Math.max(q.progress, amount);
+        } else {
+          q.progress += amount;
+        }
+        if (q.progress >= q.target) {
+          q.completed = true;
+          showCombatText("Bounty Complete!", "text-purple-400 text-3xl", "center");
+        }
+      }
+    });
   }
 }
 
@@ -407,14 +446,14 @@ function nextQuestion() {
   bgPositionX -= 20;
   document.body.style.backgroundPositionX = `${bgPositionX}%`;
   
-  const nextQ = run.questionsAnswered + 1;
-  const progressPercent = ((nextQ - 1) % 5) / 4 * 100;
+  const nextQ = (run.monstersDefeated || 0) + 1;
+  const progressPercent = ((nextQ - 1) % 8) / 7 * 100;
   elements.barProgress.style.width = `${progressPercent}%`;
 
-  if (!run.isBoss && (nextQ % 5 === 0 || run.modifiers.bossRush)) {
+  if (!run.isBoss && (nextQ % 8 === 0 || run.modifiers.bossRush)) {
     run.isBoss = true;
     run.bossesEncountered = (run.bossesEncountered || 0) + 1;
-    run.bossStage = run.modifiers.bossRush ? nextQ : (nextQ / 5);
+    run.bossStage = run.modifiers.bossRush ? nextQ : (nextQ / 8);
     run.bossMaxHP = 100 * run.bossStage;
     run.bossHP = run.bossMaxHP;
     
@@ -494,7 +533,11 @@ function createQuestion(type) {
   }
 
   const primaryOp = ops[getRandomInt(0, ops.length - 1)];
-  const targetMMR = (globalStats.playerMMR || 10) + (run.difficultyLevel * 2);
+  
+  // Base difficulty scaling - with safe NaN fallback
+  const safeMMR = (globalStats && typeof globalStats.playerMMR === 'number' && !isNaN(globalStats.playerMMR)) ? globalStats.playerMMR : 10;
+  const safeDiff = (run && typeof run.difficultyLevel === 'number' && !isNaN(run.difficultyLevel)) ? run.difficultyLevel : 1.0;
+  const targetMMR = safeMMR + (safeDiff * 2);
   
   let numTerms = 2;
   if ((primaryOp === '+' || primaryOp === '-') && targetMMR > 30 && Math.random() > 0.5) {
@@ -572,9 +615,22 @@ function createQuestion(type) {
   }
 
   const options = [bestAns];
-  while (options.length < 4) {
-    const wrong = bestAns + (Math.random() < 0.5 ? 1 : -1) * getRandomInt(1, Math.max(5, Math.floor(targetMMR * 0.2)));
+  let loopGuard = 0;
+  while (options.length < 4 && loopGuard < 100) {
+    loopGuard++;
+    let range = Math.max(5, Math.floor(targetMMR * 0.2));
+    if (isNaN(range)) range = 5;
+    
+    let wrong = bestAns + (Math.random() < 0.5 ? 1 : -1) * getRandomInt(1, range);
+    if (isNaN(wrong)) wrong = bestAns + (Math.random() < 0.5 ? 1 : -1) * getRandomInt(1, 5);
+    
     if (!options.includes(wrong) && wrong >= 0 && wrong !== bestAns) options.push(wrong);
+  }
+  
+  // Failsafe if loop guard triggered
+  while (options.length < 4) {
+    let fallback = bestAns + options.length;
+    if (!options.includes(fallback)) options.push(fallback);
   }
 
   return { text: bestExpr, answers: shuffleArray(options), correct: bestAns, operator: primaryOp };
@@ -582,7 +638,7 @@ function createQuestion(type) {
 
 function renderQuestion() {
   elements.lblQuestion.textContent = run.currentQuestion.text.replaceAll('*', '\u00d7').replaceAll('/', '\u00f7');
-  elements.lblRunStage.textContent = Math.floor(run.questionsAnswered / 5) + 1;
+  elements.lblRunStage.textContent = Math.floor((run.monstersDefeated || 0) / 8) + 1;
   elements.lblScore.textContent = Math.floor(run.score);
   elements.lblHealth.textContent = `${run.health}/${run.maxHealth}`;
 
@@ -663,14 +719,14 @@ function triggerPlayerAttack() {
   void sprite.offsetWidth;
   sprite.classList.add('anim-player-attack');
 
-  SFX.slash();
+  if (typeof SFX !== 'undefined') SFX.slash();
 
   // Spawn slash at enemy after lunge reaches ~55% of animation
   setTimeout(() => {
-    SFX.hit();
+    if (typeof SFX !== 'undefined') SFX.hit();
     if (run.isBoss) {
       spawnSlashAt(elements.enemySprite, true);
-      SFX.bossHit();
+      if (typeof SFX !== 'undefined') SFX.bossHit();
     } else {
       spawnSlashAt(elements.enemySprite, false);
     }
@@ -695,14 +751,14 @@ function triggerEnemyAttack() {
     void elements.battleArena.offsetWidth;
     setTimeout(() => {
       elements.battleArena.classList.add('anim-arena-shake');
-      SFX.playerHurt();
+      if (typeof SFX !== 'undefined') SFX.playerHurt();
       // Enemy slash on player
       spawnSlashAt(elements.playerSprite, false);
     }, 350);
   } else {
     sprite.classList.add('anim-enemy-attack');
     setTimeout(() => {
-      SFX.playerHurt();
+      if (typeof SFX !== 'undefined') SFX.playerHurt();
       spawnSlashAt(elements.playerSprite, false);
     }, 250);
   }
@@ -791,7 +847,7 @@ async function playCalculationAnimation(exprString) {
     tokenElements[opIndex].classList.add('anim-scale-up-glow');
     tokenElements[opIndex + 1].classList.add('anim-scale-up-glow');
     
-    SFX.calcStep(stepIndex);
+    if (typeof SFX !== 'undefined') SFX.calcStep(stepIndex);
     await wait(600);
     
     let mergedVal = steps[s][diffIndex];
@@ -829,7 +885,7 @@ async function playCalculationAnimation(exprString) {
   tokenElements[0].classList.add('anim-scale-up-glow', 'text-emerald-400');
   tokenElements[0].classList.remove('text-yellow-400');
   // Play the final "result reveal" tone — highest pitch in the ladder
-  SFX.calcResult(steps.length - 1);
+  if (typeof SFX !== 'undefined') SFX.calcResult(steps.length - 1);
   await wait(800);
   
   container.classList.add('hidden');
@@ -873,7 +929,7 @@ async function submitAnswer(ans, isTimeout = false) {
     if (timeTaken < globalStats.fastestTime) globalStats.fastestTime = timeTaken;
     
     // spawnCelebrationParticles('playerSpriteContainer');
-    SFX.correct();
+    if (typeof SFX !== 'undefined') SFX.correct();
     
     const timeRatio = Math.max(0, 1 - (timeTaken / MAX_TIME));
     
@@ -893,9 +949,15 @@ async function submitAnswer(ans, isTimeout = false) {
     run.streak++;
     if (run.streak > globalStats.comboGod) globalStats.comboGod = run.streak;
     updateComboUI();
+    
+    // Protect run.difficultyLevel from becoming NaN
+    if (typeof run.difficultyLevel !== 'number' || isNaN(run.difficultyLevel)) run.difficultyLevel = 1.0;
     run.difficultyLevel += 0.1;
+    
     run.stats[op].correct++;
     globalStats[op]++;
+    updateQuestProgress('questions', 1);
+    updateQuestProgress('combo', run.streak, true);
     
     triggerPlayerAttack();
 
@@ -911,6 +973,7 @@ async function submitAnswer(ans, isTimeout = false) {
       
       setTimeout(() => {
         if (run.bossHP === 0) {
+          run.monstersDefeated = (run.monstersDefeated || 0) + 1;
           showCombatText(getTranslation('modal_reward', settings.language), 'text-emerald-400 text-6xl');
           let rewardGold = Math.floor((50 + run.bossStage * 10) * run.modifiers.goldMult);
           let rewardScore = Math.floor((100 + run.bossStage * 25) * run.modifiers.scoreMult);
@@ -930,10 +993,13 @@ async function submitAnswer(ans, isTimeout = false) {
           run.score += rewardScore;
           updateStatsUI();
           
+          updateQuestProgress('bosses', 1);
+          updateQuestProgress('gold', rewardGold);
+          
           const enemyRect = elements.enemySprite.getBoundingClientRect();
           spawnCoins(Math.ceil(rewardGold), enemyRect.left + enemyRect.width / 2, enemyRect.top + enemyRect.height / 2);
-          SFX.bossDefeated();
-          setTimeout(() => SFX.coin(), 200);
+          if (typeof SFX !== 'undefined') SFX.bossDefeated();
+          setTimeout(() => { if (typeof SFX !== 'undefined') SFX.coin(); }, 200);
           run.isBoss = false;
           
           setTimeout(showRewardModal, 1500);
@@ -945,7 +1011,7 @@ async function submitAnswer(ans, isTimeout = false) {
               setTimeout(() => elements.lblCombo && elements.lblCombo.classList.add('hidden'), 1000);
             }
             showCombatText(`${getTranslation('txt_crit', settings.language)} -${damage} HP!`, 'text-yellow-300', 'enemy');
-            SFX.crit();
+            if (typeof SFX !== 'undefined') SFX.crit();
           } else {
             showCombatText(`-${damage} HP!`, 'text-orange-400', 'enemy');
           }
@@ -988,13 +1054,16 @@ async function submitAnswer(ans, isTimeout = false) {
         run.score += scoreGain;
         updateStatsUI();
         
+        updateQuestProgress('gold', gold);
+        run.monstersDefeated = (run.monstersDefeated || 0) + 1;
+        
         const enemyRect = elements.enemySprite.getBoundingClientRect();
         spawnCoins(Math.ceil(gold), enemyRect.left + enemyRect.width / 2, enemyRect.top + enemyRect.height / 2);
-        SFX.coin();
+        if (typeof SFX !== 'undefined') SFX.coin();
         setTimeout(nextQuestion, 1000);
     }
   } else {
-    SFX.wrong();
+    if (typeof SFX !== 'undefined') SFX.wrong();
     
     let mmrLoss = 1.0;
     if (isTimeout) mmrLoss = 1.5;
@@ -1003,6 +1072,9 @@ async function submitAnswer(ans, isTimeout = false) {
     run.streak = 0;
     updateComboUI();
     const baseDifficulty = 1.0 + (run.questionsAnswered * 0.05);
+    
+    // Protect run.difficultyLevel from becoming NaN
+    if (typeof run.difficultyLevel !== 'number' || isNaN(run.difficultyLevel)) run.difficultyLevel = 1.0;
     run.difficultyLevel = Math.max(baseDifficulty, run.difficultyLevel - 0.5);
     run.stats[op].incorrect++;
     
@@ -1090,6 +1162,7 @@ function endRun(msg) {
   run.active = false;
   clearInterval(timerInterval);
   totalRuns++;
+  updateQuestProgress('runs', 1);
   saveState();
   
   if (run.score > 0) {
@@ -1153,10 +1226,12 @@ function endRun(msg) {
   }
 
   elements.runOverModal.classList.add('show');
-  SFX.runOver();
+  if (typeof SFX !== 'undefined') SFX.runOver();
 }
 
-
+window.addEventListener('beforeunload', () => {
+  saveState();
+});
 
 function togglePause() {
   if (elements.runOverModal.classList.contains('show') || elements.rewardModal.classList.contains('show') || document.getElementById('countdownOverlay').style.display === 'flex') return;
@@ -1165,7 +1240,7 @@ function togglePause() {
     run.active = false;
     clearInterval(timerInterval);
     elements.pauseModal.classList.add('show');
-    SFX.btnClick();
+    if (typeof SFX !== 'undefined') SFX.btnClick();
   } else if (elements.pauseModal.classList.contains('show')) {
     elements.pauseModal.classList.remove('show');
     run.active = true;
@@ -1178,7 +1253,7 @@ function togglePause() {
         submitAnswer(null, true);
       }
     }, 100);
-    SFX.btnClick();
+    if (typeof SFX !== 'undefined') SFX.btnClick();
   }
 }
 
@@ -1227,8 +1302,6 @@ if (elements.sfxVolumeSlider) {
   };
 }
 
-
-
 function runCountdown(callback) {
   const overlay = document.getElementById('countdownOverlay');
   const text = document.getElementById('countdownText');
@@ -1275,155 +1348,97 @@ function runCountdown(callback) {
       if (floor) floor.classList.remove('floor-hidden');
       if (playerCont) playerCont.classList.remove('char-hidden-left');
       if (enemyCont) enemyCont.classList.remove('char-hidden-right');
-      SFX.countdownStart();
+      if (typeof SFX !== 'undefined') SFX.countdownStart();
     } else {
       text.style.color = '#ff4d6d';
       text.style.textShadow = '0 0 40px rgba(255,77,109,0.9), 0 0 80px rgba(255,77,109,0.5), 4px 4px 0 rgba(0,0,0,1)';
-      SFX.countdownBeep(stepVal);
+      if (typeof SFX !== 'undefined') {
+        if (typeof SFX.countdownTick === 'function') SFX.countdownTick();
+        else if (typeof SFX.countdownBeep === 'function') SFX.countdownBeep(stepVal);
+      }
     }
-    text.style.opacity = '0';
-    text.style.transform = 'scale(0.5)';
-    text.style.transition = 'none';
     
-    void text.offsetWidth; // force reflow
-    
-    text.style.transition = 'all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
-    text.style.opacity = '1';
-    text.style.transform = 'scale(1)';
+    text.classList.remove('anim-countdown-pop');
+    void text.offsetWidth;
     text.classList.add('anim-countdown-pop');
     
-    setTimeout(() => {
-      text.classList.remove('anim-countdown-pop');
-    }, 500);
-    
     idx++;
-    setTimeout(showNext, 800);
+    setTimeout(showNext, 1000);
   }
   
   showNext();
 }
 
-function spawnCelebrationParticles(containerId) {
-  const container = document.getElementById(containerId);
-  if (!container) return;
+function initGame() {
+  loadState();
+  updateStatsUI();
   
-  const particles = ['⭐', '✨', '🎈', '🎉', '🌈'];
-  const numParticles = 8;
-  
-  for (let i = 0; i < numParticles; i++) {
-    const pEl = document.createElement('span');
-    pEl.className = 'celebration-particle';
-    pEl.textContent = particles[Math.floor(Math.random() * particles.length)];
-    
-    const xDrift = (Math.random() - 0.5) * 120;
-    const yDrift = -60 - Math.random() * 80;
-    
-    pEl.style.setProperty('--x-drift', `${xDrift}px`);
-    pEl.style.setProperty('--y-drift', `${yDrift}px`);
-    
-    pEl.style.left = '50%';
-    pEl.style.top = '20%';
-    
-    container.appendChild(pEl);
-    
-    setTimeout(() => pEl.remove(), 1200);
+  if (!run.active) {
+    run = {
+      active: true,
+      health: 100,
+      maxHealth: 100,
+      score: 0,
+      questionsAnswered: 0,
+      bossesEncountered: 0,
+      bossStage: 0,
+      bossHP: 0,
+      bossMaxHP: 0,
+      isBoss: false,
+      monstersDefeated: 0,
+      streak: 0,
+      currency: 0,
+      goldEarned: 0,
+      difficultyLevel: 1.0,
+      stats: {
+        '+': { nameKey: 'stat_add', correct: 0, incorrect: 0, total: 0 },
+        '-': { nameKey: 'stat_sub', correct: 0, incorrect: 0, total: 0 },
+        '*': { nameKey: 'stat_mul', correct: 0, incorrect: 0, total: 0 },
+        '/': { nameKey: 'stat_div', correct: 0, incorrect: 0, total: 0 }
+      },
+      activeBuffs: [],
+      modifiers: {
+        enemyHealthMult: 1,
+        damageMult: 1,
+        scoreMult: 1,
+        goldMult: 1,
+        bossRush: false,
+        glassCannon: false,
+        vampirism: false,
+        gambler: false,
+        berserk: false
+      },
+      currentQuestion: null
+    };
   }
+
+  runCountdown(() => {
+    if (!run.currentQuestion) {
+      run.currentQuestion = createQuestion(run.isBoss ? 'boss' : 'enemy');
+    }
+    renderQuestion();
+    startTimer();
+    
+    if (run.isBoss) {
+      elements.bossHpContainer.style.display = 'block';
+      elements.barBossHp.style.width = `${(run.bossHP / run.bossMaxHP) * 100}%`;
+      elements.enemySprite.textContent = bossEmojis[(run.bossesEncountered - 1) % bossEmojis.length];
+      elements.enemySprite.classList.add('anim-boss-idle');
+    } else {
+      elements.bossHpContainer.style.display = 'none';
+      const enemies = ['👾', '👻', '💀', '👽', '🕷️', '🦇'];
+      elements.enemySprite.textContent = enemies[Math.floor(Math.random() * enemies.length)];
+      elements.enemySprite.classList.add('anim-idle');
+    }
+  });
 }
 
 elements.btnReturnHub.onclick = () => {
-  SFX.btnClick();
-  window.location.href = 'game.html';
+  try { if (typeof SFX !== 'undefined') SFX.btnClick(); } catch(e){}
+  window.location.assign('game.html');
 };
 
-// â”€â”€â”€ GLOBAL BUTTON SFX â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-// Use mousedown (fires immediately on press, no delay vs click)
-document.addEventListener('mousedown', (e) => {
-  const btn = e.target.closest('button');
-  if (!btn || btn.disabled) return;
-  if (btn.classList.contains('danger') || btn.id === 'btnFlee') {
-    SFX.btnDanger();
-  } else {
-    SFX.btnClick();
-  }
-});
-// Also handle touch devices
-document.addEventListener('touchstart', (e) => {
-  const btn = e.target.closest('button');
-  if (!btn || btn.disabled) return;
-  if (btn.classList.contains('danger') || btn.id === 'btnFlee') {
-    SFX.btnDanger();
-  } else {
-    SFX.btnClick();
-  }
-}, { passive: true });
-// Reward cards (divs, not buttons)
-document.addEventListener('mousedown', (e) => {
-  const card = e.target.closest('.stone-panel');
-  if (card && card.style.cursor === 'pointer') {
-    SFX.buffPick();
-  }
-});
-
-window.onload = () => {
-  loadState();
-  applyTranslationsToDOM(settings.language);
-  updateStatsUI();
-  elements.barTimer.style.width = '100%';
-  runCountdown(() => {
-    nextQuestion();
-    
-    const isGuest = (user === 'Guest');
-    const isNew = (totalRuns === 0);
-    if ((isGuest || isNew) && !localStorage.getItem('mathQuestTutorialPlay')) {
-      setTimeout(() => {
-        startPlayTutorial();
-      }, 500);
-    }
-  });
-};
-
-function startPlayTutorial() {
-  const wasActive = run.active;
-  run.active = false;
-  clearInterval(timerInterval);
-  
-  const playSteps = [
-    { target: '#hudTop', titleKey: 'tut_play_stats', descKey: 'tut_play_stats_desc' },
-    { target: '#lblQuestion', titleKey: 'tut_play_question', descKey: 'tut_play_question_desc' },
-    { target: '#answerGrid', titleKey: 'tut_play_answers', descKey: 'tut_play_answers_desc' },
-    { target: '#btnPause', titleKey: 'tut_play_pause', descKey: 'tut_play_pause_desc' }
-  ];
-  const tut = new TutorialSystem(playSteps, 'mathQuestTutorialPlay');
-  
-  const originalFinish = tut.finish.bind(tut);
-  tut.finish = () => {
-    originalFinish();
-    run.active = wasActive;
-    if (wasActive) {
-      timerInterval = setInterval(() => {
-        if(!run.active) return clearInterval(timerInterval);
-        timeLeft -= 0.1;
-        updateTimerUI();
-        if (timeLeft <= 0) {
-          clearInterval(timerInterval);
-          submitAnswer(null, true);
-        }
-      }, 100);
-    }
-  };
-  
-  tut.start();
-}
-
-document.addEventListener('click', () => {
-  if (typeof SFX !== 'undefined' && run) {
-    SFX.playBGM(run.isBoss ? 'Boss Music.mp3' : 'Battle Music.mp3');
-  }
-}, { once: true });
-
-window.addEventListener('beforeunload', function (e) {
-  if (typeof run !== 'undefined' && run && run.active) {
-    e.preventDefault();
-    e.returnValue = '';
-  }
+document.addEventListener('DOMContentLoaded', () => {
+  if (typeof updateTranslations === 'function') updateTranslations(settings.language || 'en');
+  initGame();
 });

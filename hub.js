@@ -658,11 +658,11 @@ if (elements.btnToggleQuests) {
     if (elements.questsListContainer.style.display === 'none') {
       elements.questsListContainer.style.display = 'block';
       elements.questsToggleIcon.style.transform = 'rotate(180deg)';
-      if (typeof SFX !== 'undefined') SFX.click();
+      if (typeof SFX !== 'undefined') SFX.btnClick();
     } else {
       elements.questsListContainer.style.display = 'none';
       elements.questsToggleIcon.style.transform = 'rotate(0deg)';
-      if (typeof SFX !== 'undefined') SFX.click();
+      if (typeof SFX !== 'undefined') SFX.btnClick();
     }
   };
 }

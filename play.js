@@ -1262,8 +1262,49 @@ window.onload = () => {
   elements.barTimer.style.width = '100%';
   runCountdown(() => {
     nextQuestion();
+    
+    const isGuest = (user === 'Guest');
+    const isNew = (totalRuns === 0);
+    if ((isGuest || isNew) && !localStorage.getItem('mathQuestTutorialPlay')) {
+      setTimeout(() => {
+        startPlayTutorial();
+      }, 500);
+    }
   });
 };
+
+function startPlayTutorial() {
+  const wasActive = run.active;
+  run.active = false;
+  clearInterval(timerInterval);
+  
+  const playSteps = [
+    { target: '#hudTop', titleKey: 'tut_play_stats', descKey: 'tut_play_stats_desc' },
+    { target: '#lblQuestion', titleKey: 'tut_play_question', descKey: 'tut_play_question_desc' },
+    { target: '#answerGrid', titleKey: 'tut_play_answers', descKey: 'tut_play_answers_desc' },
+    { target: '#btnFlee', titleKey: 'tut_play_pause', descKey: 'tut_play_pause_desc' }
+  ];
+  const tut = new TutorialSystem(playSteps, 'mathQuestTutorialPlay');
+  
+  const originalFinish = tut.finish.bind(tut);
+  tut.finish = () => {
+    originalFinish();
+    run.active = wasActive;
+    if (wasActive) {
+      timerInterval = setInterval(() => {
+        if(!run.active) return clearInterval(timerInterval);
+        timeLeft -= 0.1;
+        updateTimerUI();
+        if (timeLeft <= 0) {
+          clearInterval(timerInterval);
+          submitAnswer(null, true);
+        }
+      }, 100);
+    }
+  };
+  
+  tut.start();
+}
 
 document.addEventListener('click', () => {
   if (typeof SFX !== 'undefined' && run) {

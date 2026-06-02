@@ -141,44 +141,37 @@
 
 <!-- Settings Modal -->
 <div class="terra-modal-overlay" id="settingsModal">
-  <div class="terra-modal-card">
-    <h2 data-i18n="menu_settings">SETTINGS</h2>
-    <div style="display:flex; flex-direction:column; gap:24px; margin-top:16px;">
+  <div class="terra-modal-card" style="max-width:440px;">
+    <button id="xCloseSettings" class="modal-close-btn" style="position:absolute; top:12px; right:12px; z-index:20; background:var(--panel-bg); padding:4px 8px; border-radius:8px; box-shadow:0 0 10px rgba(0,0,0,0.5);">X</button>
+    <div style="margin-bottom:24px; margin-top:12px;">
+      <h2 class="fancy-header" style="margin:0;" data-i18n="modal_settings">⚙️ Settings</h2>
+    </div>
+    <div style="display:flex; flex-direction:column; gap:24px;">
       <div style="display:flex; align-items:center; justify-content:space-between;">
-        <label for="musicVolumeSlider" style="margin:0;">
-          <span style="font-size:1.2rem; vertical-align:middle; margin-right:4px;">🎵</span><span data-i18n="lbl_music_volume">Music</span>
-        </label>
+        <label for="musicVolumeSlider" style="margin:0;"><span style="font-size:1.2rem; vertical-align:middle; margin-right:4px;">🎵</span> <span data-i18n="lbl_music_volume">Music</span></label>
         <div style="display:flex; align-items:center; gap:12px;">
-          <input type="range" id="musicVolumeSlider" min="0" max="100" value="50" style="width:100px; accent-color:var(--text-gold); cursor:pointer;">
-          <span id="musicVolumeValue" style="font-family:'Press Start 2P',monospace; font-size:0.6rem; color:var(--text-gold); min-width:3rem;">50%</span>
+          <input type="range" id="musicVolumeSlider" min="0" max="100" value="50" style="width:100px; padding:0; height:12px; border:none; accent-color:var(--text-gold); cursor:pointer; box-shadow:none;">
+          <span id="musicVolumeValue" style="font-family:'Press Start 2P',monospace; font-size:0.6rem; color:var(--text-gold); min-width:3rem; text-shadow:1px 1px 0 rgba(0,0,0,0.8);">50%</span>
         </div>
       </div>
       <div style="display:flex; align-items:center; justify-content:space-between;">
-        <label for="sfxVolumeSlider" style="margin:0;">
-          <span style="font-size:1.2rem; vertical-align:middle; margin-right:4px;">🔊</span><span data-i18n="lbl_sfx_volume">SFX</span>
-        </label>
+        <label for="sfxVolumeSlider" style="margin:0;"><span style="font-size:1.2rem; vertical-align:middle; margin-right:4px;">🔊</span> <span data-i18n="lbl_sfx_volume">SFX</span></label>
         <div style="display:flex; align-items:center; gap:12px;">
-          <input type="range" id="sfxVolumeSlider" min="0" max="100" value="70" style="width:100px; accent-color:var(--text-gold); cursor:pointer;">
-          <span id="sfxVolumeValue" style="font-family:'Press Start 2P',monospace; font-size:0.6rem; color:var(--text-gold); min-width:3rem;">70%</span>
+          <input type="range" id="sfxVolumeSlider" min="0" max="100" value="70" style="width:100px; padding:0; height:12px; border:none; accent-color:var(--text-gold); cursor:pointer; box-shadow:none;">
+          <span id="sfxVolumeValue" style="font-family:'Press Start 2P',monospace; font-size:0.6rem; color:var(--text-gold); min-width:3rem; text-shadow:1px 1px 0 rgba(0,0,0,0.8);">70%</span>
         </div>
       </div>
       <div style="display:flex; align-items:center; justify-content:space-between;">
-        <label for="languageSelect" style="margin:0;">
-          <span style="font-size:1.2rem; vertical-align:middle; margin-right:4px;">🌐</span><span data-i18n="lbl_language">Language</span>
-        </label>
-        <select id="languageSelect" style="margin:0; width:140px;">
+        <label for="languageSelect" style="margin:0;">🌐 <span data-i18n="lbl_language">Language</span></label>
+        <select id="languageSelect" style="margin:0; width:180px; padding:8px;">
           <option value="en">English</option>
-          <option value="id">Indonesian</option>
+          <option value="id">Bahasa Indonesia</option>
         </select>
       </div>
     </div>
     <div style="display:flex; gap:12px; margin-top:32px;">
-      <button id="saveSettings" class="wood-btn success" style="flex:1;">
-        <span style="font-size:1.2rem; vertical-align:middle; margin-right:8px;">💾</span><span data-i18n="btn_save">Save</span>
-      </button>
-      <button id="closeSettings" class="wood-btn danger" style="flex:1;">
-        <span style="font-size:1.2rem; vertical-align:middle; margin-right:8px;">❌</span><span data-i18n="menu_cancel">Cancel</span>
-      </button>
+      <button id="saveSettings"  class="wood-btn success" style="flex:1;" data-i18n="btn_save">💾 Save</button>
+      <button id="closeSettings" class="wood-btn danger"  style="flex:1;" data-i18n="btn_close">❌ Cancel</button>
     </div>
   </div>
 </div>
@@ -197,6 +190,7 @@
   const cancelBtn  = document.getElementById('cancelLogin');
   const cancelSign = document.getElementById('cancelSignup');
   const closeSetBtn= document.getElementById('closeSettings');
+  const xCloseSetBtn= document.getElementById('xCloseSettings');
 
   playBtn.addEventListener('click', () => {
     playOpts.style.display = 'flex';
@@ -224,6 +218,7 @@
   cancelSign.addEventListener('click', () => signupModal.classList.remove('show'));
   settingsBtn.addEventListener('click', () => settModal.classList.add('show'));
   closeSetBtn.addEventListener('click', () => settModal.classList.remove('show'));
+  if (xCloseSetBtn) xCloseSetBtn.addEventListener('click', () => settModal.classList.remove('show'));
 
   [loginModal, signupModal, settModal].forEach(m => {
     m.addEventListener('click', e => { if (e.target === m) m.classList.remove('show'); });

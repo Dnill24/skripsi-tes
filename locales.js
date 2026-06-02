@@ -71,6 +71,8 @@ const locales = {
     stat_runs: "Total Stages",
     modal_settings: "Settings",
     lbl_volume: "Volume",
+    lbl_music_volume: "Music",
+    lbl_sfx_volume: "SFX",
     lbl_language: "Language",
     btn_save: "Save",
     modal_mode: "Select Mode",
@@ -175,7 +177,34 @@ const locales = {
     ach_m2_name: "Risky Winner", ach_m2_desc: "Defeat a Boss using the One Hit Hero buff.",
     ach_m3_name: "Flash Speed", ach_m3_desc: "Answer a question in under 1 second.",
     ach_m4_name: "Combo Master", ach_m4_desc: "Reach a 50x Combo streak.",
-    ach_m5_name: "The Math Legend", ach_m5_desc: "Unlock the Math God skin."
+    ach_m5_name: "The Math Legend", ach_m5_desc: "Unlock the Math God skin.",
+
+    // Tutorial
+    tut_hub_welcome: "Welcome to the Base Camp!",
+    tut_hub_welcome_desc: "This is your safe zone. Let's look around before you start your adventure.",
+    tut_hub_cave: "Enter Cave",
+    tut_hub_cave_desc: "Click here to start a run and fight monsters using math!",
+    tut_hub_shop: "Merchant",
+    tut_hub_shop_desc: "Use your hard-earned gold to buy cool new skins here.",
+    tut_hub_ach: "Trophies",
+    tut_hub_ach_desc: "Check your stats and unlock achievements for playing.",
+    tut_hub_buff: "Buff Index",
+    tut_hub_buff_desc: "Learn about the different magic buffs you can find in the cave.",
+    tut_hub_settings: "Settings",
+    tut_hub_settings_desc: "Change the language, volume, or replay this tutorial.",
+    tut_btn_next: "Next",
+    tut_btn_skip: "Skip",
+    tut_btn_finish: "Finish",
+    btn_replay_tutorial: "Replay Tutorial",
+    
+    tut_play_stats: "Your Progress",
+    tut_play_stats_desc: "Here you can see your current Stage, Score, Health, and Combo multiplier.",
+    tut_play_question: "Math Problem",
+    tut_play_question_desc: "Solve this before the timer runs out to attack the monster!",
+    tut_play_answers: "Answers",
+    tut_play_answers_desc: "Click the correct answer. The faster you answer, the more damage you deal!",
+    tut_play_pause: "Pause & Flee",
+    tut_play_pause_desc: "Need a break? Pause here, or Flee to safely return to Base Camp with your gold."
   },
   id: {
     // UI Main Menu (index.html)
@@ -249,6 +278,8 @@ const locales = {
     stat_runs: "Total Tahap",
     modal_settings: "Pengaturan",
     lbl_volume: "Volume",
+    lbl_music_volume: "Musik",
+    lbl_sfx_volume: "Efek Suara",
     lbl_language: "Bahasa",
     btn_save: "Simpan",
     modal_mode: "Pilih Mode",
@@ -352,7 +383,34 @@ const locales = {
     ach_m2_name: "Pemenang Nekat", ach_m2_desc: "Kalahkan Bos saat buff Pahlawan Satu Nyawa aktif.",
     ach_m3_name: "Secepat Kilat", ach_m3_desc: "Jawab pertanyaan dalam kurang dari 1 detik.",
     ach_m4_name: "Ahli Kombo", ach_m4_desc: "Capai rentetan Kombo 50x.",
-    ach_m5_name: "Legenda Matematika", ach_m5_desc: "Buka kostum Dewa Matematika."
+    ach_m5_name: "Legenda Matematika", ach_m5_desc: "Buka kostum Dewa Matematika.",
+
+    // Tutorial
+    tut_hub_welcome: "Selamat datang di Kemah!",
+    tut_hub_welcome_desc: "Ini adalah zona amanmu. Mari kita lihat sekeliling sebelum memulai petualangan.",
+    tut_hub_cave: "Masuk Gua",
+    tut_hub_cave_desc: "Klik di sini untuk memulai pertarungan melawan monster dengan matematika!",
+    tut_hub_shop: "Saudagar",
+    tut_hub_shop_desc: "Gunakan emasmu untuk membeli kostum baru yang keren di sini.",
+    tut_hub_ach: "Trofi",
+    tut_hub_ach_desc: "Cek statistikmu dan buka pencapaian selama bermain.",
+    tut_hub_buff: "Indeks Buff",
+    tut_hub_buff_desc: "Pelajari berbagai buff sihir yang bisa kamu temukan di dalam gua.",
+    tut_hub_settings: "Pengaturan",
+    tut_hub_settings_desc: "Ubah bahasa, volume, atau putar ulang tutorial ini.",
+    tut_btn_next: "Lanjut",
+    tut_btn_skip: "Lewati",
+    tut_btn_finish: "Selesai",
+    btn_replay_tutorial: "Ulang Tutorial",
+
+    tut_play_stats: "Kemajuanmu",
+    tut_play_stats_desc: "Di sini kamu bisa melihat Tahap, Skor, Darah, dan pengali Kombo kamu.",
+    tut_play_question: "Soal Matematika",
+    tut_play_question_desc: "Pecahkan ini sebelum waktu habis untuk menyerang monster!",
+    tut_play_answers: "Jawaban",
+    tut_play_answers_desc: "Klik jawaban yang benar. Semakin cepat menjawab, semakin besar seranganmu!",
+    tut_play_pause: "Jeda & Kabur",
+    tut_play_pause_desc: "Butuh istirahat? Jeda di sini, atau Kabur untuk kembali ke Kemah dengan aman."
   }
 };
 
@@ -398,6 +456,7 @@ window.showToast = function(message, type = 'error') {
     setTimeout(() => toast.remove(), 300);
   }, 3000);
 };
+
 // Global Custom Confirm Dialog
 window.showConfirm = function(message) {
   return new Promise((resolve) => {

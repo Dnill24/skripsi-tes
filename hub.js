@@ -30,6 +30,7 @@ const elements = {
   musicVolumeSlider: document.getElementById('musicVolumeSlider'),
   musicVolumeValue: document.getElementById('musicVolumeValue'),
   languageSelect: document.getElementById('languageSelect'),
+  btnReplayTutorial: document.getElementById('btnReplayTutorial'),
   
   btnBuffIndex: document.getElementById('btnBuffIndex'),
   buffIndexModal: document.getElementById('buffIndexModal'),
@@ -434,7 +435,35 @@ elements.btnBackToTitle.onclick = () => { window.location.href = 'index.html'; }
 window.onload = () => {
   loadState();
   updateUI();
+  
+  if (elements.btnReplayTutorial) {
+    elements.btnReplayTutorial.onclick = () => {
+      elements.settingsModal.classList.remove('show');
+      startHubTutorial();
+    };
+  }
+
+  const isGuest = (user === 'Guest');
+  const isNew = (totalRuns === 0);
+  if ((isGuest || isNew) && !localStorage.getItem('mathQuestTutorialHub')) {
+    setTimeout(() => {
+      startHubTutorial();
+    }, 500);
+  }
 };
+
+function startHubTutorial() {
+  const hubSteps = [
+    { target: '.hub-panel-container', titleKey: 'tut_hub_welcome', descKey: 'tut_hub_welcome_desc' },
+    { target: '#btnStartRun', titleKey: 'tut_hub_cave', descKey: 'tut_hub_cave_desc' },
+    { target: '#btnShop', titleKey: 'tut_hub_shop', descKey: 'tut_hub_shop_desc' },
+    { target: '#btnAchievements', titleKey: 'tut_hub_ach', descKey: 'tut_hub_ach_desc' },
+    { target: '#btnBuffIndex', titleKey: 'tut_hub_buff', descKey: 'tut_hub_buff_desc' },
+    { target: '#btnSettings', titleKey: 'tut_hub_settings', descKey: 'tut_hub_settings_desc' }
+  ];
+  const tut = new TutorialSystem(hubSteps, 'mathQuestTutorialHub');
+  tut.start();
+}
 
 // Buff Info for Index
 const buffPoolInfo = [

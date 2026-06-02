@@ -30,7 +30,15 @@ const elements = {
   rewardCardsContainer: document.getElementById('rewardCardsContainer'),
   lblDefense: document.getElementById('lblDefense'),
   lblGoldMod: document.getElementById('lblGoldMod'),
-  lblScoreMod: document.getElementById('lblScoreMod')
+  lblScoreMod: document.getElementById('lblScoreMod'),
+  btnPause: document.getElementById('btnPause'),
+  pauseModal: document.getElementById('pauseModal'),
+  sfxVolumeSlider: document.getElementById('sfxVolumeSlider'),
+  sfxVolumeValue: document.getElementById('sfxVolumeValue'),
+  musicVolumeSlider: document.getElementById('musicVolumeSlider'),
+  musicVolumeValue: document.getElementById('musicVolumeValue'),
+  btnResumePause: document.getElementById('btnResumePause'),
+  btnQuitPause: document.getElementById('btnQuitPause')
 };
 
 let currency = 0;
@@ -142,6 +150,14 @@ function loadState() {
   if (savedSettings) {
     try { settings = { ...settings, ...JSON.parse(savedSettings) }; } catch(e){}
   }
+  
+  if (elements.sfxVolumeSlider) {
+    elements.sfxVolumeSlider.value = settings.sfxVolume || 70;
+    elements.sfxVolumeValue.textContent = (settings.sfxVolume || 70) + '%';
+    elements.musicVolumeSlider.value = settings.musicVolume || 50;
+    elements.musicVolumeValue.textContent = (settings.musicVolume || 50) + '%';
+  }
+  
   elements.playerSprite.textContent = skinEmojis[selectedSkin] || '🧍';
 }
 
@@ -392,13 +408,13 @@ function nextQuestion() {
   document.body.style.backgroundPositionX = `${bgPositionX}%`;
   
   const nextQ = run.questionsAnswered + 1;
-  const progressPercent = ((nextQ - 1) % 10) / 9 * 100;
+  const progressPercent = ((nextQ - 1) % 5) / 4 * 100;
   elements.barProgress.style.width = `${progressPercent}%`;
 
-  if (!run.isBoss && (nextQ % 10 === 0 || run.modifiers.bossRush)) {
+  if (!run.isBoss && (nextQ % 5 === 0 || run.modifiers.bossRush)) {
     run.isBoss = true;
     run.bossesEncountered = (run.bossesEncountered || 0) + 1;
-    run.bossStage = run.modifiers.bossRush ? nextQ : (nextQ / 10);
+    run.bossStage = run.modifiers.bossRush ? nextQ : (nextQ / 5);
     run.bossMaxHP = 100 * run.bossStage;
     run.bossHP = run.bossMaxHP;
     
@@ -430,16 +446,45 @@ function nextQuestion() {
 function calculateEquationWeight(exprStr) {
   let tokens = exprStr.split(' ');
   let weight = 0;
-  let opMult = 1.0;
-  for (let t of tokens) {
-    if (['+', '-'].includes(t)) opMult += 0.2;
-    else if (['*', '/'].includes(t)) opMult += 1.5;
-    else {
-      let v = Math.abs(parseInt(t));
-      weight += (v.toString().length * 2) + (v * 0.1);
+  
+  if (tokens.length === 3) {
+    let a = parseInt(tokens[0]);
+    let op = tokens[1];
+    let b = parseInt(tokens[2]);
+    
+    if (op === '+') {
+      weight = (a * 0.15) + (b * 0.15) + (a.toString().length * 2.5) + (b.toString().length * 2.5);
+    } else if (op === '-') {
+      weight = (a * 0.15) + (b * 0.2) + (a.toString().length * 2.5) + (b.toString().length * 2.5);
+    } else if (op === '*') {
+      let aLog = Math.log10(a || 1);
+      let bLog = Math.log10(b || 1);
+      weight = (a * 0.5) + (b * 0.5) + (aLog * bLog * 15);
+      if (a > 10 && b > 10 && a % 10 !== 0 && b % 10 !== 0) {
+        weight += Math.max(a, b) * 1.5;
+      }
+    } else if (op === '/') {
+      let q = a / b;
+      let qLog = Math.log10(q || 1);
+      let bLog = Math.log10(b || 1);
+      weight = (b * 0.5) + (q * 0.5) + (qLog * bLog * 15);
+      if (q > 10 && b > 10 && q % 10 !== 0 && b % 10 !== 0) {
+        weight += Math.max(q, b) * 1.5;
+      }
     }
+  } else {
+    let opMult = 1.0;
+    for (let t of tokens) {
+      if (['+', '-'].includes(t)) opMult += 0.5;
+      else if (['*', '/'].includes(t)) opMult += 2.0;
+      else {
+        let v = Math.abs(parseInt(t));
+        weight += (v.toString().length * 3) + (v * 0.2);
+      }
+    }
+    weight *= opMult;
   }
-  return weight * opMult;
+  return weight;
 }
 
 function createQuestion(type) {
@@ -467,8 +512,9 @@ function createQuestion(type) {
     let exprStr = "";
     let answer = 0;
     
-    let bound = Math.max(5, targetMMR * 1.5);
-    if (primaryOp === '*' || primaryOp === '/') bound = Math.max(3, targetMMR * 0.4);
+    let bound = Math.max(10, targetMMR * 3.5);
+    if (primaryOp === '*') bound = Math.max(5, targetMMR * 0.5);
+    if (primaryOp === '/') bound = Math.max(5, targetMMR * 0.6);
 
     if (numTerms > 2 && (gameMode === 'normal' && primaryOp !== '/')) {
       let terms = [];
@@ -536,7 +582,7 @@ function createQuestion(type) {
 
 function renderQuestion() {
   elements.lblQuestion.textContent = run.currentQuestion.text.replaceAll('*', '\u00d7').replaceAll('/', '\u00f7');
-  elements.lblRunStage.textContent = Math.floor(run.questionsAnswered / 10) + 1;
+  elements.lblRunStage.textContent = Math.floor(run.questionsAnswered / 5) + 1;
   elements.lblScore.textContent = Math.floor(run.score);
   elements.lblHealth.textContent = `${run.health}/${run.maxHealth}`;
 
@@ -831,7 +877,7 @@ async function submitAnswer(ans, isTimeout = false) {
     
     const timeRatio = Math.max(0, 1 - (timeTaken / MAX_TIME));
     
-    let mmrGain = 0.5 + (timeRatio * 1.5);
+    let mmrGain = 0.25 + (timeRatio * 0.75); // Slower MMR gain
     if (run.isBoss) mmrGain *= 1.5;
     globalStats.playerMMR = (globalStats.playerMMR || 10) + mmrGain;
     
@@ -847,7 +893,7 @@ async function submitAnswer(ans, isTimeout = false) {
     run.streak++;
     if (run.streak > globalStats.comboGod) globalStats.comboGod = run.streak;
     updateComboUI();
-    run.difficultyLevel += 0.2;
+    run.difficultyLevel += 0.1;
     run.stats[op].correct++;
     globalStats[op]++;
     
@@ -1110,29 +1156,75 @@ function endRun(msg) {
   SFX.runOver();
 }
 
-if (elements.btnFlee) {
-  elements.btnFlee.addEventListener('click', async (e) => {
-    e.preventDefault();
-    const wasActive = run.active;
+
+
+function togglePause() {
+  if (elements.runOverModal.classList.contains('show') || elements.rewardModal.classList.contains('show') || document.getElementById('countdownOverlay').style.display === 'flex') return;
+  
+  if (run.active) {
     run.active = false;
     clearInterval(timerInterval);
+    elements.pauseModal.classList.add('show');
+    SFX.btnClick();
+  } else if (elements.pauseModal.classList.contains('show')) {
+    elements.pauseModal.classList.remove('show');
+    run.active = true;
+    timerInterval = setInterval(() => {
+      if(!run.active) return clearInterval(timerInterval);
+      timeLeft -= 0.1;
+      updateTimerUI();
+      if (timeLeft <= 0) {
+        clearInterval(timerInterval);
+        submitAnswer(null, true);
+      }
+    }, 100);
+    SFX.btnClick();
+  }
+}
+
+if (elements.btnPause) {
+  elements.btnPause.onclick = (e) => {
+    e.preventDefault();
+    togglePause();
+  };
+}
+
+if (elements.btnResumePause) {
+  elements.btnResumePause.onclick = togglePause;
+}
+
+if (elements.btnQuitPause) {
+  elements.btnQuitPause.onclick = async () => {
+    elements.pauseModal.classList.remove('show');
     if (await showConfirm(getTranslation('txt_confirm_flee', settings.language))) {
       endRun(getTranslation('txt_fled', settings.language));
     } else {
-      run.active = wasActive;
-      if (wasActive) {
-        timerInterval = setInterval(() => {
-          if(!run.active) return clearInterval(timerInterval);
-          timeLeft -= 0.1;
-          updateTimerUI();
-          if (timeLeft <= 0) {
-            clearInterval(timerInterval);
-            submitAnswer(null, true);
-          }
-        }, 100);
-      }
+      elements.pauseModal.classList.add('show');
     }
-  });
+  };
+}
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    togglePause();
+  }
+});
+
+if (elements.sfxVolumeSlider) {
+  elements.sfxVolumeSlider.oninput = (e) => {
+    elements.sfxVolumeValue.textContent = e.target.value + '%';
+    if (typeof SFX !== 'undefined') {
+      settings.sfxVolume = parseInt(e.target.value);
+      localStorage.setItem('mathQuestSettings', JSON.stringify(settings));
+      SFX.btnClick();
+    }
+  };
+  elements.musicVolumeSlider.oninput = (e) => {
+    elements.musicVolumeValue.textContent = e.target.value + '%';
+    settings.musicVolume = parseInt(e.target.value);
+    localStorage.setItem('mathQuestSettings', JSON.stringify(settings));
+    if (typeof SFX !== 'undefined') SFX.updateBGMVolume();
+  };
 }
 
 
@@ -1140,10 +1232,22 @@ if (elements.btnFlee) {
 function runCountdown(callback) {
   const overlay = document.getElementById('countdownOverlay');
   const text = document.getElementById('countdownText');
+  const header = document.getElementById('gameHeader');
+  const footer = document.getElementById('questionFooter');
+  const floor = document.getElementById('arenaFloor');
+  const playerCont = document.getElementById('playerSpriteContainer');
+  const enemyCont = document.getElementById('enemyContainer');
+  
   if (!overlay || !text) {
     if (callback) callback();
     return;
   }
+  
+  if (header) header.classList.add('hud-hidden-top');
+  if (footer) footer.classList.add('hud-hidden-bottom');
+  if (floor) floor.classList.add('floor-hidden');
+  if (playerCont) playerCont.classList.add('char-hidden-left');
+  if (enemyCont) enemyCont.classList.add('char-hidden-right');
   
   overlay.style.display = 'flex';
   run.active = false;
@@ -1166,6 +1270,11 @@ function runCountdown(callback) {
     if (stepVal === 'START!') {
       text.style.color = '#f5c842';
       text.style.textShadow = '0 0 40px rgba(245,200,66,0.9), 0 0 80px rgba(245,200,66,0.5), 4px 4px 0 rgba(0,0,0,1)';
+      if (header) header.classList.remove('hud-hidden-top');
+      if (footer) footer.classList.remove('hud-hidden-bottom');
+      if (floor) floor.classList.remove('floor-hidden');
+      if (playerCont) playerCont.classList.remove('char-hidden-left');
+      if (enemyCont) enemyCont.classList.remove('char-hidden-right');
       SFX.countdownStart();
     } else {
       text.style.color = '#ff4d6d';
@@ -1282,7 +1391,7 @@ function startPlayTutorial() {
     { target: '#hudTop', titleKey: 'tut_play_stats', descKey: 'tut_play_stats_desc' },
     { target: '#lblQuestion', titleKey: 'tut_play_question', descKey: 'tut_play_question_desc' },
     { target: '#answerGrid', titleKey: 'tut_play_answers', descKey: 'tut_play_answers_desc' },
-    { target: '#btnFlee', titleKey: 'tut_play_pause', descKey: 'tut_play_pause_desc' }
+    { target: '#btnPause', titleKey: 'tut_play_pause', descKey: 'tut_play_pause_desc' }
   ];
   const tut = new TutorialSystem(playSteps, 'mathQuestTutorialPlay');
   

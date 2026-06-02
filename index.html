@@ -13,7 +13,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-database-compat.js"></script>
   <script src="firebase-config.js"></script>
-  <script src="locales.js"></script>
+  <script src="locales.js?v=3"></script>
   <script src="sfx.js"></script>
   <script>tailwind.config = { theme: { extend: {} } }</script>
   <style>
@@ -106,9 +106,12 @@
   <div class="terra-modal-card">
     <h2 data-i18n="menu_login_title">WELCOME BACK</h2>
     <label for="usernameInput" data-i18n="menu_char_name">Character Name</label>
-    <input id="usernameInput" type="text" placeholder="e.g. Hero" autocomplete="username" />
+    <input id="usernameInput" type="text" autocomplete="username" />
     <label for="passwordInput" data-i18n="menu_password">Password</label>
-    <input id="passwordInput" type="password" placeholder="..." autocomplete="current-password" />
+    <div style="position:relative;">
+      <input id="passwordInput" type="password" placeholder="..." autocomplete="current-password" style="width:100%; padding-right:40px; margin:0;" />
+      <button type="button" id="toggleLoginPassword" style="position:absolute; right:10px; top:50%; transform:translateY(-50%); background:none; border:none; cursor:pointer; font-size:1.2rem;">👁️</button>
+    </div>
     <div style="display:flex; gap:12px; margin-top:20px;">
       <button id="loginSubmitButton" class="wood-btn success" style="flex:1;">
         <span style="font-size:1.2rem; vertical-align:middle; margin-right:8px;">🚀</span><span data-i18n="menu_login">Login</span>
@@ -123,11 +126,19 @@
 <!-- Signup Modal -->
 <div class="terra-modal-overlay" id="signupModal">
   <div class="terra-modal-card">
-    <h2 data-i18n="menu_join_server">CREATE ACCOUNT</h2>
+    <h2 data-i18n="menu_signup">CREATE ACCOUNT</h2>
     <label for="signupUsernameInput" data-i18n="menu_char_name">Character Name</label>
-    <input id="signupUsernameInput" type="text" placeholder="e.g. Hero" autocomplete="username" />
+    <input id="signupUsernameInput" type="text" data-i18n-placeholder="plc_hero" placeholder="e.g. Hero" autocomplete="username" />
     <label for="signupPasswordInput" data-i18n="menu_password">Password</label>
-    <input id="signupPasswordInput" type="password" placeholder="..." autocomplete="new-password" />
+    <div style="position:relative; margin-bottom:8px;">
+      <input id="signupPasswordInput" type="password" placeholder="..." autocomplete="new-password" style="width:100%; padding-right:40px; margin:0;" />
+      <button type="button" id="toggleSignupPassword" style="position:absolute; right:10px; top:50%; transform:translateY(-50%); background:none; border:none; cursor:pointer; font-size:1.2rem;">👁️</button>
+    </div>
+    <label for="signupConfirmPasswordInput" data-i18n="menu_confirm_password">Confirm Password</label>
+    <div style="position:relative;">
+      <input id="signupConfirmPasswordInput" type="password" placeholder="..." autocomplete="new-password" style="width:100%; padding-right:40px; margin:0;" />
+      <button type="button" id="toggleSignupConfirmPassword" style="position:absolute; right:10px; top:50%; transform:translateY(-50%); background:none; border:none; cursor:pointer; font-size:1.2rem;">👁️</button>
+    </div>
     <div style="display:flex; gap:12px; margin-top:20px;">
       <button id="signupSubmitButton" class="wood-btn success" style="flex:1;">
         <span style="font-size:1.2rem; vertical-align:middle; margin-right:8px;">✨</span><span data-i18n="menu_signup">Sign Up</span>
@@ -176,7 +187,7 @@
   </div>
 </div>
 
-<script src="menu.js"></script>
+<script src="menu.js?v=3"></script>
 <script>
   const playBtn    = document.getElementById('playButton');
   const playOpts   = document.getElementById('playOptions');

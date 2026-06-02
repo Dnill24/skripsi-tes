@@ -231,18 +231,30 @@ const SFX = (() => {
       });
     },
 
-    // Wrong answer — descending buzz
+    // Wrong answer — game show buzzer (dissonant square waves)
     wrong() {
       play((c, v) => {
-        const osc = c.createOscillator();
-        const g   = c.createGain();
-        osc.type = 'sawtooth';
-        osc.frequency.setValueAtTime(280, c.currentTime);
-        osc.frequency.exponentialRampToValueAtTime(130, c.currentTime + 0.28);
-        g.gain.setValueAtTime(v * 0.35, c.currentTime);
-        g.gain.exponentialRampToValueAtTime(0.001, c.currentTime + 0.3);
-        osc.connect(g); g.connect(c.destination);
-        osc.start(); osc.stop(c.currentTime + 0.3);
+        const osc1 = c.createOscillator();
+        const osc2 = c.createOscillator();
+        const g = c.createGain();
+        
+        osc1.type = 'square';
+        osc1.frequency.setValueAtTime(150, c.currentTime);
+        
+        osc2.type = 'square';
+        osc2.frequency.setValueAtTime(156, c.currentTime); // Dissonance
+        
+        g.gain.setValueAtTime(0, c.currentTime);
+        g.gain.linearRampToValueAtTime(v * 0.35, c.currentTime + 0.02);
+        g.gain.setValueAtTime(v * 0.35, c.currentTime + 0.25);
+        g.gain.linearRampToValueAtTime(0.001, c.currentTime + 0.3);
+        
+        osc1.connect(g);
+        osc2.connect(g);
+        g.connect(c.destination);
+        
+        osc1.start(); osc1.stop(c.currentTime + 0.3);
+        osc2.start(); osc2.stop(c.currentTime + 0.3);
       });
     },
 

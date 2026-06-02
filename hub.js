@@ -55,7 +55,7 @@ let totalGoldEarned = 0;
 let totalBossesDefeated = 0;
 let totalRuns = 0;
 let selectedSkin = 'rainbow';
-let globalStats = { '+': 0, '-': 0, '*': 0, '/': 0, fastestTime: 999, bossRushBosses: 0, glassCannonBosses: 0, comboGod: 0, playerMMR: 10 };
+let globalStats = { '+': 0, '-': 0, '*': 0, '/': 0, fastestTime: 999, bossRushBosses: 0, glassCannonBosses: 0, comboGod: 0, playerMMR: 10, notifiedAchievements: [] };
 
 let skins = [
   { id: 'rainbow', nameKey: 'skin_rainbow_name', descKey: 'skin_rainbow_desc', cost: 0, unlocked: true, icon: '🧍' },
@@ -85,21 +85,47 @@ const achievementsData = [
   { id: 'gold_100', nameKey: 'ach_g1_name', descKey: 'ach_g1_desc', getProgress: () => totalGoldEarned, target: 100 },
   { id: 'gold_1000', nameKey: 'ach_g2_name', descKey: 'ach_g2_desc', getProgress: () => totalGoldEarned, target: 1000 },
   { id: 'gold_10000', nameKey: 'ach_g3_name', descKey: 'ach_g3_desc', getProgress: () => totalGoldEarned, target: 10000 },
+  { id: 'gold_50000', nameKey: 'ach_g4_name', descKey: 'ach_g4_desc', getProgress: () => totalGoldEarned, target: 50000 },
+  { id: 'gold_100000', nameKey: 'ach_g5_name', descKey: 'ach_g5_desc', getProgress: () => totalGoldEarned, target: 100000 },
+  
+  { id: 'score_1000', nameKey: 'ach_s0_name', descKey: 'ach_s0_desc', getProgress: () => bestRunScore, target: 1000 },
   { id: 'score_10000', nameKey: 'ach_s1_name', descKey: 'ach_s1_desc', getProgress: () => bestRunScore, target: 10000 },
+  { id: 'score_50000', nameKey: 'ach_s2_name', descKey: 'ach_s2_desc', getProgress: () => bestRunScore, target: 50000 },
+  { id: 'score_100000', nameKey: 'ach_s3_name', descKey: 'ach_s3_desc', getProgress: () => bestRunScore, target: 100000 },
+  
   { id: 'skins_10', nameKey: 'ach_sk_name', descKey: 'ach_sk_desc', getProgress: () => skins.filter(s => s.unlocked).length, target: 10 },
+  { id: 'skins_20', nameKey: 'ach_sk2_name', descKey: 'ach_sk2_desc', getProgress: () => skins.filter(s => s.unlocked).length, target: 20 },
+  { id: 'skins_all', nameKey: 'ach_sk4_name', descKey: 'ach_sk4_desc', getProgress: () => skins.filter(s => s.unlocked).length, target: skins.length },
+  
+  { id: 'bosses_1', nameKey: 'ach_b0_name', descKey: 'ach_b0_desc', getProgress: () => totalBossesDefeated, target: 1 },
   { id: 'bosses_50', nameKey: 'ach_b1_name', descKey: 'ach_b1_desc', getProgress: () => totalBossesDefeated, target: 50 },
+  { id: 'bosses_150', nameKey: 'ach_b2_name', descKey: 'ach_b2_desc', getProgress: () => totalBossesDefeated, target: 150 },
   
   // Math Subjects
   { id: 'add_100', nameKey: 'ach_p1_name', descKey: 'ach_p1_desc', getProgress: () => globalStats['+'], target: 100 },
   { id: 'sub_100', nameKey: 'ach_p2_name', descKey: 'ach_p2_desc', getProgress: () => globalStats['-'], target: 100 },
   { id: 'mul_100', nameKey: 'ach_p3_name', descKey: 'ach_p3_desc', getProgress: () => globalStats['*'], target: 100 },
   { id: 'div_100', nameKey: 'ach_p4_name', descKey: 'ach_p4_desc', getProgress: () => globalStats['/'], target: 100 },
+  { id: 'add_500', nameKey: 'ach_p5_name', descKey: 'ach_p5_desc', getProgress: () => globalStats['+'], target: 500 },
+  { id: 'sub_500', nameKey: 'ach_p6_name', descKey: 'ach_p6_desc', getProgress: () => globalStats['-'], target: 500 },
+  { id: 'mul_500', nameKey: 'ach_p7_name', descKey: 'ach_p7_desc', getProgress: () => globalStats['*'], target: 500 },
+  { id: 'div_500', nameKey: 'ach_p8_name', descKey: 'ach_p8_desc', getProgress: () => globalStats['/'], target: 500 },
   
   // Crazy Milestones
+  { id: 'combo_50', nameKey: 'ach_m4_name', descKey: 'ach_m4_desc', getProgress: () => globalStats.comboGod, target: 50 },
+  { id: 'combo_100', nameKey: 'ach_m6_name', descKey: 'ach_m6_desc', getProgress: () => globalStats.comboGod, target: 100 },
+  
+  { id: 'runs_1', nameKey: 'ach_r1_name', descKey: 'ach_r1_desc', getProgress: () => totalRuns, target: 1 },
+  { id: 'runs_50', nameKey: 'ach_r2_name', descKey: 'ach_r2_desc', getProgress: () => totalRuns, target: 50 },
+  { id: 'runs_100', nameKey: 'ach_r3_name', descKey: 'ach_r3_desc', getProgress: () => totalRuns, target: 100 },
+
   { id: 'boss_rush_10', nameKey: 'ach_m1_name', descKey: 'ach_m1_desc', getProgress: () => globalStats.bossRushBosses, target: 10 },
+  { id: 'boss_rush_50', nameKey: 'ach_m7_name', descKey: 'ach_m7_desc', getProgress: () => globalStats.bossRushBosses, target: 50 },
   { id: 'glass_cannon_1', nameKey: 'ach_m2_name', descKey: 'ach_m2_desc', getProgress: () => globalStats.glassCannonBosses, target: 1 },
+  { id: 'glass_cannon_10', nameKey: 'ach_m8_name', descKey: 'ach_m8_desc', getProgress: () => globalStats.glassCannonBosses, target: 10 },
+  
   { id: 'speed_demon', nameKey: 'ach_m3_name', descKey: 'ach_m3_desc', getProgress: () => globalStats.fastestTime <= 1 ? 1 : 0, target: 1 },
-  { id: 'combo_god', nameKey: 'ach_m4_name', descKey: 'ach_m4_desc', getProgress: () => globalStats.comboGod, target: 50 },
+  { id: 'quick_thinker', nameKey: 'ach_m9_name', descKey: 'ach_m9_desc', getProgress: () => globalStats.fastestTime <= 0.5 ? 1 : 0, target: 1 },
   { id: 'true_hero', nameKey: 'ach_m5_name', descKey: 'ach_m5_desc', getProgress: () => skins.find(s => s.id === 'god').unlocked ? 1 : 0, target: 1 }
 ];
 
@@ -143,6 +169,7 @@ function loadState() {
       globalStats.glassCannonBosses = globalStats.glassCannonBosses ?? 0;
       globalStats.comboGod = globalStats.comboGod ?? 0;
       globalStats.playerMMR = globalStats.playerMMR ?? 10;
+      globalStats.notifiedAchievements = globalStats.notifiedAchievements || [];
       if (Array.isArray(parsed.skins)) {
         skins = skins.map(s => {
           const savedSkin = parsed.skins.find(ps => ps.id === s.id);
@@ -220,7 +247,67 @@ function updateUI() {
         btn.style.opacity = '0.7';
       }
     });
+    
+    elements.btnBackToTitle.textContent = '🚪 ' + getTranslation('btn_main_menu', settings.language);
+    elements.btnBackToTitle.removeAttribute('data-i18n');
+  } else {
+    elements.btnBackToTitle.textContent = '🚪 ' + getTranslation('btn_logout', settings.language);
   }
+  
+  checkAchievements();
+}
+
+let achievementQueue = [];
+let isShowingAchievement = false;
+
+function checkAchievements() {
+  if (user === 'Guest') return;
+  if (!globalStats.notifiedAchievements) globalStats.notifiedAchievements = [];
+  
+  let newlyUnlocked = false;
+  achievementsData.forEach(ach => {
+    if (ach.getProgress() >= ach.target && !globalStats.notifiedAchievements.includes(ach.id)) {
+      globalStats.notifiedAchievements.push(ach.id);
+      achievementQueue.push(ach);
+      newlyUnlocked = true;
+    }
+  });
+  
+  if (newlyUnlocked) saveState();
+  if (achievementQueue.length > 0 && !isShowingAchievement) {
+    showNextAchievement();
+  }
+}
+
+function showNextAchievement() {
+  if (achievementQueue.length === 0) {
+    isShowingAchievement = false;
+    return;
+  }
+  
+  isShowingAchievement = true;
+  const ach = achievementQueue.shift();
+  
+  const toast = document.createElement('div');
+  toast.className = 'achievement-toast show';
+  toast.innerHTML = `
+    <div style="font-size:2rem; margin-right:12px; filter:drop-shadow(2px 2px 0 rgba(0,0,0,1));">🏆</div>
+    <div>
+      <div style="font-family:'Press Start 2P', monospace; font-size:0.5rem; color:#ffd54f; margin-bottom:6px; text-shadow:1px 1px 0 #000;">ACHIEVEMENT UNLOCKED</div>
+      <div style="font-family:'Comic Neue', cursive; font-size:1rem; font-weight:bold; color:#fff; line-height:1;">${getTranslation(ach.nameKey, settings.language)}</div>
+    </div>
+  `;
+  document.body.appendChild(toast);
+  if (typeof SFX !== 'undefined') SFX.coin();
+  
+  setTimeout(() => {
+    toast.classList.remove('show');
+    toast.classList.add('hide');
+    setTimeout(() => {
+      toast.remove();
+      showNextAchievement();
+    }, 500);
+  }, 4000);
 }
 
 function renderLeaderboard() {

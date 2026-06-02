@@ -13,6 +13,10 @@ const locales = {
     menu_cancel: "Cancel",
     menu_signup: "Sign Up",
     menu_login_title: "WELCOME BACK",
+    menu_confirm_password: "Confirm Password",
+    txt_missing_fields: "Please enter a username and password!",
+    txt_profane: "Profanity is not allowed in names or passwords.",
+    plc_hero: "e.g. Hero",
 
     // Skins
     skin_rainbow_name: "Default Hero", skin_rainbow_desc: "The standard hero.",
@@ -48,6 +52,7 @@ const locales = {
     btn_settings: "⚙️ Settings",
     btn_versus: "Versus Mode",
     btn_logout: "Logout",
+    btn_main_menu: "Main Menu",
     modal_versus: "Versus Lobby",
     btn_host: "Host Game",
     btn_join: "Join Game",
@@ -178,6 +183,26 @@ const locales = {
     ach_m3_name: "Flash Speed", ach_m3_desc: "Answer a question in under 1 second.",
     ach_m4_name: "Combo Master", ach_m4_desc: "Reach a 50x Combo streak.",
     ach_m5_name: "The Math Legend", ach_m5_desc: "Unlock the Math God skin.",
+    ach_g4_name: "Rich Kid", ach_g4_desc: "Earn 50,000 Total Gold.",
+    ach_g5_name: "Billionaire", ach_g5_desc: "Earn 100,000 Total Gold.",
+    ach_s0_name: "Apprentice", ach_s0_desc: "Reach a Best Score of 1,000.",
+    ach_s2_name: "Math Prodigy", ach_s2_desc: "Reach a Best Score of 50,000.",
+    ach_s3_name: "Math Genius", ach_s3_desc: "Reach a Best Score of 100,000.",
+    ach_sk2_name: "Fashionista", ach_sk2_desc: "Unlock 20 different skins.",
+    ach_sk4_name: "Collector", ach_sk4_desc: "Unlock all skins.",
+    ach_b0_name: "First Blood", ach_b0_desc: "Defeat your first Boss.",
+    ach_b2_name: "God Slayer", ach_b2_desc: "Defeat 150 Bosses.",
+    ach_p5_name: "Addition Master", ach_p5_desc: "Answer 500 Addition questions correctly.",
+    ach_p6_name: "Subtraction Master", ach_p6_desc: "Answer 500 Subtraction questions correctly.",
+    ach_p7_name: "Multiplication Master", ach_p7_desc: "Answer 500 Multiplication questions correctly.",
+    ach_p8_name: "Division Master", ach_p8_desc: "Answer 500 Division questions correctly.",
+    ach_m6_name: "Unstoppable", ach_m6_desc: "Reach a 100x Combo streak.",
+    ach_r1_name: "Journey Begins", ach_r1_desc: "Play your first run.",
+    ach_r2_name: "Veteran", ach_r2_desc: "Play 50 total runs.",
+    ach_r3_name: "Addict", ach_r3_desc: "Play 100 total runs.",
+    ach_m7_name: "Boss Rush Veteran", ach_m7_desc: "Defeat 50 Bosses using the Boss Attack! buff.",
+    ach_m8_name: "Glass Cannon Veteran", ach_m8_desc: "Defeat 10 Bosses using the One Hit Hero buff.",
+    ach_m9_name: "Quick Thinker", ach_m9_desc: "Answer a question in under 0.5 seconds.",
 
     // Tutorial
     tut_hub_welcome: "Welcome to the Base Camp!",
@@ -203,8 +228,8 @@ const locales = {
     tut_play_question_desc: "Solve this before the timer runs out to attack the monster!",
     tut_play_answers: "Answers",
     tut_play_answers_desc: "Click the correct answer. The faster you answer, the more damage you deal!",
-    tut_play_pause: "Pause & Flee",
-    tut_play_pause_desc: "Need a break? Pause here, or Flee to safely return to Base Camp with your gold."
+    tut_play_pause: "Pause",
+    tut_play_pause_desc: "Need a break? Pause here, or return to Base Camp with your gold."
   },
   id: {
     // UI Main Menu (index.html)
@@ -220,6 +245,10 @@ const locales = {
     menu_cancel: "Batal",
     menu_signup: "Daftar",
     menu_login_title: "SELAMAT DATANG",
+    menu_confirm_password: "Konfirmasi Sandi",
+    txt_missing_fields: "Mohon masukkan nama dan kata sandi!",
+    txt_profane: "Kata-kata kasar tidak diizinkan untuk nama atau kata sandi.",
+    plc_hero: "Contoh: Pahlawan",
 
     // Skins
     skin_rainbow_name: "Pahlawan Biasa", skin_rainbow_desc: "Pahlawan standar.",
@@ -255,6 +284,7 @@ const locales = {
     btn_settings: "⚙️ Pengaturan",
     btn_versus: "Mode Duel",
     btn_logout: "Keluar",
+    btn_main_menu: "Menu Utama",
     modal_versus: "Lobi Duel",
     btn_host: "Buat Ruangan",
     btn_join: "Masuk Ruangan",
@@ -384,6 +414,26 @@ const locales = {
     ach_m3_name: "Secepat Kilat", ach_m3_desc: "Jawab pertanyaan dalam kurang dari 1 detik.",
     ach_m4_name: "Ahli Kombo", ach_m4_desc: "Capai rentetan Kombo 50x.",
     ach_m5_name: "Legenda Matematika", ach_m5_desc: "Buka kostum Dewa Matematika.",
+    ach_g4_name: "Anak Sultan", ach_g4_desc: "Dapatkan 50.000 Total Emas.",
+    ach_g5_name: "Miliarder", ach_g5_desc: "Dapatkan 100.000 Total Emas.",
+    ach_s0_name: "Murid Pemula", ach_s0_desc: "Capai Skor Terbaik 1.000.",
+    ach_s2_name: "Anak Ajaib", ach_s2_desc: "Capai Skor Terbaik 50.000.",
+    ach_s3_name: "Jenius Matematika", ach_s3_desc: "Capai Skor Terbaik 100.000.",
+    ach_sk2_name: "Model", ach_sk2_desc: "Buka 20 kostum berbeda.",
+    ach_sk4_name: "Kolektor", ach_sk4_desc: "Buka semua kostum.",
+    ach_b0_name: "Darah Pertama", ach_b0_desc: "Kalahkan Bos pertamamu.",
+    ach_b2_name: "Pembunuh Dewa", ach_b2_desc: "Kalahkan 150 Bos.",
+    ach_p5_name: "Master Tambah", ach_p5_desc: "Jawab 500 soal Pertambahan dengan benar.",
+    ach_p6_name: "Master Kurang", ach_p6_desc: "Jawab 500 soal Pengurangan dengan benar.",
+    ach_p7_name: "Master Kali", ach_p7_desc: "Jawab 500 soal Perkalian dengan benar.",
+    ach_p8_name: "Master Bagi", ach_p8_desc: "Jawab 500 soal Pembagian dengan benar.",
+    ach_m6_name: "Tak Terhentikan", ach_m6_desc: "Capai rentetan Kombo 100x.",
+    ach_r1_name: "Awal Perjalanan", ach_r1_desc: "Mainkan tahap pertamamu.",
+    ach_r2_name: "Veteran", ach_r2_desc: "Mainkan 50 total tahap.",
+    ach_r3_name: "Pecandu", ach_r3_desc: "Mainkan 100 total tahap.",
+    ach_m7_name: "Veteran Pesta Bos", ach_m7_desc: "Kalahkan 50 Bos saat buff Pesta Bos aktif.",
+    ach_m8_name: "Veteran Satu Nyawa", ach_m8_desc: "Kalahkan 10 Bos saat buff Pahlawan Satu Nyawa aktif.",
+    ach_m9_name: "Pemikir Cepat", ach_m9_desc: "Jawab pertanyaan dalam kurang dari 0.5 detik.",
 
     // Tutorial
     tut_hub_welcome: "Selamat datang di Kemah!",
@@ -409,8 +459,8 @@ const locales = {
     tut_play_question_desc: "Pecahkan ini sebelum waktu habis untuk menyerang monster!",
     tut_play_answers: "Jawaban",
     tut_play_answers_desc: "Klik jawaban yang benar. Semakin cepat menjawab, semakin besar seranganmu!",
-    tut_play_pause: "Jeda & Kabur",
-    tut_play_pause_desc: "Butuh istirahat? Jeda di sini, atau Kabur untuk kembali ke Kemah dengan aman."
+    tut_play_pause: "Jeda",
+    tut_play_pause_desc: "Butuh istirahat? Jeda di sini, atau kembali ke Kemah dengan aman."
   }
 };
 
@@ -421,13 +471,15 @@ function getTranslation(key, lang = 'en') {
 function applyTranslationsToDOM(lang = 'en') {
   document.querySelectorAll('[data-i18n]').forEach(el => {
     const key = el.getAttribute('data-i18n');
-    // Don't overwrite if it contains child HTML that needs dynamic parsing, but most elements are simple spans.
     if(el.children.length === 0) {
       el.textContent = getTranslation(key, lang);
     } else {
-      // For cases where there are children, we can use innerHTML but be careful.
       el.innerHTML = getTranslation(key, lang);
     }
+  });
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+    const key = el.getAttribute('data-i18n-placeholder');
+    el.setAttribute('placeholder', getTranslation(key, lang));
   });
 }
 

@@ -578,6 +578,37 @@ h1, h2, h3, h4, h5, h6, .font-minecraft {
   100% { transform: translateX(120%); opacity: 0; }
 }
 
+/* ─── ACHIEVEMENT TOAST ────────────────────────────── */
+.achievement-toast {
+  position: fixed;
+  bottom: clamp(10px, 4vw, 20px);
+  right: clamp(10px, 4vw, 20px);
+  background: var(--panel-bg);
+  border: 4px solid var(--text-gold);
+  box-shadow: var(--shadow-block), 0 0 20px rgba(255,179,0,0.4);
+  color: var(--text-main);
+  padding: clamp(8px, 3vw, 16px) clamp(12px, 4vw, 20px);
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  z-index: 10000;
+  pointer-events: none;
+  animation: achToastSlideIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+  max-width: clamp(260px, 80vw, 360px);
+}
+.achievement-toast.hide {
+  animation: achToastFadeOut 0.5s ease-in forwards;
+}
+
+@keyframes achToastSlideIn {
+  0% { transform: translateY(150%) scale(0.5); opacity: 0; }
+  100% { transform: translateY(0) scale(1); opacity: 1; }
+}
+@keyframes achToastFadeOut {
+  0% { transform: translateY(0) scale(1); opacity: 1; }
+  100% { transform: translateY(150%) scale(0.5); opacity: 0; }
+}
+
 /* ─── TUTORIAL OVERLAY ───────────────────────── */
 .tutorial-overlay {
   position: fixed;
@@ -642,5 +673,16 @@ h1, h2, h3, h4, h5, h6, .font-minecraft {
 .tutorial-controls button {
   padding: 8px 12px;
   font-size: 0.6rem;
+}
+
+/* ── Large Screen Scaling ── */
+@media (min-width: 1600px) {
+  body { zoom: 1.25; }
+}
+@media (min-width: 2100px) {
+  body { zoom: 1.5; }
+}
+@media (min-width: 2800px) {
+  body { zoom: 2; }
 }
 

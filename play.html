@@ -108,17 +108,47 @@
       box-shadow: inset 0 8px 0 rgba(0,0,0,0.3);
       z-index: 1;
       transform: perspective(200px) rotateX(10deg);
+      transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.4s ease-out;
+    }
+    .floor-hidden {
+      transform: perspective(200px) rotateX(10deg) translateY(150px) !important;
+      opacity: 0;
+    }
+    /* ── HUD ANIMATIONS ── */
+    #gameHeader, #questionFooter {
+      transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.4s ease-out;
+    }
+    .hud-hidden-top {
+      transform: translateY(-120%);
+      opacity: 0;
+      pointer-events: none;
+    }
+    .hud-hidden-bottom {
+      transform: translateY(120%);
+      opacity: 0;
+      pointer-events: none;
+    }
+    #playerSpriteContainer, #enemyContainer {
+      transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.4s ease-out;
+    }
+    .char-hidden-left {
+      transform: translateX(-200%);
+      opacity: 0;
+    }
+    .char-hidden-right {
+      transform: translateX(200%);
+      opacity: 0;
     }
   </style>
 </head>
-<body class="bg-cave" style="display:flex; flex-direction:column; min-height:100dvh; overflow:hidden;">
+<body class="bg-cave" style="display:flex; flex-direction:column; height:100%; overflow:hidden;">
 
   <!-- ── TOP HEADER ─────────────────────────────────── -->
   <header id="gameHeader">
     <div id="hudTop" class="stone-panel" style="background: linear-gradient(180deg, #4e342e 0%, #3e2723 100%) !important; border-bottom:4px solid var(--wood-border); padding:clamp(4px, 1.5vw, 10px) clamp(6px, 1.5vw, 14px); flex-shrink:0; position:relative; z-index:10; box-shadow:0 4px 16px rgba(0,0,0,0.8);">
       <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:nowrap; gap:clamp(2px, 1vw, 16px);">
-        <!-- Flee -->
-        <button id="btnFlee" class="wood-btn danger" style="padding:clamp(2px, 1vw, 6px) clamp(4px, 1.5vw, 12px); font-size:clamp(0.4rem, 1.5vw, 0.55rem); flex-shrink:0;" data-i18n="btn_flee">🏃 Flee</button>
+        <!-- Pause -->
+        <button id="btnPause" class="wood-btn" style="padding:clamp(2px, 1vw, 6px) clamp(4px, 1.5vw, 12px); font-size:clamp(0.4rem, 1.5vw, 0.55rem); flex-shrink:0;" data-i18n="btn_pause">⏸️ Pause</button>
         <!-- Stage + Score + Gold -->
         <div style="text-align:center; flex:1; min-width:0;">
           <div style="display:flex; align-items:center; justify-content:center; gap:clamp(2px, 1vw, 12px); white-space:nowrap;">
@@ -174,10 +204,10 @@
   <!-- ── BATTLE ARENA ───────────────────────────────── -->
   <main id="gameArenaWrapper">
 
-    <div class="arena-floor"></div>
+    <div id="arenaFloor" class="arena-floor"></div>
 
     <!-- Countdown Overlay -->
-    <div id="countdownOverlay" style="display:none; position:absolute; inset:0; background:rgba(0,0,0,0.6); align-items:center; justify-content:center; z-index:40; pointer-events:none;">
+    <div id="countdownOverlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); align-items:center; justify-content:center; z-index:9999; pointer-events:none;">
       <div id="countdownText" class="font-minecraft"
         style="font-size:clamp(2rem,15vw,9rem); color:var(--text-gold); text-shadow:4px 4px 0 rgba(0,0,0,0.9); opacity:0; transform:scale(0.5);">
         3
@@ -276,6 +306,37 @@
       <p style="font-family:'Press Start 2P',monospace; font-size:0.6rem; color:var(--text-dim); text-align:center; margin-bottom:24px; text-shadow:1px 1px 0 rgba(0,0,0,0.8);" data-i18n="msg_reward">Choose your loot...</p>
       
       <div id="rewardCardsContainer" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:16px;"></div>
+    </div>
+  </div>
+
+  <!-- ── PAUSE MODAL ─────────────────────────────────── -->
+  <div class="terra-modal-overlay" id="pauseModal">
+    <div class="terra-modal-card">
+      <div style="margin-bottom:16px;">
+        <h2 class="fancy-header" data-i18n="txt_paused">PAUSED</h2>
+      </div>
+      
+      <div style="display:flex; flex-direction:column; gap:24px; margin-bottom:32px;">
+        <div style="display:flex; align-items:center; justify-content:space-between;">
+          <label for="musicVolumeSlider" style="margin:0;"><span style="font-size:1.2rem; vertical-align:middle; margin-right:4px;">🎵</span> <span data-i18n="lbl_music_volume">Music</span></label>
+          <div style="display:flex; align-items:center; gap:12px;">
+            <input type="range" id="musicVolumeSlider" min="0" max="100" value="50" style="width:100px; padding:0; height:12px; border:none; accent-color:var(--text-gold); cursor:pointer; box-shadow:none;">
+            <span id="musicVolumeValue" style="font-family:'Press Start 2P',monospace; font-size:0.6rem; color:var(--text-gold); min-width:3rem; text-shadow:1px 1px 0 rgba(0,0,0,0.8);">50%</span>
+          </div>
+        </div>
+        <div style="display:flex; align-items:center; justify-content:space-between;">
+          <label for="sfxVolumeSlider" style="margin:0;"><span style="font-size:1.2rem; vertical-align:middle; margin-right:4px;">🔊</span> <span data-i18n="lbl_sfx_volume">SFX</span></label>
+          <div style="display:flex; align-items:center; gap:12px;">
+            <input type="range" id="sfxVolumeSlider" min="0" max="100" value="70" style="width:100px; padding:0; height:12px; border:none; accent-color:var(--text-gold); cursor:pointer; box-shadow:none;">
+            <span id="sfxVolumeValue" style="font-family:'Press Start 2P',monospace; font-size:0.6rem; color:var(--text-gold); min-width:3rem; text-shadow:1px 1px 0 rgba(0,0,0,0.8);">70%</span>
+          </div>
+        </div>
+      </div>
+      
+      <div style="display:flex; gap:16px;">
+        <button id="btnResumePause" class="wood-btn success" style="flex:1;" data-i18n="btn_resume">Resume</button>
+        <button id="btnQuitPause" class="wood-btn danger" style="flex:1;" data-i18n="btn_return_hub">Return to Camp</button>
+      </div>
     </div>
   </div>
 

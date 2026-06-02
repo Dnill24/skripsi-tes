@@ -4,6 +4,14 @@ const state = {
   musicVolume: 50
 };
 
+const badWords = ['fuck', 'shit', 'bitch', 'asshole', 'dick', 'pussy', 'cunt', 'bastard', 'whore', 'slut', 'fag', 'nigger', 'crap', 'anjing', 'babi', 'bangsat', 'kontol', 'memek', 'ngentot', 'peler', 'perek', 'tai'];
+
+function isProfane(text) {
+  if (!text) return false;
+  const lower = text.toLowerCase();
+  return badWords.some(word => lower.includes(word));
+}
+
 // Validates username for Firebase NoSQL keys
 function sanitizeUsername(name) {
   return name.trim().replace(/[.#$[\]\s/]/g, '_').toLowerCase();
@@ -66,6 +74,7 @@ const elements = {
   signupModal: document.getElementById('signupModal'),
   signupUsernameInput: document.getElementById('signupUsernameInput'),
   signupPasswordInput: document.getElementById('signupPasswordInput'),
+  signupConfirmPasswordInput: document.getElementById('signupConfirmPasswordInput'),
   signupSubmitButton: document.getElementById('signupSubmitButton'),
   cancelSignup: document.getElementById('cancelSignup'),
   
@@ -124,6 +133,13 @@ function login() {
     return;
   }
   
+  if (isProfane(username) || isProfane(password)) {
+    let msg = getTranslation('txt_profane', state.language);
+    if (msg === 'txt_profane') msg = 'Profanity is not allowed in names or passwords.';
+    showToast(msg);
+    return;
+  }
+  
   if (typeof db === 'undefined') {
     showToast("Firebase not connected. Logging in offline.");
     localStorage.setItem('mathQuestUser', JSON.stringify({ user: username, isLoggedIn: true }));
@@ -178,9 +194,24 @@ function login() {
 function signup() {
   const username = elements.signupUsernameInput.value.trim();
   const password = elements.signupPasswordInput.value.trim();
+  const confirmPassword = elements.signupConfirmPasswordInput ? elements.signupConfirmPasswordInput.value.trim() : '';
   
   if (!username || !password) {
-    showToast("Please enter a username and password!");
+    let msg = getTranslation('txt_missing_fields', state.language);
+    if (msg === 'txt_missing_fields') msg = 'Please enter a username and password!';
+    showToast(msg);
+    return;
+  }
+  
+  if (password !== confirmPassword) {
+    showToast("Passwords do not match!");
+    return;
+  }
+  
+  if (isProfane(username) || isProfane(password)) {
+    let msg = getTranslation('txt_profane', state.language);
+    if (msg === 'txt_profane') msg = 'Profanity is not allowed in names or passwords.';
+    showToast(msg);
     return;
   }
   
@@ -226,6 +257,23 @@ function saveSettingsModal() {
   saveSettings();
 }
 
+// Password visibility toggle logic
+function togglePassword(inputId, btnId) {
+  const inp = document.getElementById(inputId);
+  const btn = document.getElementById(btnId);
+  if (!inp || !btn) return;
+  if (inp.type === 'password') {
+    inp.type = 'text';
+    btn.textContent = '🙈';
+  } else {
+    inp.type = 'password';
+    btn.textContent = '👁️';
+  }
+}
+document.getElementById('toggleLoginPassword').addEventListener('click', () => togglePassword('passwordInput', 'toggleLoginPassword'));
+document.getElementById('toggleSignupPassword').addEventListener('click', () => togglePassword('signupPasswordInput', 'toggleSignupPassword'));
+document.getElementById('toggleSignupConfirmPassword').addEventListener('click', () => togglePassword('signupConfirmPasswordInput', 'toggleSignupConfirmPassword'));
+
 // Event listeners (only ones not defined in index.html inline script)
 elements.guestButton.addEventListener('click', playAsGuest);
 elements.loginSubmitButton.addEventListener('click', login);
@@ -267,6 +315,9 @@ elements.usernameInput.addEventListener('keydown', e => { if (e.key === 'Enter')
 elements.passwordInput.addEventListener('keydown', e => { if (e.key === 'Enter') login(); });
 elements.signupUsernameInput.addEventListener('keydown', e => { if (e.key === 'Enter') signup(); });
 elements.signupPasswordInput.addEventListener('keydown', e => { if (e.key === 'Enter') signup(); });
+if (elements.signupConfirmPasswordInput) {
+  elements.signupConfirmPasswordInput.addEventListener('keydown', e => { if (e.key === 'Enter') signup(); });
+}
 
 // Initialize
 loadSettings();

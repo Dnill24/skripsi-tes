@@ -61,7 +61,7 @@
     </div>
     
     <!-- Battle Arena (Middle - Horizontal Layout) -->
-    <div id="battleArena" class="w-full relative h-48 md:h-56 z-10 my-2 overflow-hidden bg-[radial-gradient(circle_at_center,transparent_40%,rgba(0,0,0,0.6)_100%)]">
+    <div id="battleArena" class="w-full relative flex-1 min-h-[120px] max-h-[45vh] z-10 my-2 overflow-hidden bg-[radial-gradient(circle_at_center,transparent_40%,rgba(0,0,0,0.6)_100%)]">
       <div class="arena-floor"></div>
       <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-orange-400/20 font-minecraft text-4xl -z-10">VS</div>
       
@@ -89,7 +89,7 @@
     </div>
 
     <!-- Player Area (Bottom) -->
-    <div class="stone-panel p-3 mt-2 flex flex-col flex-grow justify-end">
+    <div class="stone-panel p-3 mt-2 flex flex-col shrink-0 justify-end">
       <div class="flex justify-between items-center mb-2">
         <div class="flex gap-4">
           <span class="text-slate-400 text-xs font-minecraft" data-i18n="lbl_health">Health</span>

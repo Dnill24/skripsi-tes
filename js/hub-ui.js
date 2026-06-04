@@ -182,10 +182,11 @@ function renderLeaderboard() {
 
 function checkGuestFeature() {
   if (user === 'Guest') {
+    const msg = window.getTranslation ? window.getTranslation('toast_guest_feature', settings.language) : "Not available for Guest. Please sign up to save your progress!";
     if (typeof window.showToast === 'function') {
-      window.showToast("Not available for Guest. Please create an account to save progress!", "error");
+      window.showToast(msg, "error");
     } else {
-      alert("Not available for Guest. Please create an account to save progress!");
+      alert(msg);
     }
     return true;
   }

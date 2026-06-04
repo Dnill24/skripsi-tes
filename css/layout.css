@@ -112,17 +112,6 @@ html, body {
   }
 }
 
-/* ── Large Screen Scaling ── */
-@media (min-width: 1600px) and (min-height: 900px) {
-  body { zoom: 1.25; }
-}
-@media (min-width: 2100px) and (min-height: 1100px) {
-  body { zoom: 1.5; }
-}
-@media (min-width: 2800px) and (min-height: 1400px) {
-  body { zoom: 2; }
-}
-
 /* ─── Index Menu Classes ─── */
 .menu-layout {
   display: flex;

@@ -23,6 +23,11 @@ class TutorialSystem {
         this.positionPopup();
       }
     });
+    window.addEventListener('scroll', () => {
+      if (this.overlay.style.display !== 'none') {
+        this.positionPopup();
+      }
+    }, true);
   }
 
   start() {
@@ -65,10 +70,10 @@ class TutorialSystem {
 
     this.popup.innerHTML = `
       <h3>${window.getTranslation ? window.getTranslation(step.titleKey, lang) : step.titleKey}</h3>
-      <p style="font-family:'Comic Neue', cursive; font-size:1rem; margin-bottom:16px;">${window.getTranslation ? window.getTranslation(step.descKey, lang) : step.descKey}</p>
-      <div class="tutorial-controls" style="display:flex; justify-content:space-between; gap:12px;">
-        <button class="wood-btn danger" style="padding:8px 12px; font-size:0.6rem;" onclick="window.activeTutorial.finish()">${window.getTranslation ? window.getTranslation('tut_btn_skip', lang) : 'Skip'}</button>
-        <button class="wood-btn success" style="padding:8px 12px; font-size:0.6rem;" onclick="window.activeTutorial.next()">${window.getTranslation ? (isLast ? window.getTranslation('tut_btn_finish', lang) : window.getTranslation('tut_btn_next', lang)) : (isLast ? 'Finish' : 'Next')}</button>
+      <p class="font-[Comic_Neue] text-[1rem] mb-4">${window.getTranslation ? window.getTranslation(step.descKey, lang) : step.descKey}</p>
+      <div class="tutorial-controls flex justify-between gap-3">
+        <button class="wood-btn danger px-3 py-2 text-[0.6rem]" onclick="window.activeTutorial.finish()">${window.getTranslation ? window.getTranslation('tut_btn_skip', lang) : 'Skip'}</button>
+        <button class="wood-btn success px-3 py-2 text-[0.6rem]" onclick="window.activeTutorial.next()">${window.getTranslation ? (isLast ? window.getTranslation('tut_btn_finish', lang) : window.getTranslation('tut_btn_next', lang)) : (isLast ? 'Finish' : 'Next')}</button>
       </div>
     `;
 
@@ -100,28 +105,44 @@ class TutorialSystem {
     this.hole.style.display = 'block';
     const rect = targetEl.getBoundingClientRect();
     
+    let zoomStr = window.getComputedStyle(document.body).zoom;
+    let zoom = 1;
+    if (zoomStr && zoomStr !== 'normal') {
+      zoom = parseFloat(zoomStr);
+    } else {
+      if (window.innerWidth >= 2800 && window.innerHeight >= 1400) zoom = 2;
+      else if (window.innerWidth >= 2100 && window.innerHeight >= 1100) zoom = 1.5;
+      else if (window.innerWidth >= 1600 && window.innerHeight >= 900) zoom = 1.25;
+    }
+    if (isNaN(zoom)) zoom = 1;
+    
     // Position the hole
-    this.hole.style.top = (rect.top - 4) + 'px';
-    this.hole.style.left = (rect.left - 4) + 'px';
-    this.hole.style.width = (rect.width + 8) + 'px';
-    this.hole.style.height = (rect.height + 8) + 'px';
+    this.hole.style.top = ((rect.top / zoom) - 4) + 'px';
+    this.hole.style.left = ((rect.left / zoom) - 4) + 'px';
+    this.hole.style.width = ((rect.width / zoom) + 8) + 'px';
+    this.hole.style.height = ((rect.height / zoom) + 8) + 'px';
 
     const popupRect = this.popup.getBoundingClientRect();
     this.popup.style.transform = 'none';
 
-    let top = rect.bottom + 20;
-    let left = rect.left + (rect.width / 2) - (popupRect.width / 2);
+    let top = (rect.bottom / zoom) + 20;
+    let left = (rect.left / zoom) + ((rect.width / zoom) / 2) - ((popupRect.width / zoom) / 2);
 
-    if (top + popupRect.height > window.innerHeight - 10) {
-      top = rect.top - popupRect.height - 20;
+    let innerH = window.innerHeight / zoom;
+    let innerW = window.innerWidth / zoom;
+    let popH = popupRect.height / zoom;
+    let popW = popupRect.width / zoom;
+
+    if (top + popH > innerH - 10) {
+      top = (rect.top / zoom) - popH - 20;
     }
     
     if (top < 10) {
-      top = window.innerHeight / 2 - popupRect.height / 2;
-      left = window.innerWidth / 2 - popupRect.width / 2;
+      top = innerH / 2 - popH / 2;
+      left = innerW / 2 - popW / 2;
     } else {
       if (left < 10) left = 10;
-      if (left + popupRect.width > window.innerWidth - 10) left = window.innerWidth - popupRect.width - 10;
+      if (left + popW > innerW - 10) left = innerW - popW - 10;
     }
 
     this.popup.style.top = top + 'px';

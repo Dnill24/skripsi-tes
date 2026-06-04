@@ -65,7 +65,7 @@ const SFX = (() => {
   function playBGM(trackName) {
     if (currentBGMName === trackName) return;
     
-    const nextBGM = new Audio(trackName);
+    const nextBGM = new Audio('music/' + trackName);
     nextBGM.loop = true;
     nextBGM.volume = 0; // start at 0 for fade in
     

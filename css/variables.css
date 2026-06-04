@@ -1,0 +1,21 @@
+/* ─── CSS Variables ─────────────────────────────────── */
+:root {
+  --terra-sky:   #79a2ff;        /* daytime sky blue */
+  --terra-dirt:  #795548;        /* rich dirt brown */
+  --terra-stone: #607d8b;        /* blue-grey stone */
+  --terra-wood:  #8d6e63;        /* warm wood */
+  --terra-grass: #4caf50;        /* bright surface grass */
+  --terra-deep:  #1a1c29;        /* deep cavern blue-black */
+  
+  --panel-bg:    #37474f;        /* dark stone interior */
+  --panel-border:#263238;        /* dark stone edge */
+  --wood-bg:     #a1887f;        /* light wood */
+  --wood-border: #4e342e;        /* dark wood grain */
+  
+  --text-main:   #ffffff;        
+  --text-dim:    #b0bec5;        
+  --text-gold:   #ffb300;
+  
+  --shadow-block: inset -4px -4px 0 rgba(0,0,0,0.4), inset 4px 4px 0 rgba(255,255,255,0.15);
+  --shadow-btn:   inset -3px -3px 0 rgba(0,0,0,0.3), inset 3px 3px 0 rgba(255,255,255,0.2);
+}

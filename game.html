@@ -13,105 +13,86 @@
       alert("PROMISE CRASH: " + e.reason);
     });
   </script>
-  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="css/styles.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&family=Press+Start+2P&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-database-compat.js"></script>
-  <script src="firebase-config.js"></script>
-  <script src="locales.js"></script>
-  <script src="sfx.js"></script>
+  <script src="js/firebase-config.js"></script>
+  <!-- ── RANK INFO MODAL ─────────────────────────────────── -->
+<div class="terra-modal-overlay" id="rankInfoModal">
+  <div class="terra-modal-card max-w-[500px]">
+    <button id="xCloseRankInfo" class="modal-close-btn sticky top-0 float-right z-20">X</button>
+    <div class="mb-4">
+      <h2 class="fancy-header m-0" data-i18n="modal_rank_info">🏅 Rank Info</h2>
+    </div>
+    <div class="text-[0.75rem] leading-[1.6] mb-4 text-[#b0bec5] font-minecraft drop-shadow-[1px_1px_0_rgba(0,0,0,0.8)]">
+      <p class="mb-2 text-white"><span data-i18n="txt_your_mmr">Your MMR:</span> <span id="rankInfoCurrentMMR" class="text-yellow-400">0</span></p>
+      <p class="mb-2 text-white"><span data-i18n="txt_score_bonus">Score Bonus:</span> <span id="rankInfoCurrentMult" class="text-green-400">1.0x</span></p>
+      <p class="text-[#b0bec5] text-[0.6rem] leading-[1.8]" data-i18n="txt_rank_desc">Defeat enemies and answer quickly to increase your MMR. Higher MMR continuously increases your score multiplier!</p>
+    </div>
+    <div class="terra-divider" data-i18n="txt_ranks_mmr">RANKS (MMR)</div>
+    <div class="flex flex-col gap-2">
+      <div class="stone-chip justify-between px-3 py-2"><span class="text-[#aaa]">🪨 Iron</span><span class="value text-[#aaa] text-[0.7rem]">0 - 19</span></div>
+      <div class="stone-chip justify-between px-3 py-2"><span class="text-[#cd7f32]">🥉 Bronze</span><span class="value text-[#cd7f32] text-[0.7rem]">20 - 39</span></div>
+      <div class="stone-chip justify-between px-3 py-2"><span class="text-[#e0e0e0]">🥈 Silver</span><span class="value text-[#e0e0e0] text-[0.7rem]">40 - 59</span></div>
+      <div class="stone-chip justify-between px-3 py-2"><span class="text-yellow-400">🥇 Gold</span><span class="value text-yellow-400 text-[0.7rem]">60 - 79</span></div>
+      <div class="stone-chip justify-between px-3 py-2"><span class="text-[#e5e4e2]">💎 Platinum</span><span class="value text-[#e5e4e2] text-[0.7rem]">80 - 99</span></div>
+      <div class="stone-chip justify-between px-3 py-2"><span class="text-cyan-200">💠 Diamond</span><span class="value text-cyan-200 text-[0.7rem]">100 - 149</span></div>
+      <div class="stone-chip justify-between px-3 py-2"><span class="text-yellow-500">👑 Master</span><span class="value text-yellow-500 text-[0.7rem]">150+</span></div>
+    </div>
+  </div>
+</div>
+
+<script src="js/locales.js"></script>
+  <script src="js/sfx.js"></script>
   <script>tailwind.config = { theme: { extend: {} } }</script>
-  <style>
-    *, *::before, *::after { box-sizing: border-box; }
-    html, body { min-height: 100%; margin: 0; padding: 0; overflow-x: hidden; overflow-y: auto; }
-
-    /* Title Signpost */
-    .title-sign {
-      background: var(--wood-bg); border: 6px solid var(--wood-border);
-      box-shadow: var(--shadow-block), 0 12px 24px rgba(0,0,0,0.6);
-      padding: 16px 20px; position: relative; text-align: center;
-      /* Removed rotation and float animation so it aligns perfectly with the panel below */
-    }
-    .title-sign::before, .title-sign::after {
-      content: ''; position: absolute; top: 8px; width: 10px; height: 10px;
-      background: #424242; border: 2px solid #212121; border-radius: 50%;
-    }
-    .title-sign::before { left: 10px; }
-    .title-sign::after { right: 10px; }
-    .title-sign h1 {
-      font-family: 'Press Start 2P', monospace; font-size: clamp(0.9rem, 2.5vw, 1.5rem);
-      color: #fff; text-shadow: 2px 2px 0 rgba(0,0,0,0.8); margin: 0; line-height: 1.4;
-    }
-    .title-sign p {
-      font-family: 'Comic Neue', cursive; font-weight: 700; font-size: 1rem;
-      color: #4e342e; margin: 8px 0 0; text-shadow: none;
-    }
-    .title-sign span { color: #ffb300; text-shadow: 1px 1px 0 rgba(0,0,0,0.5); }
-
-    /* Close X button */
-    .modal-close-btn {
-      background: none; border: none; cursor: pointer;
-      font-size: 1.2rem; color: var(--text-dim); transition: color 0.15s steps(2);
-      text-shadow: 1px 1px 0 rgba(0,0,0,0.8);
-      font-family: 'Press Start 2P', monospace;
-    }
-    .modal-close-btn:hover { color: #ef5350; }
-
-    /* Mobile Text Scaling */
-    @media (max-width: 640px) {
-      .title-sign h1 { font-size: clamp(0.45rem, 3vw, 1.5rem) !important; }
-      .title-sign p { font-size: 0.5rem !important; }
-      #playerMMRDisplay { font-size: 0.3rem !important; }
-      .title-sign p[style*="0.6rem"] { font-size: 0.3rem !important; }
-      #btnToggleQuests { font-size: 0.45rem !important; }
-      #questsToggleIcon { font-size: 0.4rem !important; }
-      #dailyQuestTimer { font-size: 0.35rem !important; }
-    }
-  </style>
 </head>
 <body class="bg-hub">
-<div style="display:flex; flex-direction:column; align-items:flex-start; justify-content:space-between; padding:clamp(16px,4vw,48px); min-height:100vh; gap:40px; margin: 0 auto; width: 100%; max-width: 1400px;">
+<div class="hub-layout">
+
+  <div id="topRightMenu" class="fixed top-[clamp(8px,2vw,16px)] right-[clamp(8px,2vw,16px)] flex gap-2 z-10 origin-top-right">
+    <button id="btnAchievements" class="wood-btn top-right-btn" title="Trophies">🏆</button>
+    <button id="btnBuffIndex" class="wood-btn top-right-btn" title="Buff Index">📖</button>
+    <button id="btnSettings" class="wood-btn top-right-btn" title="Settings">⚙️</button>
+  </div>
 
   <!-- Left Column: Title and Missions -->
-  <div class="hub-left-column" style="display:flex; flex-direction:column; align-items:stretch; width:100%; max-width:340px; min-width:280px; box-sizing:border-box;">
+  <div class="hub-left-column flex flex-col items-stretch w-full max-w-[340px] min-w-[280px]">
     <!-- Title Card -->
-    <div class="hub-title-container" style="text-align:center; z-index: 2;">
-      <div class="title-sign" style="width:100%; box-sizing:border-box; border-bottom: none; border-radius: 4px 4px 0 0;">
+    <div class="hub-title-container text-center z-[2]">
+      <div class="title-sign w-full border-b-0 rounded-t-md">
         <h1 data-i18n="title_hub">Base Camp</h1>
         <p data-i18n="welcome">Welcome back, <span id="playerNameDisplay">Hero</span>!</p>
-        <p style="font-family: 'Press Start 2P', monospace; font-size: 0.6rem; color: #64b5f6; margin-top: 4px; text-shadow: 1px 1px 0 rgba(0,0,0,0.8);">Rank: <span id="playerMMRDisplay">10</span></p>
+        <p id="rankDisplayBtn" class="rank-btn-text font-minecraft text-[0.6rem] text-blue-400 mt-1 drop-shadow-[1px_1px_0_rgba(0,0,0,0.8)] cursor-pointer inline-block" title="Click for Rank Info">Rank: <span id="playerMMRDisplay">10</span> <span class="text-[0.5rem] text-gray-400 ml-1">(?)</span></p>
       </div>
     </div>
     
     <!-- Daily Missions Panel -->
-    <div class="stone-panel quests-panel" style="padding:12px; width:100%; box-sizing:border-box; overflow:hidden; border-top: none !important; border-radius: 0 0 4px 4px !important; transition: all 0.3s ease;">
-      <h2 id="btnToggleQuests" class="fancy-header" style="margin:0; font-size:0.9rem; text-align:center; cursor:pointer; display:flex; justify-content:space-between; align-items:center; user-select:none;">
+    <div class="stone-panel quests-panel w-full !border-t-0 !rounded-t-none transition-all duration-300 ease-in p-3">
+      <h2 id="btnToggleQuests" class="fancy-header m-0 text-[0.9rem] text-center cursor-pointer flex justify-between items-center select-none">
         <span data-i18n="modal_quests">📜 Daily Mission</span>
-        <span id="questsToggleIcon" style="font-size:0.8rem; transition:transform 0.2s; color:#ffb300;">▼</span>
+        <span id="questsToggleIcon" class="text-[0.8rem] transition-transform duration-200 text-yellow-500">▼</span>
       </h2>
-      <div id="dailyQuestTimer" style="text-align:center; font-size:0.75rem; color:#888; margin-top:4px; font-family: 'Press Start 2P', monospace;"></div>
-      <div id="questsListContainer" style="display:none; margin-top:12px; animation: pop 0.2s ease-out;">
-        <div id="questsList" style="display:flex; flex-direction:column; gap:8px;"></div>
+      <div id="dailyQuestTimer" class="text-center text-[0.75rem] text-gray-400 mt-1 font-minecraft"></div>
+      <div id="questsListContainer" class="hidden mt-3 animate-pop">
+        <div id="questsList" class="flex flex-col gap-2"></div>
       </div>
     </div>
   </div>
 
   <!-- Right Column: Hub Panel -->
   <div class="hub-panel-container">
-    <div class="stone-panel" style="padding:16px 14px; min-width:280px; max-width:360px; width:90vw;">
+    <div class="stone-panel px-[14px] py-4 min-w-[280px] max-w-[360px] w-[90vw]">
       <div class="hub-btn-grid">
         <button id="btnStartRun" class="wood-btn success btn-full" data-i18n="btn_start">⚔️ Enter Cave</button>
+        <button id="btnVersus"       class="wood-btn btn-full bg-[#5e35b1] border-[#311b92] shadow-[inset_-3px_-3px_0_rgba(0,0,0,0.3),inset_3px_3px_0_rgba(255,255,255,0.2),0_4px_0_#311b92]" data-i18n="btn_versus">⚡ Versus</button>
         <button id="btnShop"         class="wood-btn" data-i18n="btn_shop">🛒 Skins</button>
         <button id="btnUpgrades"     class="wood-btn" data-i18n="btn_upgrades">⚒️ Upgrades</button>
-        <button id="btnAchievements" class="wood-btn" data-i18n="btn_achievements">🏆 Trophies</button>
-        <button id="btnBuffIndex"    class="wood-btn" data-i18n="btn_buff_index">📖 Buff Index</button>
         <button id="btnLeaderboard"  class="wood-btn" data-i18n="btn_leaderboard">📊 Rankings</button>
-        <button id="btnVersus"       class="wood-btn" style="background:#5e35b1; border-color:#311b92; box-shadow:inset -3px -3px 0 rgba(0,0,0,0.3), inset 3px 3px 0 rgba(255,255,255,0.2), 0 4px 0 #311b92;" data-i18n="btn_versus">⚡ Versus</button>
-        <button id="btnSettings"     class="wood-btn" data-i18n="btn_settings">⚙️ Settings</button>
-        <button id="btnBackToTitle"  class="wood-btn danger" data-i18n="btn_logout">🚪 Logout</button>
+        <button id="btnBackToTitle"  class="wood-btn danger" data-i18n="btn_leave">🚪 Leave</button>
       </div>
     </div>
   </div>
@@ -121,101 +102,101 @@
 
 <!-- ── SHOP MODAL ─────────────────────────────────────── -->
 <div class="terra-modal-overlay" id="shopModal">
-  <div class="terra-modal-card" style="max-width:640px;">
-    <button id="xCloseShop" class="modal-close-btn" style="position:sticky; top:0; float:right; z-index:20; background:var(--panel-bg); padding:4px 8px; border-radius:8px; box-shadow:0 0 10px rgba(0,0,0,0.5);">X</button>
-    <div style="margin-bottom:16px;">
-      <h2 class="fancy-header" style="margin:0;" data-i18n="modal_shop">🛒 Skins</h2>
+  <div class="terra-modal-card max-w-[640px]">
+    <button id="xCloseShop" class="modal-close-btn sticky top-0 float-right z-20">X</button>
+    <div class="mb-4">
+      <h2 class="fancy-header m-0" data-i18n="modal_shop">🛒 Skins</h2>
     </div>
-    <p style="text-align:center; font-size:1.1rem; margin-bottom:20px;">
-      <span data-i18n="gold_label" style="font-family:'Press Start 2P',monospace; font-size:0.6rem;">Coins: </span>
-      <span id="shopGoldDisplay" style="font-family:'Press Start 2P',monospace; font-size:0.8rem; color:var(--text-gold); text-shadow:2px 2px 0 rgba(0,0,0,0.8);">0</span>
-      <span style="margin-left:4px;">🪙</span>
+    <p class="text-center text-[1.1rem] mb-5">
+      <span data-i18n="gold_label" class="font-minecraft text-[0.6rem]">Coins: </span>
+      <span id="shopGoldDisplay" class="font-minecraft text-[0.8rem] text-yellow-400 drop-shadow-[2px_2px_0_rgba(0,0,0,0.8)]">0</span>
+      <span class="ml-1">🪙</span>
     </p>
-    <div id="shopList" style="display:flex; flex-direction:row; gap:12px; overflow-x:auto; padding-bottom:16px; scroll-snap-type:x mandatory;"></div>
-    <button id="closeShopModal" class="wood-btn" style="margin-top:16px; width:100%;" data-i18n="btn_close">Close</button>
+    <div id="shopList" class="flex flex-row gap-3 overflow-x-auto pb-4 snap-x snap-mandatory"></div>
   </div>
 </div>
 
 <!-- ── UPGRADES MODAL ─────────────────────────────────── -->
 <div class="terra-modal-overlay" id="upgradesModal">
-  <div class="terra-modal-card" style="max-width:540px;">
-    <button id="xCloseUpgrades" class="modal-close-btn" style="position:sticky; top:0; float:right; z-index:20; background:var(--panel-bg); padding:4px 8px; border-radius:8px; box-shadow:0 0 10px rgba(0,0,0,0.5);">X</button>
-    <div style="margin-bottom:16px;">
-      <h2 class="fancy-header" style="margin:0;" data-i18n="modal_upgrades">⚒️ Upgrades</h2>
+  <div class="terra-modal-card max-w-[540px]">
+    <button id="xCloseUpgrades" class="modal-close-btn sticky top-0 float-right z-20">X</button>
+    <div class="mb-4">
+      <h2 class="fancy-header m-0" data-i18n="modal_upgrades">⚒️ Upgrades</h2>
     </div>
-    <p style="text-align:center; font-size:1.1rem; margin-bottom:20px;">
-      <span data-i18n="gold_label" style="font-family:'Press Start 2P',monospace; font-size:0.6rem;">Coins: </span>
-      <span id="upgradesGoldDisplay" style="font-family:'Press Start 2P',monospace; font-size:0.8rem; color:var(--text-gold); text-shadow:2px 2px 0 rgba(0,0,0,0.8);">0</span>
-      <span style="margin-left:4px;">🪙</span>
+    <p class="text-center text-[1.1rem] mb-5">
+      <span data-i18n="gold_label" class="font-minecraft text-[0.6rem]">Coins: </span>
+      <span id="upgradesGoldDisplay" class="font-minecraft text-[0.8rem] text-yellow-400 drop-shadow-[2px_2px_0_rgba(0,0,0,0.8)]">0</span>
+      <span class="ml-1">🪙</span>
     </p>
-    <div id="upgradesList" style="display:flex; flex-direction:column; gap:12px; padding-bottom:16px;"></div>
-    <button id="closeUpgradesModal" class="wood-btn" style="margin-top:16px; width:100%;" data-i18n="btn_close">Close</button>
+    <div id="upgradesList" class="flex flex-col gap-3 pb-4"></div>
   </div>
 </div>
 
 <!-- ── ACHIEVEMENTS MODAL ─────────────────────────────── -->
 <div class="terra-modal-overlay" id="achievementsModal">
-  <div class="terra-modal-card" style="max-width:560px;">
-    <button id="xCloseAchievements" class="modal-close-btn" style="position:sticky; top:0; float:right; z-index:20; background:var(--panel-bg); padding:4px 8px; border-radius:8px; box-shadow:0 0 10px rgba(0,0,0,0.5);">X</button>
-    <div style="margin-bottom:16px;">
-      <h2 class="fancy-header" style="margin:0;" data-i18n="modal_achievements">🏆 Trophies</h2>
+  <div class="terra-modal-card max-w-[560px]">
+    <button id="xCloseAchievements" class="modal-close-btn sticky top-0 float-right z-20">X</button>
+    <div class="mb-4">
+      <h2 class="fancy-header m-0" data-i18n="modal_achievements">🏆 Trophies</h2>
+    </div>
+    <div id="guestAchievementWarning" class="hidden bg-red-900 text-white p-3 border-2 border-red-500 rounded-lg mb-4 text-[0.8rem] text-center">
+      ⚠️ Trophies do not progress in Guest Mode. Please create an account to save your achievements!
     </div>
     <div class="terra-divider">STATS</div>
-    <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:20px;">
-      <div class="stone-chip"><span class="value" id="statBestScore" style="color:#69f0ae;">0</span><span class="label" data-i18n="stat_best">Best Score</span></div>
-      <div class="stone-chip"><span class="value" id="statTotalGold" style="color:var(--text-gold);">0</span><span class="label" data-i18n="stat_gold">Total Coins</span></div>
-      <div class="stone-chip"><span class="value" id="statBosses"    style="color:#ff5252;">0</span><span class="label" data-i18n="stat_bosses">Bosses</span></div>
-      <div class="stone-chip"><span class="value" id="statRuns"      style="color:#40c4ff;">0</span><span class="label" data-i18n="stat_runs">Total Runs</span></div>
+    <div class="grid grid-cols-2 gap-3 mb-5">
+      <div class="stone-chip"><span class="value text-green-400" id="statBestScore">0</span><span class="label" data-i18n="stat_best">Best Score</span></div>
+      <div class="stone-chip"><span class="value text-yellow-400" id="statTotalGold">0</span><span class="label" data-i18n="stat_gold">Total Coins</span></div>
+      <div class="stone-chip"><span class="value text-red-500" id="statBosses">0</span><span class="label" data-i18n="stat_bosses">Bosses</span></div>
+      <div class="stone-chip"><span class="value text-blue-400" id="statRuns">0</span><span class="label" data-i18n="stat_runs">Total Runs</span></div>
     </div>
     <div class="terra-divider">GOALS</div>
-    <div id="achievementsList" style="display:flex; flex-direction:column; gap:12px; padding-bottom:24px;"></div>
+    <div id="achievementsList" class="flex flex-col gap-3 pb-6"></div>
   </div>
 </div>
 
 <!-- ── BUFF INDEX MODAL ─────────────────────────────── -->
 <div class="terra-modal-overlay" id="buffIndexModal">
-  <div class="terra-modal-card" style="max-width:600px; width:95%; max-height:85vh; overflow-y:auto;">
-    <button id="xCloseBuffIndex" class="modal-close-btn" style="position:sticky; top:0; float:right; z-index:20; background:var(--panel-bg); padding:4px 8px; border-radius:8px; box-shadow:0 0 10px rgba(0,0,0,0.5);">X</button>
-    <div style="margin-bottom:16px;">
-      <h2 class="fancy-header" style="margin:0;" data-i18n="title_buff_index">Buff Index</h2>
+  <div class="terra-modal-card max-w-[600px]">
+    <button id="xCloseBuffIndex" class="modal-close-btn sticky top-0 float-right z-20">X</button>
+    <div class="mb-4">
+      <h2 class="fancy-header m-0" data-i18n="title_buff_index">Buff Index</h2>
     </div>
-    <div id="buffIndexList" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(250px, 1fr)); gap:16px; margin-top: 16px;"></div>
+    <div id="buffIndexList" class="grid grid-cols-[repeat(auto-fill,minmax(250px,1fr))] gap-4 mt-4"></div>
   </div>
 </div>
 
 <!-- ── LEADERBOARD MODAL ───────────────────────────────── -->
 <div class="terra-modal-overlay" id="leaderboardModal">
-  <div class="terra-modal-card" style="max-width:540px;">
-    <button id="xCloseLeaderboard" class="modal-close-btn" style="position:sticky; top:0; float:right; z-index:20; background:var(--panel-bg); padding:4px 8px; border-radius:8px; box-shadow:0 0 10px rgba(0,0,0,0.5);">X</button>
-    <div style="margin-bottom:16px;">
-      <h2 class="fancy-header" style="margin:0;" data-i18n="modal_leaderboard">📊 Top Heroes</h2>
+  <div class="terra-modal-card max-w-[540px] !overflow-hidden">
+    <button id="xCloseLeaderboard" class="modal-close-btn sticky top-0 float-right z-20">X</button>
+    <div class="mb-4">
+      <h2 class="fancy-header m-0" data-i18n="modal_leaderboard">📊 Top Heroes</h2>
     </div>
-    <div style="background:#263238; border:4px solid var(--panel-border); box-shadow:inset 2px 2px 0 rgba(0,0,0,0.5); max-height:55vh; overflow-y:auto;">
-      <table style="width:100%; border-collapse:collapse;">
-        <thead style="background:#37474f; position:sticky; top:0; z-index:1; border-bottom:4px solid var(--panel-border);">
+    <div id="leaderboardPodium" class="flex justify-center items-end gap-2 mb-4 min-h-[140px] px-2"></div>
+    <div class="drag-scroll bg-[#263238] border-4 border-[var(--panel-border)] shadow-[inset_2px_2px_0_rgba(0,0,0,0.5)] max-h-[45vh] overflow-y-auto cursor-grab">
+      <table class="w-full border-collapse">
+        <thead class="bg-[#37474f] sticky top-0 z-[1] border-b-4 border-[var(--panel-border)]">
           <tr>
-            <th style="font-family:'Press Start 2P',monospace; font-size:0.55rem; color:var(--text-gold); padding:12px; text-shadow:1px 1px 0 rgba(0,0,0,0.8); text-align:center;" data-i18n="col_rank">Rank</th>
-            <th style="font-family:'Press Start 2P',monospace; font-size:0.55rem; color:var(--text-gold); padding:12px; text-shadow:1px 1px 0 rgba(0,0,0,0.8);" data-i18n="col_name">Hero</th>
-            <th style="font-family:'Press Start 2P',monospace; font-size:0.55rem; color:#64b5f6; padding:12px; text-shadow:1px 1px 0 rgba(0,0,0,0.8); text-align:right;">Rank</th>
-            <th style="font-family:'Press Start 2P',monospace; font-size:0.55rem; color:var(--text-gold); padding:12px; text-shadow:1px 1px 0 rgba(0,0,0,0.8); text-align:right;" data-i18n="col_score">Score</th>
-            <th style="font-family:'Press Start 2P',monospace; font-size:0.55rem; color:var(--text-gold); padding:12px; text-shadow:1px 1px 0 rgba(0,0,0,0.8); text-align:right;" data-i18n="col_date">Date</th>
+            <th class="font-minecraft text-[0.55rem] text-yellow-400 p-3 drop-shadow-[1px_1px_0_rgba(0,0,0,0.8)] text-center" data-i18n="col_rank">Rank</th>
+            <th class="font-minecraft text-[0.55rem] text-yellow-400 p-3 drop-shadow-[1px_1px_0_rgba(0,0,0,0.8)]" data-i18n="col_name">Hero</th>
+            <th class="font-minecraft text-[0.55rem] text-blue-400 p-3 drop-shadow-[1px_1px_0_rgba(0,0,0,0.8)] text-right">Rank</th>
+            <th class="font-minecraft text-[0.55rem] text-yellow-400 p-3 drop-shadow-[1px_1px_0_rgba(0,0,0,0.8)] text-right" data-i18n="col_score">Score</th>
           </tr>
         </thead>
         <tbody id="leaderboardList"></tbody>
       </table>
     </div>
-    <button id="closeLeaderboardModal" class="wood-btn" style="margin-top:20px; width:100%;" data-i18n="btn_close">Close</button>
   </div>
 </div>
 
 <!-- ── MODE MODAL ──────────────────────────────────────── -->
 <div class="terra-modal-overlay" id="modeModal">
-  <div class="terra-modal-card" style="max-width:440px; text-align:center;">
-    <button id="xCloseMode" class="modal-close-btn" style="position:absolute; top:12px; right:12px; z-index:20; background:var(--panel-bg); padding:4px 8px; border-radius:8px; box-shadow:0 0 10px rgba(0,0,0,0.5);">X</button>
-    <div style="margin-bottom:24px; margin-top:12px;">
-      <h2 class="fancy-header" style="margin:0;" data-i18n="modal_mode">⚔️ Select Mode</h2>
+  <div class="terra-modal-card max-w-[440px] text-center">
+    <button id="xCloseMode" class="modal-close-btn absolute top-3 right-3 z-20">X</button>
+    <div class="mb-6 mt-3">
+      <h2 class="fancy-header m-0" data-i18n="modal_mode">⚔️ Select Mode</h2>
     </div>
-    <div style="display:flex; flex-direction:column; gap:12px;">
+    <div class="flex flex-col gap-3">
       <button class="wood-btn success btn-mode" data-mode="normal" data-i18n="btn_normal">⚔️ Deep Cave (Normal)</button>
       <div class="terra-divider" data-i18n="lbl_practice_mode">Practice (0.2x Coins)</div>
       <button class="wood-btn btn-mode" data-mode="+" data-i18n="btn_add">➕ Addition</button>
@@ -223,58 +204,62 @@
       <button class="wood-btn btn-mode" data-mode="*" data-i18n="btn_mul">✖️ Multiplication</button>
       <button class="wood-btn btn-mode" data-mode="/" data-i18n="btn_div">➗ Division</button>
     </div>
-    <button id="closeModeModal" class="wood-btn danger" style="margin-top:24px; width:100%;" data-i18n="btn_close">Cancel</button>
+    <button id="closeModeModal" class="wood-btn danger mt-6 w-full" data-i18n="btn_close">Cancel</button>
   </div>
 </div>
 
 <!-- ── SETTINGS MODAL ─────────────────────────────────── -->
 <div class="terra-modal-overlay" id="settingsModal">
-  <div class="terra-modal-card" style="max-width:440px;">
-    <button id="xCloseSettings" class="modal-close-btn" style="position:absolute; top:12px; right:12px; z-index:20; background:var(--panel-bg); padding:4px 8px; border-radius:8px; box-shadow:0 0 10px rgba(0,0,0,0.5);">X</button>
-    <div style="margin-bottom:24px; margin-top:12px;">
-      <h2 class="fancy-header" style="margin:0;" data-i18n="modal_settings">⚙️ Settings</h2>
+  <div class="terra-modal-card max-w-[440px]">
+    <button id="xCloseSettings" class="modal-close-btn absolute top-3 right-3 z-20">X</button>
+    <div class="mb-6 mt-3">
+      <h2 class="fancy-header m-0" data-i18n="modal_settings">⚙️ Settings</h2>
     </div>
-    <div style="display:flex; flex-direction:column; gap:24px;">
-      <div style="display:flex; align-items:center; justify-content:space-between;">
-        <label for="musicVolumeSlider" style="margin:0;"><span style="font-size:1.2rem; vertical-align:middle; margin-right:4px;">🎵</span> <span data-i18n="lbl_music_volume">Music</span></label>
-        <div style="display:flex; align-items:center; gap:12px;">
-          <input type="range" id="musicVolumeSlider" min="0" max="100" value="50" style="width:100px; padding:0; height:12px; border:none; accent-color:var(--text-gold); cursor:pointer; box-shadow:none;">
-          <span id="musicVolumeValue" style="font-family:'Press Start 2P',monospace; font-size:0.6rem; color:var(--text-gold); min-width:3rem; text-shadow:1px 1px 0 rgba(0,0,0,0.8);">50%</span>
+    <div class="flex flex-col gap-6">
+      <div class="flex items-center justify-between">
+        <label for="musicVolumeSlider" class="m-0"><span class="text-[1.2rem] align-middle mr-1">🎵</span> <span data-i18n="lbl_music_volume">Music</span></label>
+        <div class="flex items-center gap-3">
+          <input type="range" id="musicVolumeSlider" min="0" max="100" value="50" class="settings-slider">
+          <span id="musicVolumeValue" class="font-minecraft text-[0.6rem] text-yellow-400 min-w-[3rem] drop-shadow-[1px_1px_0_rgba(0,0,0,0.8)]">50%</span>
         </div>
       </div>
-      <div style="display:flex; align-items:center; justify-content:space-between;">
-        <label for="sfxVolumeSlider" style="margin:0;"><span style="font-size:1.2rem; vertical-align:middle; margin-right:4px;">🔊</span> <span data-i18n="lbl_sfx_volume">SFX</span></label>
-        <div style="display:flex; align-items:center; gap:12px;">
-          <input type="range" id="sfxVolumeSlider" min="0" max="100" value="70" style="width:100px; padding:0; height:12px; border:none; accent-color:var(--text-gold); cursor:pointer; box-shadow:none;">
-          <span id="sfxVolumeValue" style="font-family:'Press Start 2P',monospace; font-size:0.6rem; color:var(--text-gold); min-width:3rem; text-shadow:1px 1px 0 rgba(0,0,0,0.8);">70%</span>
+      <div class="flex items-center justify-between">
+        <label for="sfxVolumeSlider" class="m-0"><span class="text-[1.2rem] align-middle mr-1">🔊</span> <span data-i18n="lbl_sfx_volume">SFX</span></label>
+        <div class="flex items-center gap-3">
+          <input type="range" id="sfxVolumeSlider" min="0" max="100" value="70" class="settings-slider">
+          <span id="sfxVolumeValue" class="font-minecraft text-[0.6rem] text-yellow-400 min-w-[3rem] drop-shadow-[1px_1px_0_rgba(0,0,0,0.8)]">70%</span>
         </div>
       </div>
-      <div style="display:flex; align-items:center; justify-content:space-between;">
-        <label for="languageSelect" style="margin:0;">🌐 <span data-i18n="lbl_language">Language</span></label>
-        <select id="languageSelect" style="margin:0; width:180px; padding:8px;">
+      <div class="flex items-center justify-between gap-4">
+        <label for="languageSelect" class="m-0 whitespace-nowrap"><span class="text-[1.2rem] align-middle mr-1">🌐</span> <span data-i18n="lbl_language">Language</span></label>
+        <select id="languageSelect" class="m-0 w-[130px] p-2 bg-[#455a64] border-2 border-[var(--panel-border)] text-white rounded">
           <option value="en">English</option>
           <option value="id">Bahasa Indonesia</option>
         </select>
       </div>
-      <button id="btnReplayTutorial" class="wood-btn" style="width:100%; margin-top:8px;" data-i18n="btn_replay_tutorial">🔄 Replay Tutorial</button>
+      <button id="btnReplayTutorial" class="wood-btn w-full mt-2" data-i18n="btn_replay_tutorial">🔄 Replay Tutorial</button>
     </div>
-    <div style="display:flex; gap:12px; margin-top:32px;">
-      <button id="saveSettings"  class="wood-btn success" style="flex:1;" data-i18n="btn_save">💾 Save</button>
-      <button id="closeSettings" class="wood-btn danger"  style="flex:1;" data-i18n="btn_close">❌ Cancel</button>
+    <div class="flex gap-3 mt-8">
+      <button id="saveSettings"  class="wood-btn success flex-1" data-i18n="btn_save">💾 Save</button>
+      <button id="closeSettings" class="wood-btn danger flex-1" data-i18n="btn_close">❌ Cancel</button>
     </div>
   </div>
 </div>
 
 </div><!-- /modalsContainer -->
 
-<script src="tutorial.js"></script>
-<script src="hub.js"></script>
+<script src="js/tutorial.js"></script>
+<script src="js/hub-ui.js"></script>
+<script src="js/hub-state.js"></script>
+<script src="js/hub-shop.js"></script>
+<script src="js/hub-quests.js"></script>
+<script src="js/hub-achievements.js"></script>
 <script>
   // Backdrop click to close
   document.querySelectorAll('.terra-modal-overlay').forEach(el => {
     el.addEventListener('click', e => { if (e.target === el) el.classList.remove('show'); });
   });
 </script>
-<script src="drag-scroll.js"></script>
+<script src="js/drag-scroll.js"></script>
 </body>
 </html>

@@ -1,0 +1,180 @@
+/* ─── Animations ────────────────────────────────────── */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-4px); }
+}
+.animate-float { animation: float 3s steps(4) infinite; }
+
+@keyframes pulse-glow {
+  0%, 100% { filter: drop-shadow(0 0 4px var(--text-gold)); }
+  50% { filter: drop-shadow(0 0 12px var(--text-gold)); }
+}
+.animate-pulse-glow { animation: pulse-glow 2s infinite; }
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-4px); }
+  75% { transform: translateX(4px); }
+}
+.shake { animation: shake 0.3s steps(2); }
+
+@keyframes pop {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+.pop { animation: pop 0.2s steps(2); }
+
+/* ─── Battle Animations (Horizontal Side-Scrolling) ─── */
+@keyframes shake-idle {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+@keyframes scale-up-glow {
+  0% { transform: scale(1); filter: brightness(1); }
+  50% { transform: scale(1.5); filter: brightness(1.5) drop-shadow(0 0 10px var(--text-gold)); color: var(--text-gold); }
+  100% { transform: scale(1.2); filter: brightness(1.2); color: var(--text-gold); }
+}
+.anim-scale-up-glow { animation: scale-up-glow 0.3s ease-out forwards; z-index: 50; }
+
+@keyframes merge-pop {
+  0% { transform: scale(0.5); opacity: 0; filter: drop-shadow(0 0 0 #4caf50); }
+  50% { transform: scale(1.4); opacity: 1; filter: drop-shadow(0 0 10px #4caf50); }
+  100% { transform: scale(1); opacity: 1; filter: drop-shadow(0 0 0 #4caf50); }
+}
+.anim-merge-pop { animation: merge-pop 0.3s ease-out forwards; }
+
+.calc-token {
+  transition: all 0.2s ease-out;
+  display: inline-block;
+  overflow: hidden;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+
+/* Horizontal Attacks */
+@keyframes player-attack-horiz {
+  0%   { transform: translateX(0)   translateY(0)    scale(1);   }
+  20%  { transform: translateX(30px) translateY(-30px) scale(1.1); }
+  55%  { transform: translateX(200px) translateY(-10px) scale(1.15); }
+  70%  { transform: translateX(200px) translateY(0)   scale(1.1); }
+  100% { transform: translateX(0)   translateY(0)    scale(1);   }
+}
+.anim-player-attack { animation: player-attack-horiz 0.45s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; z-index: 50; }
+
+/* Slash impact effect */
+@keyframes slash-impact {
+  0%   { opacity: 1; transform: translate(-50%, -50%) scale(0.3) rotate(-30deg); }
+  40%  { opacity: 1; transform: translate(-50%, -60%) scale(1.4) rotate(15deg); }
+  100% { opacity: 0; transform: translate(-50%, -80%) scale(0.8) rotate(30deg); }
+}
+.slash-effect {
+  position: absolute;
+  font-size: 3.5rem;
+  pointer-events: none;
+  z-index: 60;
+  animation: slash-impact 0.4s ease-out forwards;
+  text-shadow: 0 0 8px #fff, 0 0 16px #ffeb3b;
+  filter: drop-shadow(2px 2px 0 rgba(0,0,0,0.8));
+}
+
+/* Boss slash - bigger */
+@keyframes slash-impact-big {
+  0%   { opacity: 1; transform: translate(-50%, -50%) scale(0.4) rotate(-20deg); }
+  30%  { opacity: 1; transform: translate(-50%, -70%) scale(2.2) rotate(10deg); }
+  100% { opacity: 0; transform: translate(-50%, -100%) scale(1.2) rotate(25deg); }
+}
+.slash-effect-big {
+  position: absolute;
+  font-size: 4rem;
+  pointer-events: none;
+  z-index: 60;
+  animation: slash-impact-big 0.55s ease-out forwards;
+  text-shadow: 0 0 12px #ff5722, 0 0 24px #ffeb3b;
+  filter: drop-shadow(2px 2px 0 rgba(0,0,0,0.8));
+}
+
+@keyframes enemy-attack-horiz {
+  0% { transform: translateX(0) scale(1); }
+  30% { transform: translateX(10px) scale(0.9); }
+  60% { transform: translateX(-180px) scale(1.1); }
+  80% { transform: translateX(-180px) scale(1.1); }
+  100% { transform: translateX(0) scale(1); }
+}
+.anim-enemy-attack { animation: enemy-attack-horiz 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; z-index: 50; }
+
+@keyframes boss-attack-horiz {
+  0% { transform: translateX(0) scale(1); filter: brightness(1); }
+  30% { transform: translateX(20px) scale(1.1); filter: brightness(1.5) drop-shadow(0 0 10px #e53935); }
+  60% { transform: translateX(-240px) scale(1); }
+  80% { transform: translateX(-240px) scale(1); }
+  100% { transform: translateX(0) scale(1); filter: brightness(1); }
+}
+.anim-boss-attack { animation: boss-attack-horiz 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 50; }
+
+@keyframes arena-shake {
+  0%, 100% { transform: translate(0, 0); }
+  25% { transform: translate(-6px, 4px); }
+  50% { transform: translate(6px, -4px); }
+  75% { transform: translate(-6px, -4px); }
+}
+.anim-arena-shake { animation: arena-shake 0.3s ease-in-out both; }
+
+@keyframes hit-flash {
+  0%, 100% { filter: brightness(1); }
+  50% { filter: brightness(2) drop-shadow(0 0 10px #ff0000); }
+}
+.anim-hit-flash { animation: hit-flash 0.3s ease-in-out forwards; }
+
+/* ─── Countdown ─────────────────────────────────────── */
+@keyframes countdown-pop {
+  0% { transform: scale(0.5); opacity: 0; }
+  50% { transform: scale(1.2); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+.anim-countdown-pop { animation: countdown-pop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+
+/* Coin Drop Animation */
+.coin-drop {
+  position: absolute;
+  font-size: clamp(1rem, 3vw, 1.5rem);
+  pointer-events: none;
+  z-index: 1000;
+  animation: coinDrop 1s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+  filter: drop-shadow(2px 2px 0 rgba(0,0,0,0.8));
+}
+
+@keyframes coinDrop {
+  0% {
+    transform: translate(0, 0) scale(0.5);
+    opacity: 1;
+  }
+  50% {
+    transform: translate(var(--tx), var(--ty)) scale(1.2);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(var(--tx), calc(var(--ty) + 100px)) scale(1);
+    opacity: 0;
+  }
+}
+@keyframes combatTextFloat { 0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); } 20% { opacity: 1; transform: translate(-50%, -70%) scale(1.2); } 100% { opacity: 0; transform: translate(-50%, -150%) scale(1); } }
+
+@keyframes toastSlideIn {
+  0% { transform: translateX(120%); opacity: 0; }
+  100% { transform: translateX(0); opacity: 1; }
+}
+@keyframes toastFadeOut {
+  0% { transform: translateX(0); opacity: 1; }
+  100% { transform: translateX(120%); opacity: 0; }
+}
+
+@keyframes achToastSlideIn {
+  0% { transform: translateY(150%) scale(0.5); opacity: 0; }
+  100% { transform: translateY(0) scale(1); opacity: 1; }
+}
+@keyframes achToastFadeOut {
+  0% { transform: translateY(0) scale(1); opacity: 1; }
+  100% { transform: translateY(150%) scale(0.5); opacity: 0; }
+}

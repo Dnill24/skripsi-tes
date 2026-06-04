@@ -6,7 +6,7 @@
   <title>Math Quest - Versus Mode</title>
   <script src="https://cdn.tailwindcss.com"></script>
   
-  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="css/styles.css" />
   <script>
     tailwind.config = { theme: { extend: { colors: { primary: '#0f172a', secondary: '#1e293b', accent: '#8b5cf6' } } } }
   </script>
@@ -38,10 +38,11 @@
   </div>
 
   <!-- Game Arena (Hidden until connected) -->
-    <div id="gameArena" class="hidden flex-col h-full relative z-10 max-w-5xl w-full mx-auto justify-between pb-4 pt-12">
+    <div id="gameArenaWrapper" class="hidden flex-col h-full relative z-10 max-w-5xl w-full mx-auto justify-between pb-4 pt-12">
+      <button id="btnForfeit" class="wood-btn danger absolute top-4 right-4 z-50 text-[0.6rem] px-2 py-1 shadow-lg border-2 border-red-900 font-minecraft" data-i18n="btn_forfeit">🏳️ Forfeit</button>
     
     <!-- Opponent Area (Top) -->
-    <div class="stone-panel p-3 mb-2 relative overflow-hidden" style="border-color:#b71c1c !important;">
+    <div class="stone-panel p-3 mb-2 relative overflow-hidden border-[#b71c1c]">
       <div class="flex justify-between items-center mb-1">
         <div class="flex items-center gap-2">
           <span id="opponentSprite" class="text-lg drop-shadow-md">🧍</span>
@@ -54,13 +55,13 @@
       <div class="bar-track h-4">
         <div id="barOpponentHp" class="bar-fill bar-fill-hp h-full w-full"></div>
       </div>
-      <p class="text-center text-xs text-red-300 mt-1" style="font-family:'Press Start 2P',monospace; font-size:0.5rem;"><span data-i18n="txt_opponent_hp">Opponent HP:</span> <span id="lblOpponentHp">100/100</span></p>
+      <p class="text-center text-[0.5rem] text-red-300 mt-1 font-minecraft"><span data-i18n="txt_opponent_hp">Opponent HP:</span> <span id="lblOpponentHp">100/100</span></p>
       
       <div id="opponentDamageText" class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-2xl font-bold font-minecraft text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] opacity-0 transition-opacity duration-300 pointer-events-none z-10"></div>
     </div>
     
     <!-- Battle Arena (Middle - Horizontal Layout) -->
-    <div id="versusArena" class="w-full relative h-48 md:h-56 z-10 my-2 overflow-hidden" style="background:radial-gradient(circle at center, transparent 40%, rgba(0,0,0,0.6) 100%);">
+    <div id="battleArena" class="w-full relative h-48 md:h-56 z-10 my-2 overflow-hidden bg-[radial-gradient(circle_at_center,transparent_40%,rgba(0,0,0,0.6)_100%)]">
       <div class="arena-floor"></div>
       <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-orange-400/20 font-minecraft text-4xl -z-10">VS</div>
       
@@ -69,10 +70,7 @@
         <div id="countdownText" class="text-7xl md:text-8xl font-minecraft text-orange-400 drop-shadow-[4px_4px_0_rgba(0,0,0,1)] scale-50 opacity-0 transition-all duration-300">3</div>
       </div>
 
-      <!-- Calculation Animation Container -->
-      <div id="calcAnimContainer" class="absolute inset-0 flex items-center justify-center z-40 pointer-events-none hidden transition-opacity duration-300">
-         <div id="calcAnimContent" class="stone-panel text-3xl font-minecraft font-bold text-white p-4 flex gap-3 flex-wrap justify-center items-center transition-all duration-500"></div>
-      </div>
+
 
       <!-- Opponent (Right Side, on floor) -->
       <div id="versusOpponentContainer" class="absolute bottom-6 right-8 flex flex-col items-center z-10 transition-transform duration-300">
@@ -135,9 +133,13 @@
 
   <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-database-compat.js"></script>
-  <script src="firebase-config.js"></script>
-  <script src="locales.js"></script>
-  <script src="sfx.js"></script>
-  <script src="versus.js"></script>
-  <script src="drag-scroll.js"></script></body>
+  <script src="js/firebase-config.js"></script>
+  <script src="js/locales.js"></script>
+  <script src="js/sfx.js"></script>
+  <script src="js/animations.js"></script>
+  <script src="js/question.js"></script>
+  <script src="js/versus-ui.js"></script>
+  <script src="js/versus-network.js"></script>
+  <script src="js/versus-logic.js"></script>
+  <script src="js/drag-scroll.js"></script></body>
 </html>

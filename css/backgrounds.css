@@ -1,0 +1,32 @@
+/* ─── Backgrounds ───────────────────────────────────── */
+body {
+  background-color: var(--terra-deep);
+}
+
+.bg-hub {
+  background-image: url('../backgrounds/terraria_hub_bright.png');
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  image-rendering: pixelated;
+}
+
+.bg-cave {
+  background-image: url('../backgrounds/terraria_play_bg.png');
+  background-size: cover;
+  background-position: 0% center;
+  background-repeat: repeat-x;
+  background-attachment: fixed;
+  image-rendering: pixelated;
+  transition: background-position 1s ease-in-out;
+}
+
+.bg-arena {
+  background-image: url('../backgrounds/terraria_arena_bg.png');
+  background-size: cover;
+  background-position: center bottom;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  image-rendering: pixelated;
+}

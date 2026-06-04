@@ -5,63 +5,24 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Math Quest Adventure</title>
   <meta name="description" content="A math adventure game for elementary students!" />
-  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="css/styles.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&family=Press+Start+2P&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-database-compat.js"></script>
-  <script src="firebase-config.js"></script>
-  <script src="locales.js?v=3"></script>
-  <script src="sfx.js"></script>
+  <script src="js/firebase-config.js"></script>
+  <script src="js/locales.js?v=3"></script>
+  <script src="js/sfx.js"></script>
   <script>tailwind.config = { theme: { extend: {} } }</script>
-  <style>
-    *, *::before, *::after { box-sizing: border-box; }
-    html, body { height: 100%; margin: 0; padding: 0; overflow: hidden; }
 
-    /* Title Signpost */
-    .title-sign {
-      background: var(--wood-bg);
-      border: 6px solid var(--wood-border);
-      box-shadow: var(--shadow-block), 0 12px 24px rgba(0,0,0,0.6);
-      padding: 24px 32px;
-      position: relative;
-      text-align: center;
-      transform: rotate(-2deg);
-      animation: float 4s ease-in-out infinite;
-      transition: transform 0.3s ease-out;
-    }
-    .title-sign:hover {
-      transform: rotate(2deg) scale(1.05);
-    }
-    .title-sign::before, .title-sign::after {
-      content: ''; position: absolute; top: 12px; width: 12px; height: 12px;
-      background: #424242; border: 2px solid #212121; border-radius: 50%;
-    }
-    .title-sign::before { left: 12px; }
-    .title-sign::after { right: 12px; }
-
-    .title-sign h1 {
-      font-size: clamp(1.2rem, 4vw, 2.2rem);
-      color: #fff;
-      text-shadow: 3px 3px 0 rgba(0,0,0,0.8);
-      margin: 0; line-height: 1.4;
-    }
-    .title-sign p {
-      font-family: 'Press Start 2P', monospace;
-      font-size: clamp(0.5rem, 1.5vw, 0.75rem);
-      color: var(--text-gold);
-      text-shadow: 2px 2px 0 rgba(0,0,0,0.8);
-      margin: 12px 0 0;
-    }
-  </style>
 </head>
 <body class="bg-hub">
-<div style="display:flex; align-items:stretch; justify-content:flex-end; padding:clamp(16px,4vw,48px); height:100%;">
+<div class="menu-layout">
 
   <!-- Title Card (top-left) -->
-  <div style="position:absolute; top:clamp(20px,8vh,64px); left:clamp(20px,6vw,64px); z-index:10;">
+  <div class="menu-logo-container">
     <div class="title-sign">
       <h1>MATH QUEST</h1>
       <p>Sandbox Adventure</p>
@@ -69,31 +30,31 @@
   </div>
 
   <!-- Menu Panel (bottom-right) -->
-  <div style="position:absolute; bottom:clamp(16px,5vh,56px); right:clamp(16px,5vw,56px); z-index:20;">
-    <div class="stone-panel" style="padding:24px 20px; min-width:260px; max-width:300px; width:88vw;">
-      <div style="display:flex; flex-direction:column; gap:12px;">
+  <div class="menu-panel-container">
+    <div class="stone-panel menu-panel">
+      <div class="flex-col-gap-12">
         <button id="playButton" class="wood-btn success">
-          <span style="font-size:1.2rem; vertical-align:middle; margin-right:8px;">⚔️</span><span data-i18n="menu_play">Play</span>
+          <span class="btn-icon">⚔️</span><span data-i18n="menu_play">Play</span>
         </button>
 
         <!-- Play sub-options -->
-        <div id="playOptions" style="display:none; flex-direction:column; gap:12px;">
+        <div id="playOptions" class="flex flex-col gap-3 hidden">
           <button id="guestButton" class="wood-btn">
-            <span style="font-size:1.2rem; vertical-align:middle; margin-right:8px;">🧑‍🌾</span><span data-i18n="menu_guest">Guest Mode</span>
+            <span class="btn-icon">🧑‍🌾</span><span data-i18n="menu_guest">Guest Mode</span>
           </button>
           <button id="loginButton" class="wood-btn">
-            <span style="font-size:1.2rem; vertical-align:middle; margin-right:8px;">🔑</span><span data-i18n="menu_login">Login</span>
+            <span class="btn-icon">🔑</span><span data-i18n="menu_login">Login</span>
           </button>
           <button id="signupButton" class="wood-btn">
-            <span style="font-size:1.2rem; vertical-align:middle; margin-right:8px;">📝</span><span data-i18n="menu_signup">Sign Up</span>
+            <span class="btn-icon">📝</span><span data-i18n="menu_signup">Sign Up</span>
           </button>
           <button id="exitButton" class="wood-btn danger">
-            <span style="font-size:1.2rem; vertical-align:middle; margin-right:8px;">🔙</span><span data-i18n="menu_back">Back</span>
+            <span class="btn-icon">🔙</span><span data-i18n="menu_back">Back</span>
           </button>
         </div>
 
         <button id="settingsButton" class="wood-btn">
-          <span style="font-size:1.2rem; vertical-align:middle; margin-right:8px;">⚙️</span><span data-i18n="menu_settings">Settings</span>
+          <span class="btn-icon">⚙️</span><span data-i18n="menu_settings">Settings</span>
         </button>
       </div>
     </div>
@@ -108,16 +69,16 @@
     <label for="usernameInput" data-i18n="menu_char_name">Character Name</label>
     <input id="usernameInput" type="text" autocomplete="username" />
     <label for="passwordInput" data-i18n="menu_password">Password</label>
-    <div style="position:relative;">
-      <input id="passwordInput" type="password" placeholder="..." autocomplete="current-password" style="width:100%; padding-right:40px; margin:0;" />
-      <button type="button" id="toggleLoginPassword" style="position:absolute; right:10px; top:50%; transform:translateY(-50%); background:none; border:none; cursor:pointer; font-size:1.2rem;">👁️</button>
+    <div class="password-container">
+      <input id="passwordInput" type="password" class="password-input" placeholder="..." autocomplete="current-password" />
+      <button type="button" id="toggleLoginPassword" class="password-toggle">👁️</button>
     </div>
-    <div style="display:flex; gap:12px; margin-top:20px;">
-      <button id="loginSubmitButton" class="wood-btn success" style="flex:1;">
-        <span style="font-size:1.2rem; vertical-align:middle; margin-right:8px;">🚀</span><span data-i18n="menu_login">Login</span>
+    <div class="flex-row-gap-12-mt20">
+      <button id="loginSubmitButton" class="wood-btn success flex-1">
+        <span class="btn-icon">🚀</span><span data-i18n="menu_login">Login</span>
       </button>
-      <button id="cancelLogin" class="wood-btn danger" style="flex:1;">
-        <span style="font-size:1.2rem; vertical-align:middle; margin-right:8px;">❌</span><span data-i18n="menu_cancel">Cancel</span>
+      <button id="cancelLogin" class="wood-btn danger flex-1">
+        <span class="btn-icon">❌</span><span data-i18n="menu_cancel">Cancel</span>
       </button>
     </div>
   </div>
@@ -130,21 +91,21 @@
     <label for="signupUsernameInput" data-i18n="menu_char_name">Character Name</label>
     <input id="signupUsernameInput" type="text" data-i18n-placeholder="plc_hero" placeholder="e.g. Hero" autocomplete="username" />
     <label for="signupPasswordInput" data-i18n="menu_password">Password</label>
-    <div style="position:relative; margin-bottom:8px;">
-      <input id="signupPasswordInput" type="password" placeholder="..." autocomplete="new-password" style="width:100%; padding-right:40px; margin:0;" />
-      <button type="button" id="toggleSignupPassword" style="position:absolute; right:10px; top:50%; transform:translateY(-50%); background:none; border:none; cursor:pointer; font-size:1.2rem;">👁️</button>
+    <div class="password-container">
+      <input id="signupPasswordInput" type="password" class="password-input" placeholder="..." autocomplete="new-password" />
+      <button type="button" id="toggleSignupPassword" class="password-toggle">👁️</button>
     </div>
     <label for="signupConfirmPasswordInput" data-i18n="menu_confirm_password">Confirm Password</label>
-    <div style="position:relative;">
-      <input id="signupConfirmPasswordInput" type="password" placeholder="..." autocomplete="new-password" style="width:100%; padding-right:40px; margin:0;" />
-      <button type="button" id="toggleSignupConfirmPassword" style="position:absolute; right:10px; top:50%; transform:translateY(-50%); background:none; border:none; cursor:pointer; font-size:1.2rem;">👁️</button>
+    <div class="password-container">
+      <input id="signupConfirmPasswordInput" type="password" class="password-input" placeholder="..." autocomplete="new-password" />
+      <button type="button" id="toggleSignupConfirmPassword" class="password-toggle">👁️</button>
     </div>
-    <div style="display:flex; gap:12px; margin-top:20px;">
-      <button id="signupSubmitButton" class="wood-btn success" style="flex:1;">
-        <span style="font-size:1.2rem; vertical-align:middle; margin-right:8px;">✨</span><span data-i18n="menu_signup">Sign Up</span>
+    <div class="flex-row-gap-12-mt20">
+      <button id="signupSubmitButton" class="wood-btn success flex-1">
+        <span class="btn-icon">✨</span><span data-i18n="menu_signup">Sign Up</span>
       </button>
-      <button id="cancelSignup" class="wood-btn danger" style="flex:1;">
-        <span style="font-size:1.2rem; vertical-align:middle; margin-right:8px;">❌</span><span data-i18n="menu_cancel">Cancel</span>
+      <button id="cancelSignup" class="wood-btn danger flex-1">
+        <span class="btn-icon">❌</span><span data-i18n="menu_cancel">Cancel</span>
       </button>
     </div>
   </div>
@@ -152,42 +113,43 @@
 
 <!-- Settings Modal -->
 <div class="terra-modal-overlay" id="settingsModal">
-  <div class="terra-modal-card" style="max-width:440px;">
-    <button id="xCloseSettings" class="modal-close-btn" style="position:absolute; top:12px; right:12px; z-index:20; background:var(--panel-bg); padding:4px 8px; border-radius:8px; box-shadow:0 0 10px rgba(0,0,0,0.5);">X</button>
-    <div style="margin-bottom:24px; margin-top:12px;">
-      <h2 class="fancy-header" style="margin:0;" data-i18n="modal_settings">⚙️ Settings</h2>
+  <div class="terra-modal-card max-w-[440px]">
+    <button id="xCloseSettings" class="modal-close-btn absolute top-3 right-3 z-20">X</button>
+    <div class="mb-6 mt-3">
+      <h2 class="fancy-header m-0" data-i18n="modal_settings">⚙️ Settings</h2>
     </div>
-    <div style="display:flex; flex-direction:column; gap:24px;">
-      <div style="display:flex; align-items:center; justify-content:space-between;">
-        <label for="musicVolumeSlider" style="margin:0;"><span style="font-size:1.2rem; vertical-align:middle; margin-right:4px;">🎵</span> <span data-i18n="lbl_music_volume">Music</span></label>
-        <div style="display:flex; align-items:center; gap:12px;">
-          <input type="range" id="musicVolumeSlider" min="0" max="100" value="50" style="width:100px; padding:0; height:12px; border:none; accent-color:var(--text-gold); cursor:pointer; box-shadow:none;">
-          <span id="musicVolumeValue" style="font-family:'Press Start 2P',monospace; font-size:0.6rem; color:var(--text-gold); min-width:3rem; text-shadow:1px 1px 0 rgba(0,0,0,0.8);">50%</span>
+    <div class="flex flex-col gap-6">
+      <div class="flex items-center justify-between">
+        <label for="musicVolumeSlider" class="m-0"><span class="text-[1.2rem] align-middle mr-1">🎵</span> <span data-i18n="lbl_music_volume">Music</span></label>
+        <div class="flex items-center gap-3">
+          <input type="range" id="musicVolumeSlider" min="0" max="100" value="50" class="settings-slider">
+          <span id="musicVolumeValue" class="font-minecraft text-[0.6rem] text-yellow-400 min-w-[3rem] drop-shadow-[1px_1px_0_rgba(0,0,0,0.8)]">50%</span>
         </div>
       </div>
-      <div style="display:flex; align-items:center; justify-content:space-between;">
-        <label for="sfxVolumeSlider" style="margin:0;"><span style="font-size:1.2rem; vertical-align:middle; margin-right:4px;">🔊</span> <span data-i18n="lbl_sfx_volume">SFX</span></label>
-        <div style="display:flex; align-items:center; gap:12px;">
-          <input type="range" id="sfxVolumeSlider" min="0" max="100" value="70" style="width:100px; padding:0; height:12px; border:none; accent-color:var(--text-gold); cursor:pointer; box-shadow:none;">
-          <span id="sfxVolumeValue" style="font-family:'Press Start 2P',monospace; font-size:0.6rem; color:var(--text-gold); min-width:3rem; text-shadow:1px 1px 0 rgba(0,0,0,0.8);">70%</span>
+      <div class="flex items-center justify-between">
+        <label for="sfxVolumeSlider" class="m-0"><span class="text-[1.2rem] align-middle mr-1">🔊</span> <span data-i18n="lbl_sfx_volume">SFX</span></label>
+        <div class="flex items-center gap-3">
+          <input type="range" id="sfxVolumeSlider" min="0" max="100" value="70" class="settings-slider">
+          <span id="sfxVolumeValue" class="font-minecraft text-[0.6rem] text-yellow-400 min-w-[3rem] drop-shadow-[1px_1px_0_rgba(0,0,0,0.8)]">70%</span>
         </div>
       </div>
-      <div style="display:flex; align-items:center; justify-content:space-between;">
-        <label for="languageSelect" style="margin:0;">🌐 <span data-i18n="lbl_language">Language</span></label>
-        <select id="languageSelect" style="margin:0; width:180px; padding:8px;">
+      <div class="flex items-center justify-between gap-4">
+        <label for="languageSelect" class="m-0 whitespace-nowrap"><span class="text-[1.2rem] align-middle mr-1">🌐</span> <span data-i18n="lbl_language">Language</span></label>
+        <select id="languageSelect" class="m-0 w-[130px] p-2 bg-[#455a64] border-2 border-[var(--panel-border)] text-white rounded">
           <option value="en">English</option>
           <option value="id">Bahasa Indonesia</option>
         </select>
       </div>
     </div>
-    <div style="display:flex; gap:12px; margin-top:32px;">
-      <button id="saveSettings"  class="wood-btn success" style="flex:1;" data-i18n="btn_save">💾 Save</button>
-      <button id="closeSettings" class="wood-btn danger"  style="flex:1;" data-i18n="btn_close">❌ Cancel</button>
+    <div class="flex gap-3 mt-8">
+      <button id="saveSettings"  class="wood-btn success flex-1" data-i18n="btn_save">💾 Save</button>
+      <button id="closeSettings" class="wood-btn danger flex-1" data-i18n="btn_close">❌ Cancel</button>
     </div>
   </div>
 </div>
 
-<script src="menu.js?v=3"></script>
+<script src="js/menu-ui.js"></script>
+<script src="js/menu-auth.js"></script>
 <script>
   const playBtn    = document.getElementById('playButton');
   const playOpts   = document.getElementById('playOptions');
@@ -204,24 +166,24 @@
   const xCloseSetBtn= document.getElementById('xCloseSettings');
 
   playBtn.addEventListener('click', () => {
-    playOpts.style.display = 'flex';
+    playOpts.classList.remove('hidden');
     playBtn.style.display = 'none';
     settingsBtn.style.display = 'none';
   });
   exitBtn.addEventListener('click', () => {
-    playOpts.style.display = 'none';
+    playOpts.classList.add('hidden');
     playBtn.style.display = '';
     settingsBtn.style.display = '';
   });
   loginBtn.addEventListener('click', () => {
     loginModal.classList.add('show');
-    playOpts.style.display = 'none';
+    playOpts.classList.add('hidden');
     playBtn.style.display = '';
     settingsBtn.style.display = '';
   });
   signupBtn.addEventListener('click', () => {
     signupModal.classList.add('show');
-    playOpts.style.display = 'none';
+    playOpts.classList.add('hidden');
     playBtn.style.display = '';
     settingsBtn.style.display = '';
   });
@@ -235,6 +197,6 @@
     m.addEventListener('click', e => { if (e.target === m) m.classList.remove('show'); });
   });
 </script>
-<script src="drag-scroll.js"></script>
+<script src="js/drag-scroll.js"></script>
 </body>
 </html>

@@ -1,0 +1,14 @@
+/* ═══════════════════════════════════════════════════════
+   MATH QUEST — COMPONENT-BASED CSS ARCHITECTURE
+   ═══════════════════════════════════════════════════════ */
+
+@import 'variables.css';
+@import 'typography.css';
+@import 'backgrounds.css';
+@import 'layout.css';
+@import 'panels.css';
+@import 'buttons.css';
+@import 'modals.css';
+@import 'hud.css';
+@import 'animations.css';
+@import 'play.css';

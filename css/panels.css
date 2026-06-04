@@ -1,0 +1,76 @@
+/* ─── Stone Panel (Modals, Hub Cards) ───────────────── */
+.stone-panel {
+  background: var(--panel-bg) !important;
+  border: 4px solid var(--panel-border) !important;
+  border-radius: 4px !important;
+  box-shadow: var(--shadow-block), 0 8px 24px rgba(0,0,0,0.6) !important;
+  color: var(--text-main) !important;
+  position: relative;
+}
+
+/* Add corner stone details */
+.stone-panel::before {
+  content: '';
+  position: absolute; top: -4px; left: -4px; right: -4px; bottom: -4px;
+  border: 4px solid rgba(255,255,255,0.05);
+  pointer-events: none;
+  border-radius: 4px;
+}
+
+/* ─── Hub Stat / Item Cards ───────────────────────────── */
+.stone-chip {
+  background: #455a64;
+  border: 4px solid var(--panel-border);
+  border-radius: 0;
+  padding: 12px;
+  text-align: center;
+  box-shadow: var(--shadow-block);
+  transition: transform 0.1s steps(2);
+}
+.stone-chip:hover { transform: translateY(-2px); border-color: var(--text-gold); }
+.stone-chip .value {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 1rem;
+  display: block;
+  margin-bottom: 8px;
+  text-shadow: 2px 2px 0 rgba(0,0,0,0.8);
+}
+.stone-chip .label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.55rem;
+  color: var(--text-dim);
+  display: block;
+}
+
+/* ─── Title Signpost (Hub) ───────────────────────── */
+.title-sign {
+  background: var(--wood-bg); border: 6px solid var(--wood-border);
+  box-shadow: var(--shadow-block), 0 12px 24px rgba(0,0,0,0.6);
+  padding: 16px 20px; position: relative; text-align: center;
+}
+.title-sign::before, .title-sign::after {
+  content: ''; position: absolute; top: 8px; width: 10px; height: 10px;
+  background: #424242; border: 2px solid #212121; border-radius: 50%;
+}
+.title-sign::before { left: 10px; }
+.title-sign::after { right: 10px; }
+.title-sign h1 {
+  font-family: 'Press Start 2P', monospace; font-size: clamp(0.9rem, 2.5vw, 1.5rem);
+  color: #fff; text-shadow: 2px 2px 0 rgba(0,0,0,0.8); margin: 0; line-height: 1.4;
+}
+.title-sign p {
+  font-family: 'Comic Neue', cursive; font-weight: 700; font-size: 1rem;
+  color: #4e342e; margin: 8px 0 0; text-shadow: none;
+}
+.title-sign span { color: #ffb300; text-shadow: 1px 1px 0 rgba(0,0,0,0.5); }
+
+/* Mobile Text Scaling */
+@media (max-width: 640px) {
+  .title-sign h1 { font-size: clamp(0.45rem, 3vw, 1.5rem) !important; }
+  .title-sign p { font-size: 0.5rem !important; }
+  #playerMMRDisplay { font-size: 0.3rem !important; }
+  .title-sign p[style*="0.6rem"], .rank-btn-text { font-size: 0.3rem !important; }
+  #btnToggleQuests { font-size: 0.45rem !important; }
+  #questsToggleIcon { font-size: 0.4rem !important; }
+  #dailyQuestTimer { font-size: 0.35rem !important; }
+}

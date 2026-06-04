@@ -118,7 +118,7 @@ html, body {
   align-items: stretch;
   justify-content: flex-end;
   padding: clamp(16px, 4vw, 48px);
-  height: 100vh;
+  height: 100%;
 }
 .menu-logo-container {
   position: absolute;

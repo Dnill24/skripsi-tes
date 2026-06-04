@@ -81,7 +81,7 @@
 .play-layout {
   display: flex;
   flex-direction: column;
-  height: 100vh; /* using 100vh instead of 100% for body */
+  height: 100%;
   overflow: hidden;
 }
 

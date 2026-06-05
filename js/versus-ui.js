@@ -189,7 +189,9 @@ function runCountdown(callback) {
   window.gameActive = false;
   clearInterval(window.timerInterval);
   
-  const countSteps = ['3', '2', '1', 'START!'];
+  const lang = (typeof settings !== 'undefined') ? settings.language : 'en';
+  const startText = window.getTranslation ? window.getTranslation('txt_start_countdown', lang) : 'START!';
+  const countSteps = ['3', '2', '1', startText];
   let idx = 0;
   
   function showNext() {
@@ -202,7 +204,7 @@ function runCountdown(callback) {
     const stepVal = countSteps[idx];
     text.textContent = stepVal;
     
-    if (stepVal === 'START!') {
+    if (idx === 3) {
       text.className = 'text-7xl md:text-8xl font-minecraft text-yellow-400 drop-shadow-[0_6px_0_rgba(0,0,0,1)] scale-50 opacity-0 transition-all duration-300';
       if (typeof SFX !== 'undefined') SFX.countdownStart();
     } else {

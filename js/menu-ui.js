@@ -126,3 +126,29 @@ if (elements.languageSelect) {
 if (typeof applyTranslationsToDOM === 'function') {
   applyTranslationsToDOM(state.language);
 }
+
+// Initial Language Prompt
+function checkLanguagePrompt() {
+  if (!localStorage.getItem('mathQuestLangSelected')) {
+    const langModal = document.getElementById('langPromptModal');
+    if (langModal) langModal.classList.add('show');
+  }
+}
+
+document.getElementById('btnLangEn')?.addEventListener('click', () => {
+  setLanguage('en');
+  if (elements.languageSelect) elements.languageSelect.value = 'en';
+  localStorage.setItem('mathQuestLangSelected', 'true');
+  document.getElementById('langPromptModal').classList.remove('show');
+  if (typeof SFX !== 'undefined') SFX.btnClick();
+});
+
+document.getElementById('btnLangId')?.addEventListener('click', () => {
+  setLanguage('id');
+  if (elements.languageSelect) elements.languageSelect.value = 'id';
+  localStorage.setItem('mathQuestLangSelected', 'true');
+  document.getElementById('langPromptModal').classList.remove('show');
+  if (typeof SFX !== 'undefined') SFX.btnClick();
+});
+
+checkLanguagePrompt();

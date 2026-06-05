@@ -22,7 +22,9 @@ function runCountdown(callback) {
   run.active = false;
   clearInterval(timerInterval);
   
-  const countSteps = ['3', '2', '1', 'START!'];
+  const lang = (typeof settings !== 'undefined') ? settings.language : 'en';
+  const startText = window.getTranslation ? window.getTranslation('txt_start_countdown', lang) : 'START!';
+  const countSteps = ['3', '2', '1', startText];
   let idx = 0;
   
   function showNext() {
@@ -36,7 +38,7 @@ function runCountdown(callback) {
     const stepVal = countSteps[idx];
     text.textContent = stepVal;
     // Balatro-style: gold for START!, hot red for numbers
-    if (stepVal === 'START!') {
+    if (idx === 3) {
       text.style.color = '#f5c842';
       text.style.textShadow = '0 0 40px rgba(245,200,66,0.9), 0 0 80px rgba(245,200,66,0.5), 4px 4px 0 rgba(0,0,0,1)';
       if (header) header.classList.remove('hud-hidden-top');

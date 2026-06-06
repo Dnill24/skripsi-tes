@@ -4,7 +4,15 @@ function updateComboUI() {
     elements.lblCombo.textContent = `${run.streak}x Combo!`;
     elements.lblCombo.classList.remove('hidden');
     elements.lblCombo.classList.add('scale-110');
-    setTimeout(() => elements.lblCombo.classList.remove('scale-110'), 200);
+    setTimeout(() => elements.lblCombo && elements.lblCombo.classList.remove('scale-110'), 200);
+    
+    if ([10, 25, 50, 100].includes(run.streak)) {
+      if (typeof SFX !== 'undefined' && SFX.bossDefeated) SFX.bossDefeated();
+      if (typeof showCombatText !== 'undefined') {
+        const comboMsg = getTranslation('txt_combo_msg', settings.language).replace('{n}', run.streak);
+        showCombatText(comboMsg, 'text-cyan-400 text-5xl', 'center');
+      }
+    }
   } else {
     elements.lblCombo.classList.add('hidden');
   }
@@ -89,8 +97,10 @@ function processBossHit(damage, timeRatio) {
   }, 250);
 }
 
-function processEnemyDefeat() {
-  showCombatText(getTranslation('txt_hit', settings.language), 'text-emerald-400', 'enemy');
+function processEnemyDefeat(damage) {
+  const hitVariations = ['txt_hit_1', 'txt_hit_2', 'txt_hit_3', 'txt_hit_4', 'txt_hit'];
+  const randomHit = hitVariations[Math.floor(Math.random() * hitVariations.length)];
+  showCombatText(getTranslation(randomHit, settings.language), 'text-emerald-400', 'enemy');
     
   let baseGold = getRandomInt(5, 10);
   let baseScore = 15;
@@ -157,8 +167,15 @@ function processPlayerDamage(isTimeout, op) {
     run.health = Math.max(0, run.health - damage);
     elements.lblHealth.textContent = `${run.health}/${run.maxHealth}`;
     
-    elements.battleArena.classList.add('shadow-[inset_0_0_50px_rgba(239,68,68,0.5)]');
-    setTimeout(() => elements.battleArena.classList.remove('shadow-[inset_0_0_50px_rgba(239,68,68,0.5)]'), 300);
+    elements.battleArena.classList.add('shadow-[inset_0_0_50px_rgba(239,68,68,0.5)]', 'anim-arena-shake');
+    const questionFooter = document.getElementById('questionFooter');
+    if (questionFooter) questionFooter.classList.add('anim-arena-shake');
+    setTimeout(() => {
+      if (elements.battleArena) {
+        elements.battleArena.classList.remove('shadow-[inset_0_0_50px_rgba(239,68,68,0.5)]', 'anim-arena-shake');
+      }
+      if (questionFooter) questionFooter.classList.remove('anim-arena-shake');
+    }, 300);
     
     if (isTimeout) {
       showCombatText(`${getTranslation('txt_timeout', settings.language)} -${damage} HP`, 'text-red-500', 'player');

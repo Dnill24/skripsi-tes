@@ -161,6 +161,11 @@ const locales = {
     // Dynamic Play text
     txt_combo: "x COMBO!",
     txt_hit: "Super! ⭐",
+    txt_hit_1: "Nice!",
+    txt_hit_2: "Great!",
+    txt_hit_3: "Amazing!",
+    txt_hit_4: "Super!",
+    txt_combo_msg: "{n}x COMBO!",
     txt_miss: "Oops! 💡",
     txt_timeout: "Time's up! ⏰",
     txt_crit: "CRIT!",
@@ -449,6 +454,11 @@ const locales = {
     // Dynamic Play text
     txt_combo: "x KOMBO!",
     txt_hit: "Hebat! ⭐",
+    txt_hit_1: "Bagus!",
+    txt_hit_2: "Hebat!",
+    txt_hit_3: "Luar Biasa!",
+    txt_hit_4: "Super!",
+    txt_combo_msg: "{n}x KOMBO!",
     txt_miss: "Ups! 💡",
     txt_timeout: "Waktu Habis! ⏰",
     txt_crit: "KRITIS!",

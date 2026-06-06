@@ -56,19 +56,32 @@ function createQuestion(type) {
   const targetMMR = safeMMR + (safeDiff * 2);
   
   let numTerms = 2;
+  const rankMMR = safeMMR; // Use actual rank to cap complexity strictly
   
   if (primaryOp === '+' || primaryOp === '-') {
-    if (targetMMR > 10 && Math.random() > 0.2) {
-      numTerms = 3;
-      if (targetMMR > 20 && Math.random() > 0.3) numTerms = 3 + Math.floor(Math.random() * 2); // 3 or 4
-      if (targetMMR > 40 && Math.random() > 0.4) numTerms = 3 + Math.floor(Math.random() * 3); // 3, 4, or 5
+    if (rankMMR < 20) {
+      numTerms = 2; // Iron
+    } else if (rankMMR < 40) {
+      numTerms = Math.random() > 0.5 ? 2 : 3; // Bronze
+    } else if (rankMMR < 60) {
+      numTerms = 3; // Silver
+    } else if (rankMMR < 80) {
+      numTerms = 3 + (Math.random() > 0.5 ? 1 : 0); // Gold (3-4)
+    } else if (rankMMR < 100) {
+      numTerms = 3 + Math.floor(Math.random() * 2); // Plat (3-4)
+    } else if (rankMMR < 150) {
+      numTerms = 4 + Math.floor(Math.random() * 2); // Diamond (4-5)
+    } else {
+      numTerms = 4 + Math.floor(Math.random() * 3); // Master (4-6)
     }
   } else {
     // Multiplication
-    if (targetMMR > 25 && Math.random() > 0.5) {
-      numTerms = 3;
-      if (targetMMR > 50 && Math.random() > 0.5) numTerms = 3 + Math.floor(Math.random() * 2); // 3 or 4
-      if (targetMMR > 80 && Math.random() > 0.5) numTerms = 3 + Math.floor(Math.random() * 3); // 3, 4, or 5
+    if (rankMMR < 40) {
+      numTerms = 2; // Iron/Bronze
+    } else if (rankMMR < 80) {
+      numTerms = Math.random() > 0.5 ? 2 : 3; // Silver/Gold
+    } else {
+      numTerms = 3 + Math.floor(Math.random() * 2); // Plat+ (3-4)
     }
   }
   // Division is hard to chain without fractions, stick to 2 terms
@@ -109,15 +122,40 @@ function createQuestion(type) {
       expOps = shuffleArray(expOps);
 
       for(let i=0; i<numTerms; i++) {
-        let termBound = Math.max(10, targetMMR * 3.5);
+        let termBound = 10;
+        
+        if (primaryOp === '+' || primaryOp === '-') {
+           if (rankMMR < 20) termBound = 10;
+           else if (rankMMR < 40) termBound = 20;
+           else if (rankMMR < 60) termBound = 50;
+           else if (rankMMR < 80) termBound = 100;
+           else if (rankMMR < 100) termBound = 200;
+           else if (rankMMR < 150) termBound = 500;
+           else termBound = 1000;
+        } else if (primaryOp === '*') {
+           if (rankMMR < 40) termBound = 6;
+           else if (rankMMR < 60) termBound = 10;
+           else if (rankMMR < 80) termBound = 12;
+           else if (rankMMR < 100) termBound = 15;
+           else if (rankMMR < 150) termBound = 20;
+           else termBound = 30;
+        } else if (primaryOp === '/') {
+           if (rankMMR < 20) termBound = 10;
+           else if (rankMMR < 40) termBound = 20;
+           else if (rankMMR < 60) termBound = 50;
+           else if (rankMMR < 80) termBound = 100;
+           else if (rankMMR < 100) termBound = 200;
+           else termBound = 500;
+        }
+        
         let prevOp = i > 0 ? expOps[i-1] : null;
         let nextOp = i < expOps.length ? expOps[i] : null;
         
         if (prevOp === '*' || nextOp === '*') {
-          termBound = Math.max(4, targetMMR * 0.25); // Small numbers for multiplication
-          if (numTerms >= 4) termBound = Math.min(termBound, 5); // Keep chains manageable
+          termBound = Math.min(termBound, Math.max(4, 3 + Math.floor(rankMMR / 20))); // Keep chained multiplication small
+          if (numTerms >= 4) termBound = Math.min(termBound, 5);
         } else if (prevOp === '-' || nextOp === '-') {
-          termBound = Math.max(10, targetMMR * 1.5);
+          termBound = Math.min(termBound, Math.max(10, rankMMR * 1.5));
         }
         
         terms.push(getRandomInt(2, Math.floor(termBound)));
@@ -168,15 +206,43 @@ function createQuestion(type) {
 
   const options = [bestAns];
   let loopGuard = 0;
+  let targetDigits = bestAns.toString().length;
+  let sameLastDigitCount = (targetDigits > 1) ? 1 : 0; // Only do same-last-digit trick if it's 2+ digits
+
   while (options.length < 4 && loopGuard < 100) {
     loopGuard++;
     let range = Math.max(5, Math.floor(targetMMR * 0.2));
     if (isNaN(range)) range = 5;
     
-    let wrong = bestAns + (Math.random() < 0.5 ? 1 : -1) * getRandomInt(1, range);
+    let wrong = bestAns;
+    if (targetDigits === 1) {
+      wrong = getRandomInt(0, 9);
+    } else if (sameLastDigitCount > 0) {
+      let mult10 = getRandomInt(1, 2) * 10; // Offset by 10 or 20 so the second digit is very similar
+      let dir = Math.random() < 0.5 ? 1 : -1;
+      wrong = bestAns + dir * mult10;
+      
+      if (wrong.toString().length === targetDigits && !options.includes(wrong) && wrong >= 0 && wrong !== bestAns) {
+        options.push(wrong);
+        sameLastDigitCount--;
+      }
+      continue;
+    } else {
+      wrong = bestAns + (Math.random() < 0.5 ? 1 : -1) * getRandomInt(1, Math.max(range, 5));
+    }
+    
     if (isNaN(wrong)) wrong = bestAns + (Math.random() < 0.5 ? 1 : -1) * getRandomInt(1, 5);
     
-    if (!options.includes(wrong) && wrong >= 0 && wrong !== bestAns) options.push(wrong);
+    // Strictly enforce matching digit counts
+    if (wrong.toString().length !== targetDigits) {
+      let minVal = targetDigits === 1 ? 0 : Math.pow(10, targetDigits - 1);
+      let maxVal = Math.pow(10, targetDigits) - 1;
+      wrong = getRandomInt(minVal, maxVal);
+    }
+    
+    if (!options.includes(wrong) && wrong >= 0 && wrong !== bestAns) {
+      options.push(wrong);
+    }
   }
   
   // Failsafe if loop guard triggered

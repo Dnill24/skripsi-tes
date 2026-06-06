@@ -214,7 +214,7 @@ async function submitAnswer(ans, isTimeout = false) {
     if (run.isBoss) {
       processBossHit(damage, timeRatio);
     } else {
-      processEnemyDefeat();
+      processEnemyDefeat(damage);
     }
   } else {
     if (typeof SFX !== 'undefined') SFX.wrong();

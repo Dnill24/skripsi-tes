@@ -151,20 +151,33 @@ function renderLeaderboard() {
     podiumOrder.forEach(entry => {
       const height = entry.rank === 1 ? '90px' : (entry.rank === 2 ? '70px' : '50px');
       const color = entry.rank === 1 ? '#ffd700' : (entry.rank === 2 ? '#e0e0e0' : '#cd7f32');
-      const bg = entry.rank === 1 ? 'linear-gradient(to top, rgba(255,215,0,0.2), transparent)' : (entry.rank === 2 ? 'linear-gradient(to top, rgba(224,224,224,0.2), transparent)' : 'linear-gradient(to top, rgba(205,127,50,0.2), transparent)');
+      const borderColor = entry.rank === 1 ? '#b8860b' : (entry.rank === 2 ? '#9e9e9e' : '#a0522d');
       
       const el = document.createElement('div');
       el.style = `display:flex; flex-direction:column; align-items:center; width:33%; justify-content:flex-end;`;
       
       const mmrRank = entry.mmr ? (window.getRankFromMMR ? window.getRankFromMMR(entry.mmr) : Math.floor(entry.mmr)) : (window.getRankFromMMR ? window.getRankFromMMR(0) : '🪨 Iron');
       
+      const avatarAnim = entry.rank === 1 ? `style="animation: float 3s ease-in-out infinite;"` : '';
+      
+      let starHtml = '';
+      if (entry.rank === 1) starHtml = '<span class="animate-pulse drop-shadow-md">✨</span>';
+      if (entry.rank === 2) starHtml = '<span class="animate-pulse drop-shadow-md" style="filter: grayscale(100%) brightness(1.5);">✨</span>';
+      if (entry.rank === 3) starHtml = '<span class="animate-pulse drop-shadow-md" style="filter: hue-rotate(-30deg) saturate(1.5) brightness(0.8);">✨</span>';
+      
       el.innerHTML = `
-        <div class="text-[clamp(1.5rem,3vw,2.5rem)] mb-1 drop-shadow-[0_4px_2px_rgba(0,0,0,0.5)]">${entry.skin || '🧍'}</div>
-        <div class="font-minecraft text-[0.45rem] text-white max-w-full overflow-hidden text-ellipsis whitespace-nowrap mb-1" title="${entry.name}">${entry.name}</div>
+        <div class="relative text-[clamp(1.5rem,3vw,2.5rem)] mb-1 drop-shadow-[0_4px_2px_rgba(0,0,0,0.5)]" ${avatarAnim}>
+          ${entry.skin || '🧍'}
+        </div>
+        <div class="font-minecraft text-[0.45rem] text-white max-w-full overflow-hidden text-ellipsis whitespace-nowrap mb-1" title="${entry.name}">
+          ${starHtml ? starHtml + ' ' : ''}${entry.name}${starHtml ? ' ' + starHtml : ''}
+        </div>
         <div class="font-minecraft text-[0.4rem] text-blue-400 mb-1 whitespace-nowrap overflow-hidden text-ellipsis">${mmrRank}</div>
         <div class="font-minecraft text-[0.45rem] text-green-400 mb-1">${entry.score.toLocaleString()}</div>
-        <div class="w-full flex justify-center items-start pt-2 rounded-t-md shadow-[inset_0_10px_20px_rgba(0,0,0,0.3)] border-t-4" style="height:${height}; background:${bg}; border-color:${color};">
-          <span class="font-minecraft text-[1.5rem] drop-shadow-[2px_2px_0_rgba(0,0,0,0.8)]" style="color:${color};">${entry.rank}</span>
+        <div class="w-full flex justify-center items-start pt-2 rounded-t-sm border-t-4 border-l-4 border-r-4 shadow-[inset_0_-8px_0_rgba(0,0,0,0.3),_inset_0_4px_0_rgba(255,255,255,0.4)] relative overflow-hidden" 
+             style="height:${height}; background:${color}; border-color:${borderColor};">
+          ${entry.rank === 1 ? `<div class="absolute top-0 left-0 w-[50%] h-[200%] bg-white opacity-40 mix-blend-overlay" style="transform: skewX(-45deg) translateX(-200%); animation: shineSweep 3s infinite;"></div>` : ''}
+          <span class="font-minecraft text-[1.5rem] relative z-10" style="color:#000;">${entry.rank}</span>
         </div>
       `;
       podiumContainer.appendChild(el);

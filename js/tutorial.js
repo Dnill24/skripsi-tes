@@ -95,9 +95,11 @@ class TutorialSystem {
     const targetEl = document.querySelector(step.target);
     
     if (!targetEl) {
-      this.popup.style.top = '50%';
-      this.popup.style.left = '50%';
-      this.popup.style.transform = 'translate(-50%, -50%)';
+      const popW = this.popup.offsetWidth || 300;
+      const popH = this.popup.offsetHeight || 150;
+      this.popup.style.top = `calc(50% - ${popH / 2}px)`;
+      this.popup.style.left = `calc(50% - ${popW / 2}px)`;
+      this.popup.style.transform = 'none';
       this.hole.style.display = 'none';
       return;
     }

@@ -35,13 +35,13 @@
     </div>
     <div class="terra-divider" data-i18n="txt_ranks_mmr">RANKS (MMR)</div>
     <div class="flex flex-col gap-2">
-      <div class="stone-chip justify-between px-3 py-2"><span class="text-[#aaa]">🪨 Iron</span><span class="value text-[#aaa] text-[0.7rem]">0 - 19</span></div>
-      <div class="stone-chip justify-between px-3 py-2"><span class="text-[#cd7f32]">🥉 Bronze</span><span class="value text-[#cd7f32] text-[0.7rem]">20 - 39</span></div>
-      <div class="stone-chip justify-between px-3 py-2"><span class="text-[#e0e0e0]">🥈 Silver</span><span class="value text-[#e0e0e0] text-[0.7rem]">40 - 59</span></div>
-      <div class="stone-chip justify-between px-3 py-2"><span class="text-yellow-400">🥇 Gold</span><span class="value text-yellow-400 text-[0.7rem]">60 - 79</span></div>
-      <div class="stone-chip justify-between px-3 py-2"><span class="text-[#e5e4e2]">💎 Platinum</span><span class="value text-[#e5e4e2] text-[0.7rem]">80 - 99</span></div>
-      <div class="stone-chip justify-between px-3 py-2"><span class="text-cyan-200">💠 Diamond</span><span class="value text-cyan-200 text-[0.7rem]">100 - 149</span></div>
-      <div class="stone-chip justify-between px-3 py-2"><span class="text-yellow-500">👑 Master</span><span class="value text-yellow-500 text-[0.7rem]">150+</span></div>
+      <div class="stone-chip justify-between px-3 py-2"><span class="text-[#aaa]" data-i18n="rank_iron">🪨 Iron</span><span class="value text-[#aaa] text-[0.7rem]">0 - 19</span></div>
+      <div class="stone-chip justify-between px-3 py-2"><span class="text-[#cd7f32]" data-i18n="rank_bronze">🥉 Bronze</span><span class="value text-[#cd7f32] text-[0.7rem]">20 - 39</span></div>
+      <div class="stone-chip justify-between px-3 py-2"><span class="text-[#e0e0e0]" data-i18n="rank_silver">🥈 Silver</span><span class="value text-[#e0e0e0] text-[0.7rem]">40 - 59</span></div>
+      <div class="stone-chip justify-between px-3 py-2"><span class="text-yellow-400" data-i18n="rank_gold">🥇 Gold</span><span class="value text-yellow-400 text-[0.7rem]">60 - 79</span></div>
+      <div class="stone-chip justify-between px-3 py-2"><span class="text-[#e5e4e2]" data-i18n="rank_platinum">💎 Platinum</span><span class="value text-[#e5e4e2] text-[0.7rem]">80 - 99</span></div>
+      <div class="stone-chip justify-between px-3 py-2"><span class="text-cyan-200" data-i18n="rank_diamond">💠 Diamond</span><span class="value text-cyan-200 text-[0.7rem]">100 - 149</span></div>
+      <div class="stone-chip justify-between px-3 py-2"><span class="text-yellow-500" data-i18n="rank_master">👑 Master</span><span class="value text-yellow-500 text-[0.7rem]">150+</span></div>
     </div>
   </div>
 </div>
@@ -60,13 +60,18 @@
   </div>
 
   <!-- Left Column: Title and Missions -->
-  <div class="hub-left-column flex flex-col items-stretch w-full max-w-[340px] min-w-[280px]">
+  <div class="hub-left-column flex flex-col items-stretch w-full max-w-[340px] min-w-[280px] animate-float transition-transform duration-300 hover:scale-105">
     <!-- Title Card -->
     <div class="hub-title-container text-center z-[2]">
       <div class="title-sign w-full border-b-0 rounded-t-md">
         <h1 data-i18n="title_hub">Base Camp</h1>
-        <p data-i18n="welcome">Welcome back, <span id="playerNameDisplay">Hero</span>!</p>
-        <p id="rankDisplayBtn" class="rank-btn-text font-minecraft text-[0.6rem] text-blue-400 mt-1 drop-shadow-[1px_1px_0_rgba(0,0,0,0.8)] cursor-pointer inline-block" title="Click for Rank Info"><span data-i18n="lbl_rank_display">Rank: </span><span id="playerMMRDisplay">10</span> <span class="text-[0.5rem] text-gray-400 ml-1">(?)</span></p>
+        <p id="welcomeMessage"></p>
+        <div class="flex items-center justify-center gap-2 mt-1">
+          <p class="font-minecraft text-[0.6rem] text-blue-400 drop-shadow-[1px_1px_0_rgba(0,0,0,0.8)]">
+            <span data-i18n="lbl_rank_display">Rank: </span><span id="playerMMRDisplay">10</span>
+          </p>
+          <button id="rankDisplayBtn" class="wood-btn info !py-0 !px-1.5 text-[0.6rem] min-h-0" title="Click for Rank Info">❓</button>
+        </div>
       </div>
     </div>
     
@@ -147,7 +152,7 @@
       <div class="stone-chip"><span class="value text-green-400" id="statBestScore">0</span><span class="label" data-i18n="stat_best">Best Score</span></div>
       <div class="stone-chip"><span class="value text-yellow-400" id="statTotalGold">0</span><span class="label" data-i18n="stat_gold">Total Coins</span></div>
       <div class="stone-chip"><span class="value text-red-500" id="statBosses">0</span><span class="label" data-i18n="stat_bosses">Bosses</span></div>
-      <div class="stone-chip"><span class="value text-blue-400" id="statRuns">0</span><span class="label" data-i18n="stat_runs">Total Runs</span></div>
+      <div class="stone-chip"><span class="value text-blue-400" id="statRuns">0</span><span class="label" data-i18n="stat_runs">Total Questions</span></div>
     </div>
     <div class="terra-divider">GOALS</div>
     <div id="achievementsList" class="flex flex-col gap-3 pb-6"></div>
@@ -194,10 +199,23 @@
   <div class="terra-modal-card max-w-[440px] text-center">
     <button id="xCloseMode" class="modal-close-btn absolute top-3 right-3 z-20">X</button>
     <div class="mb-6 mt-3">
-      <h2 class="fancy-header m-0" data-i18n="modal_mode">⚔️ Select Mode</h2>
+      <h2 class="fancy-header m-0" id="modeModalHeader" data-i18n="modal_mode">⚔️ Select Mode</h2>
     </div>
-    <div class="flex flex-col gap-3">
-      <button class="wood-btn success btn-mode" data-mode="normal" data-i18n="btn_normal">⚔️ Deep Cave (Normal)</button>
+    <div class="flex flex-col gap-3" id="modeMainMenu">
+      <button class="wood-btn success" id="btnShowCampaign" data-i18n="btn_campaign">📜 Campaign Mode</button>
+      <button class="wood-btn dark-blue btn-mode" data-mode="endless" data-i18n="btn_normal">♾️ Endless Mode</button>
+      <button class="wood-btn warning" id="btnShowPractice" data-i18n="btn_practice">🎯 Practice Mode</button>
+    </div>
+
+    <div class="flex flex-col gap-3 hidden" id="modeCampaignMenu">
+      <button class="wood-btn mb-2 text-sm" id="btnBackFromCampaign" data-i18n="menu_back">Back</button>
+      <div class="grid grid-cols-2 gap-2 max-h-[300px] overflow-y-auto p-1 pb-2" id="campaignLevelGrid">
+        <!-- JS will populate levels here -->
+      </div>
+    </div>
+
+    <div class="flex flex-col gap-3 hidden" id="modePracticeMenu">
+      <button class="wood-btn mb-2 text-sm" id="btnBackFromPractice" data-i18n="menu_back">Back</button>
       <div class="terra-divider" data-i18n="lbl_practice_mode">Practice (0.2x Coins)</div>
       <button class="wood-btn btn-mode" data-mode="+" data-i18n="btn_add">➕ Addition</button>
       <button class="wood-btn btn-mode" data-mode="-" data-i18n="btn_sub">➖ Subtraction</button>

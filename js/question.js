@@ -44,7 +44,7 @@ function calculateEquationWeight(exprStr) {
 
 function createQuestion(type) {
   let ops = ['+', '-', '*', '/'];
-  if (typeof gameMode !== 'undefined' && gameMode !== 'normal') {
+  if (typeof gameMode !== 'undefined' && ['+', '-', '*', '/'].includes(gameMode)) {
     ops = [gameMode];
   }
 
@@ -56,10 +56,20 @@ function createQuestion(type) {
   const targetMMR = safeMMR + (safeDiff * 2);
   
   let numTerms = 2;
-  if (targetMMR > 10 && Math.random() > 0.2) {
-    numTerms = 3;
-    if (targetMMR > 20 && Math.random() > 0.3) numTerms = 3 + Math.floor(Math.random() * 2); // 3 or 4
-    if (targetMMR > 40 && Math.random() > 0.4) numTerms = 3 + Math.floor(Math.random() * 3); // 3, 4, or 5
+  
+  if (primaryOp === '+' || primaryOp === '-') {
+    if (targetMMR > 10 && Math.random() > 0.2) {
+      numTerms = 3;
+      if (targetMMR > 20 && Math.random() > 0.3) numTerms = 3 + Math.floor(Math.random() * 2); // 3 or 4
+      if (targetMMR > 40 && Math.random() > 0.4) numTerms = 3 + Math.floor(Math.random() * 3); // 3, 4, or 5
+    }
+  } else {
+    // Multiplication
+    if (targetMMR > 25 && Math.random() > 0.5) {
+      numTerms = 3;
+      if (targetMMR > 50 && Math.random() > 0.5) numTerms = 3 + Math.floor(Math.random() * 2); // 3 or 4
+      if (targetMMR > 80 && Math.random() > 0.5) numTerms = 3 + Math.floor(Math.random() * 3); // 3, 4, or 5
+    }
   }
   // Division is hard to chain without fractions, stick to 2 terms
   if (primaryOp === '/') numTerms = 2;
@@ -87,7 +97,12 @@ function createQuestion(type) {
           expOps.push(primaryOp);
         } else {
           let mixChoices = ['+', '-'];
-          if (targetMMR > 35) mixChoices.push('*');
+          let canMixMult = false;
+          if (numTerms <= 3 && targetMMR > 25) canMixMult = true;
+          else if (numTerms === 4 && targetMMR > 50) canMixMult = true;
+          else if (numTerms >= 5 && targetMMR > 80) canMixMult = true;
+          
+          if (canMixMult) mixChoices.push('*');
           expOps.push(mixChoices[getRandomInt(0, mixChoices.length - 1)]);
         }
       }

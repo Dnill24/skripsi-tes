@@ -53,9 +53,10 @@ let totalRuns = 0;
 let highestStreak = 0;
 let totalQuestionsAnswered = 0;
 let selectedSkin = 'rainbow';
-let globalStats = { '+': 0, '-': 0, '*': 0, '/': 0, fastestTime: 999, bossRushBosses: 0, glassCannonBosses: 0, comboGod: 0, playerMMR: 10 };
+let globalStats = { '+': 0, '-': 0, '*': 0, '/': 0, fastestTime: 999, bossRushBosses: 0, glassCannonBosses: 0, comboGod: 0, playerMMR: 10, highestLevelUnlocked: 1 };
 
-let gameMode = localStorage.getItem('mathQuestMode') || 'normal';
+let gameMode = localStorage.getItem('mathQuestMode') || 'endless';
+let gameLevel = parseInt(localStorage.getItem('mathQuestLevel')) || 1;
 let settings = { volume: 50, language: 'en' };
 let currentQuestion = null;
 
@@ -154,8 +155,9 @@ function loadState() {
       totalQuestionsAnswered = parsed.totalQuestionsAnswered ?? 0;
       selectedSkin = parsed.selectedSkin || 'rainbow';
       if (parsed.dailyQuests) window.dailyQuests = parsed.dailyQuests;
-      globalStats = parsed.globalStats || { '+': 0, '-': 0, '*': 0, '/': 0, fastestTime: 999, bossRushBosses: 0, glassCannonBosses: 0, comboGod: 0, playerMMR: 10 };
+      globalStats = parsed.globalStats || { '+': 0, '-': 0, '*': 0, '/': 0, fastestTime: 999, bossRushBosses: 0, glassCannonBosses: 0, comboGod: 0, playerMMR: 10, highestLevelUnlocked: 1 };
       globalStats.playerMMR = globalStats.playerMMR ?? 10;
+      globalStats.highestLevelUnlocked = globalStats.highestLevelUnlocked ?? 1;
     } catch(e){}
   }
   

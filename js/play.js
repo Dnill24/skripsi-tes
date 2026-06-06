@@ -36,6 +36,59 @@ function updateTimerUI() {
   }
 }
 
+function getCampaignLevelConfig(level) {
+  const configs = {
+    1: { total: 5, bossesAt: [5] },
+    2: { total: 10, bossesAt: [10] },
+    3: { total: 15, bossesAt: [5, 15] },
+    4: { total: 20, bossesAt: [5, 15, 20] }
+  };
+  if (configs[level]) return configs[level];
+  const total = 25 + (level - 5) * 5;
+  const bossesAt = [];
+  for (let i = 5; i <= total; i += 5) {
+    bossesAt.push(i);
+  }
+  return { total, bossesAt };
+}
+
+function showLevelCompleteModal() {
+  run.active = false;
+  clearInterval(timerInterval);
+  
+  if (gameLevel >= (globalStats.highestLevelUnlocked || 1) && gameLevel < 10) {
+    globalStats.highestLevelUnlocked = gameLevel + 1;
+  }
+  
+  let rewardGold = gameLevel * 100;
+  run.goldEarned += rewardGold;
+  currency += rewardGold;
+  totalGoldEarned += rewardGold;
+  
+  saveState();
+  
+  elements.runOverModal.querySelector('h2').textContent = getTranslation('lbl_level_complete', settings.language) || "Level Complete!";
+  elements.runOverMessage.innerHTML = `<span class="text-yellow-400 text-2xl font-bold">+${rewardGold} Bonus Gold!</span>`;
+  
+  elements.finalScore.textContent = Math.floor(run.score);
+  elements.finalGold.textContent = run.goldEarned;
+  
+  let totalCorrect = 0;
+  let totalWrong = 0;
+  for (const op in run.stats) {
+    totalCorrect += run.stats[op].correct || 0;
+    totalWrong += run.stats[op].incorrect || 0;
+  }
+  elements.finalStages.textContent = run.monstersDefeated || 0;
+  elements.finalCorrect.textContent = totalCorrect;
+  elements.finalWrong.textContent = totalWrong;
+  elements.finalCombo.textContent = run.questionsAnswered;
+  elements.recommendationBox.classList.add('hidden');
+  
+  elements.runOverModal.classList.add('show');
+  if (typeof SFX !== 'undefined') SFX.buffPick();
+}
+
 function nextQuestion() {
   if (elements.runOverModal.classList.contains('show')) return;
   run.active = true;
@@ -44,18 +97,34 @@ function nextQuestion() {
   document.body.style.backgroundPositionX = `${bgPositionX}%`;
   
   const nextQ = (run.monstersDefeated || 0) + 1;
-  const progressPercent = ((nextQ - 1) % 8) / 7 * 100;
+  let isBossTrigger = false;
+  let isFinalBoss = false;
+  let progressPercent = 0;
+
+  if (gameMode === 'campaign') {
+    const config = getCampaignLevelConfig(gameLevel);
+    isBossTrigger = config.bossesAt.includes(nextQ) || run.modifiers.bossRush;
+    isFinalBoss = (nextQ === config.total);
+    progressPercent = ((nextQ - 1) / config.total) * 100;
+  } else {
+    isBossTrigger = (nextQ % 8 === 0) || run.modifiers.bossRush;
+    progressPercent = ((nextQ - 1) % 8) / 7 * 100;
+  }
+
   elements.barProgress.style.width = `${progressPercent}%`;
 
-  if (!run.isBoss && (nextQ % 8 === 0 || run.modifiers.bossRush)) {
+  if (!run.isBoss && isBossTrigger) {
     run.isBoss = true;
+    run.isFinalBoss = isFinalBoss;
     run.bossesEncountered = (run.bossesEncountered || 0) + 1;
-    run.bossStage = run.modifiers.bossRush ? nextQ : (nextQ / 8);
+    run.bossStage = run.modifiers.bossRush ? nextQ : (gameMode === 'campaign' ? run.bossesEncountered : (nextQ / 8));
     run.bossMaxHP = 100 * run.bossStage;
     run.bossHP = run.bossMaxHP;
     
     elements.bossHpContainer.classList.remove('hidden');
-    elements.lblBossHp.textContent = `${window.bossHp}/${window.bossMaxHp}`;
+    if (elements.lblBossHp) {
+      elements.lblBossHp.textContent = `${run.bossHP}/${run.bossMaxHP}`;
+    }
     elements.enemySprite.textContent = bossEmojis[(run.bossesEncountered - 1) % bossEmojis.length];
     
     elements.enemySprite.parentElement.classList.add('animate-float');
@@ -253,6 +322,15 @@ function endRun(msg) {
 
 function initGame() {
   loadState();
+  
+  // Firebase drops empty arrays, so we must restore them if missing
+  if (run) {
+    if (!run.activeBuffs) run.activeBuffs = [];
+    if (!run.modifiers) run.modifiers = {};
+    if (run.modifiers.scoreMult === undefined) run.modifiers.scoreMult = 1.0;
+    if (run.modifiers.goldMult === undefined) run.modifiers.goldMult = 1.0;
+  }
+  
   updateStatsUI();
   
   if (!run.active) {

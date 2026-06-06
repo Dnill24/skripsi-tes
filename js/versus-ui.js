@@ -94,7 +94,7 @@ const elements = {
 
 window.addEventListener('DOMContentLoaded', () => {
   if (elements.playerSprite) elements.playerSprite.textContent = skinEmojis[selectedSkin] || '🧍';
-  if (elements.lblPlayerMMR) elements.lblPlayerMMR.textContent = window.getRankFromMMR ? window.getRankFromMMR(playerMMR) : '🪨 Iron';
+  if (elements.lblPlayerMMR) elements.lblPlayerMMR.textContent = window.getRankFromMMR ? window.getRankFromMMR(playerMMR) : (window.getRankFromMMR ? window.getRankFromMMR(0) : '🪨 Iron');
   if (elements.playerName) elements.playerName.textContent = user;
 });
 

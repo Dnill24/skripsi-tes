@@ -286,12 +286,6 @@ html, body {
   padding: 24px 32px;
   position: relative;
   text-align: center;
-  transform: rotate(-2deg);
-  animation: float 4s ease-in-out infinite;
-  transition: transform 0.3s ease-out;
-}
-.title-sign:hover {
-  transform: rotate(2deg) scale(1.05);
 }
 .title-sign::before, .title-sign::after {
   content: ''; position: absolute; top: 12px; width: 12px; height: 12px;

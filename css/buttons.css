@@ -52,6 +52,38 @@
 .wood-btn.success:hover { background: #43a047; box-shadow: var(--shadow-btn), 0 2px 0 #1b5e20; }
 .wood-btn.success:active { box-shadow: var(--shadow-btn), 0 0 0 #1b5e20; }
 
+.wood-btn.info {
+  background: #1976d2;
+  border-color: #0d47a1;
+  box-shadow: var(--shadow-btn), 0 4px 0 #0d47a1;
+}
+.wood-btn.info:hover { background: #2196f3; box-shadow: var(--shadow-btn), 0 2px 0 #0d47a1; }
+.wood-btn.info:active { box-shadow: var(--shadow-btn), 0 0 0 #0d47a1; }
+
+.wood-btn.light-blue {
+  background: #03a9f4;
+  border-color: #0277bd;
+  box-shadow: var(--shadow-btn), 0 4px 0 #0277bd;
+}
+.wood-btn.light-blue:hover { background: #29b6f6; box-shadow: var(--shadow-btn), 0 2px 0 #0277bd; }
+.wood-btn.light-blue:active { box-shadow: var(--shadow-btn), 0 0 0 #0277bd; }
+
+.wood-btn.warning {
+  background: #f57c00;
+  border-color: #e65100;
+  box-shadow: var(--shadow-btn), 0 4px 0 #e65100;
+}
+.wood-btn.warning:hover { background: #ff9800; box-shadow: var(--shadow-btn), 0 2px 0 #e65100; }
+.wood-btn.warning:active { box-shadow: var(--shadow-btn), 0 0 0 #e65100; }
+
+.wood-btn.dark-blue {
+  background: #283593;
+  border-color: #1a237e;
+  box-shadow: var(--shadow-btn), 0 4px 0 #1a237e;
+}
+.wood-btn.dark-blue:hover { background: #3949ab; box-shadow: var(--shadow-btn), 0 2px 0 #1a237e; }
+.wood-btn.dark-blue:active { box-shadow: var(--shadow-btn), 0 0 0 #1a237e; }
+
 .btn-full {
   width: 100%;
 }

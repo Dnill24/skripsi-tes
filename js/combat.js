@@ -37,7 +37,7 @@ function processBossHit(damage, timeRatio) {
       let rewardGold = Math.floor((50 + run.bossStage * 10) * run.modifiers.goldMult);
       let rewardScore = Math.floor((100 + run.bossStage * 25) * run.modifiers.scoreMult * rankMult);
       
-      if (gameMode !== 'normal') {
+      if (['+', '-', '*', '/'].includes(gameMode)) {
         rewardGold = Math.floor(rewardGold * 0.2);
         rewardScore = Math.floor(rewardScore * 0.2);
       }
@@ -61,7 +61,11 @@ function processBossHit(damage, timeRatio) {
       setTimeout(() => { if (typeof SFX !== 'undefined') SFX.coin(); }, 200);
       run.isBoss = false;
       
-      setTimeout(showRewardModal, 1500);
+      if (run.isFinalBoss) {
+        setTimeout(showLevelCompleteModal, 1500);
+      } else {
+        setTimeout(showRewardModal, 1500);
+      }
     } else {
       if (timeRatio > 0.7) {
         if (elements.lblCombo) {
@@ -101,7 +105,7 @@ function processEnemyDefeat() {
   const rankMult = 1 + ((globalStats.playerMMR || 10) / 100);
   let scoreGain = Math.floor(baseScore * (1 + (run.streak * 0.3)) * run.modifiers.scoreMult * rankMult);
   
-  if (gameMode !== 'normal') {
+  if (['+', '-', '*', '/'].includes(gameMode)) {
     gold = Math.max(1, Math.floor(gold * 0.2));
     scoreGain = Math.floor(scoreGain * 0.2);
   }

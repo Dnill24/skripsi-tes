@@ -59,7 +59,7 @@
   color: #fff; text-shadow: 2px 2px 0 rgba(0,0,0,0.8); margin: 0; line-height: 1.4;
 }
 .title-sign p {
-  font-family: 'Comic Neue', cursive; font-weight: 700; font-size: 1rem;
+  font-family: 'Press Start 2P', monospace; font-size: 0.7rem; line-height: 1.5;
   color: #4e342e; margin: 8px 0 0; text-shadow: none;
 }
 .title-sign span { color: #ffb300; text-shadow: 1px 1px 0 rgba(0,0,0,0.5); }

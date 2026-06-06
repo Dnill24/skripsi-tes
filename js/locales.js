@@ -3,13 +3,15 @@ const locales = {
     // UI Main Menu (index.html)
     menu_play: "Play",
     menu_guest: "Guest Mode",
-    menu_login: "Login",
     menu_back: "Back",
     menu_settings: "Settings",
     menu_join_server: "JOIN SERVER",
     menu_char_name: "Character Name",
     menu_password: "Password",
     menu_join: "Join",
+    txt_no_account: "Don't have an account yet?",
+    txt_signup_here: "Sign up here",
+    menu_login: "Login",
     menu_cancel: "Cancel",
     menu_signup: "Sign Up",
     menu_login_title: "WELCOME BACK",
@@ -45,16 +47,18 @@ const locales = {
     // UI Game.html
     title_hub: "Game Hub",
     welcome: "Welcome back, Hero!",
+    welcome_guest: "Welcome!",
+    welcome_user: "Welcome back, {user}!",
     btn_start: "⚔️ Enter Cave",
     btn_resume_run: "⚔️ Resume Run",
     btn_shop: "🛒 Skins",
     btn_upgrades: "⚒️ Upgrades",
     btn_quests: "📜 Bounties",
-    btn_achievements: "🏆 Trophies",
+    btn_achievements: "🏆 Achievements",
     btn_buff_index: "📖 Buff Index",
     btn_leaderboard: "📊 Rankings",
     btn_settings: "⚙️ Settings",
-    btn_versus: "Versus Mode",
+    btn_versus: "⚡ Versus Mode",
     btn_logout: "Logout",
     btn_main_menu: "Main Menu",
     modal_versus: "Versus Lobby",
@@ -78,29 +82,36 @@ const locales = {
     modal_shop: "🛒 Skins",
     gold_label: "Gold: ",
     btn_close: "Close",
-    modal_achievements: "🏆 Trophies",
+    modal_achievements: "🏆 Achievements",
     guest_achievement_warning: "⚠️ Not available for Guest. Please sign up to save your progress!",
     toast_guest_feature: "Not available for Guest. Please sign up to save your progress!",
     title_buff_index: "Buff Index",
     stat_best: "Best Score",
     stat_gold: "Total Gold",
     stat_bosses: "Bosses Defeated",
-    stat_runs: "Total Stages",
+    stat_runs: "Total Questions",
     modal_settings: "Settings",
     lbl_volume: "Volume",
     lbl_music_volume: "Music",
     lbl_sfx_volume: "SFX",
     lbl_language: "Language",
     btn_save: "Save",
-    modal_mode: "Select Mode",
-    btn_normal: "Normal Mode (Mixed)",
-    btn_add: "Addition Mode",
-    btn_sub: "Subtraction Mode",
-    btn_mul: "Multiplication Mode",
-    btn_div: "Division Mode",
+    modal_mode: "⚔️ Select Mode",
+    modal_level: "📜 Select Level",
+    btn_normal: "♾️ Endless Mode",
+    btn_campaign: "📜 Campaign Mode",
+    btn_practice: "🎯 Practice Mode",
+    btn_practice_now: "🎯 Practice Now",
+    lbl_level: "Level {lvl}",
+    lbl_locked: "Locked",
+    lbl_level_complete: "Level Complete!",
+    lbl_practice_mode: "Practice (0.2x Coins)",
+    btn_add: "➕ Addition Mode",
+    btn_sub: "➖ Subtraction Mode",
+    btn_mul: "✖️ Multiplication Mode",
+    btn_div: "➗ Division Mode",
     hdr_stats: "Statistics",
     hdr_goals: "Goals",
-    btn_leaderboard: "Leaderboard",
     lbl_rank_display: "Rank: ",
     modal_leaderboard: "📊 Top Heroes",
     col_rank: "Rank",
@@ -144,7 +155,6 @@ const locales = {
     lbl_recommendation: "Recommendation",
     lbl_practice_prefix: "Practice",
     rec_focus: "Recommendation: Focus on ",
-    btn_practice: "Practice Now",
     modal_reward: "BOSS DEFEATED!",
     msg_reward: "Choose your reward...",
 
@@ -231,6 +241,15 @@ const locales = {
     ach_m8_name: "Glass Cannon Veteran", ach_m8_desc: "Defeat 10 Bosses using the One Hit Hero buff.",
     ach_m9_name: "Quick Thinker", ach_m9_desc: "Answer a question in under 0.5 seconds.",
 
+    // Ranks
+    rank_iron: "🪨 Iron",
+    rank_bronze: "🥉 Bronze",
+    rank_silver: "🥈 Silver",
+    rank_gold: "🥇 Gold",
+    rank_platinum: "💎 Platinum",
+    rank_diamond: "💠 Diamond",
+    rank_master: "👑 Master",
+
     // Tutorial
     tut_hub_welcome: "Welcome to the Base Camp!",
     tut_hub_welcome_desc: "This is your Base Camp! Before you start, let's explore.",
@@ -272,13 +291,15 @@ const locales = {
     // UI Main Menu (index.html)
     menu_play: "Main",
     menu_guest: "Mode Tamu",
-    menu_login: "Masuk",
     menu_back: "Kembali",
     menu_settings: "Pengaturan",
     menu_join_server: "GABUNG SERVER",
     menu_char_name: "Nama Karakter",
     menu_password: "Kata Sandi",
     menu_join: "Masuk",
+    txt_no_account: "Belum punya akun?",
+    txt_signup_here: "Daftar di sini",
+    menu_login: "Masuk",
     menu_cancel: "Batal",
     menu_signup: "Daftar",
     menu_login_title: "SELAMAT DATANG",
@@ -314,16 +335,18 @@ const locales = {
     // UI Game.html
     title_hub: "Pusat Permainan",
     welcome: "Selamat datang kembali, Pahlawan!",
+    welcome_guest: "Selamat datang!",
+    welcome_user: "Selamat datang kembali, {user}!",
     btn_start: "⚔️ Masuk Gua",
     btn_resume_run: "⚔️ Lanjut Petualangan",
     btn_shop: "🛒 Kostum",
     btn_upgrades: "⚒️ Peningkatan",
     btn_quests: "📜 Misi Harian",
-    btn_achievements: "🏆 Trofi",
+    btn_achievements: "🏆 Pencapaian",
     btn_buff_index: "📖 Indeks Buff",
     btn_leaderboard: "📊 Peringkat",
     btn_settings: "⚙️ Pengaturan",
-    btn_versus: "Mode Duel",
+    btn_versus: "⚡ Mode Duel",
     btn_logout: "Keluar",
     btn_main_menu: "Menu Utama",
     modal_versus: "Lobi Duel",
@@ -347,29 +370,35 @@ const locales = {
     modal_shop: "🛒 Kostum",
     gold_label: "Emas: ",
     btn_close: "Tutup",
-    modal_achievements: "🏆 Trofi",
+    modal_achievements: "🏆 Pencapaian",
     guest_achievement_warning: "⚠️ Tidak tersedia untuk Tamu. Silakan mendaftar untuk menyimpan progres Anda!",
     toast_guest_feature: "Tidak tersedia untuk Tamu. Silakan mendaftar untuk menyimpan progres Anda!",
     title_buff_index: "Indeks Buff",
     stat_best: "Skor Terbaik",
     stat_gold: "Total Emas",
     stat_bosses: "Bos Dikalahkan",
-    stat_runs: "Total Tahap",
+    stat_runs: "Total Soal",
     modal_settings: "Pengaturan",
     lbl_volume: "Volume",
     lbl_music_volume: "Musik",
     lbl_sfx_volume: "Efek Suara",
     lbl_language: "Bahasa",
     btn_save: "Simpan",
-    modal_mode: "Pilih Mode",
-    btn_normal: "Gua Dalam (Normal)",
-    btn_add: "Mode Pertambahan",
-    btn_sub: "Mode Pengurangan",
-    btn_mul: "Mode Perkalian",
-    btn_div: "Mode Pembagian",
+    modal_mode: "⚔️ Pilih Mode",
+    modal_level: "📜 Pilih Level",
+    btn_normal: "♾️ Mode Tanpa Batas",
+    btn_campaign: "📜 Mode Kampanye",
+    btn_practice: "🎯 Mode Latihan",
+    btn_practice_now: "🎯 Latihan Sekarang",
+    lbl_level: "Tahap {lvl}",
+    lbl_locked: "Terkunci",
+    lbl_level_complete: "Level Selesai!",
+    btn_add: "➕ Mode Penambahan",
+    btn_sub: "➖ Mode Pengurangan",
+    btn_mul: "✖️ Mode Perkalian",
+    btn_div: "➗ Mode Pembagian",
     hdr_stats: "Statistik",
     hdr_goals: "Tujuan",
-    btn_leaderboard: "Papan Peringkat",
     modal_leaderboard: "Skor Tertinggi",
     lbl_rank_display: "Pangkat: ",
     col_rank: "Peringkat",
@@ -413,7 +442,6 @@ const locales = {
     lbl_recommendation: "Rekomendasi",
     lbl_practice_prefix: "Latihan",
     rec_focus: "Rekomendasi: Fokus pada ",
-    btn_practice: "Latihan Sekarang",
     btn_return: "Kembali ke Pusat",
     modal_reward: "BOS DIKALAHKAN!",
     msg_reward: "Pilih hadiahmu...",
@@ -449,6 +477,7 @@ const locales = {
 
     // Buffs
     buff_heal_name: "Plester Luka", buff_heal_desc: "Tambah 50 Darah.",
+    buff_def_name: "Perisai", buff_def_desc: "Monster memberikan kerusakan lebih kecil padamu.",
     buff_vit_name: "Badan Kuat", buff_vit_desc: "Darah maksimal jadi lebih banyak! (+25 Darah)",
     buff_time_name: "Tambah Waktu", buff_time_desc: "Dapat ekstra 2 detik tiap pertanyaan.",
     buff_greed_name: "Magnet Emas", buff_greed_desc: "Monster menjatuhkan lebih banyak Emas!",
@@ -499,6 +528,15 @@ const locales = {
     ach_m7_name: "Veteran Pesta Bos", ach_m7_desc: "Kalahkan 50 Bos saat buff Pesta Bos aktif.",
     ach_m8_name: "Veteran Satu Nyawa", ach_m8_desc: "Kalahkan 10 Bos saat buff Pahlawan Satu Nyawa aktif.",
     ach_m9_name: "Pemikir Cepat", ach_m9_desc: "Jawab pertanyaan dalam kurang dari 0.5 detik.",
+    
+    // Ranks
+    rank_iron: "🪨 Besi",
+    rank_bronze: "🥉 Perunggu",
+    rank_silver: "🥈 Perak",
+    rank_gold: "🥇 Emas",
+    rank_platinum: "💎 Platinum",
+    rank_diamond: "💠 Berlian",
+    rank_master: "👑 Master",
 
     // Tutorial
     tut_hub_welcome: "Selamat datang di Kemah!",
@@ -515,7 +553,7 @@ const locales = {
     tut_hub_shop: "Skin", tut_hub_shop_desc: "Gunakan emas untuk membeli penampilan karakter baru.",
     tut_hub_upg: "Upgrade", tut_hub_upg_desc: "Gunakan emas untuk meningkatkan statistik Anda secara permanen.",
     tut_hub_quests: "Misi Harian", tut_hub_quests_desc: "Selesaikan tugas harian untuk mendapatkan banyak hadiah emas.",
-    tut_hub_ach: "Trofi", tut_hub_ach_desc: "Lacak pencapaian dan tujuan Anda.",
+    tut_hub_ach: "Pencapaian", tut_hub_ach_desc: "Lacak pencapaian dan tujuan Anda.",
     tut_hub_buff: "Indeks Buff",
     tut_hub_buff_desc: "Pelajari berbagai buff sihir yang bisa kamu temukan di dalam gua.",
     tut_hub_leaderboard: "Peringkat", tut_hub_leaderboard_desc: "Lihat peringkatmu dibandingkan dengan pemain lain di dunia.",
@@ -644,11 +682,19 @@ window.showConfirm = function(message) {
 };
 
 window.getRankFromMMR = function(mmr) {
-  if (!mmr || mmr < 20) return '🪨 Iron';
-  if (mmr < 40) return '🥉 Bronze';
-  if (mmr < 60) return '🥈 Silver';
-  if (mmr < 80) return '🥇 Gold';
-  if (mmr < 100) return '💎 Platinum';
-  if (mmr < 150) return '💠 Diamond';
-  return '👑 Master';
+  let lang = 'en';
+  try {
+    const settings = JSON.parse(localStorage.getItem('mathQuestSettings') || '{}');
+    if (settings.language) lang = settings.language;
+  } catch(e) {}
+  
+  let rank = 'rank_iron';
+  if (mmr >= 20 && mmr < 40) rank = 'rank_bronze';
+  else if (mmr >= 40 && mmr < 60) rank = 'rank_silver';
+  else if (mmr >= 60 && mmr < 80) rank = 'rank_gold';
+  else if (mmr >= 80 && mmr < 100) rank = 'rank_platinum';
+  else if (mmr >= 100 && mmr < 150) rank = 'rank_diamond';
+  else if (mmr >= 150) rank = 'rank_master';
+  
+  return getTranslation(rank, lang);
 };

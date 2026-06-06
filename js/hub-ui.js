@@ -1,5 +1,5 @@
 const elements = {
-  playerNameDisplay: document.getElementById('playerNameDisplay'),
+  welcomeMessage: document.getElementById('welcomeMessage'),
   playerMMRDisplay: document.getElementById('playerMMRDisplay'),
   shopGoldDisplay: document.getElementById('shopGoldDisplay'),
   btnStartRun: document.getElementById('btnStartRun'),
@@ -56,7 +56,16 @@ const elements = {
 
 function updateUI() {
   applyTranslationsToDOM(settings.language);
-  elements.playerNameDisplay.textContent = user;
+  
+  if (elements.welcomeMessage) {
+    if (user === 'Guest') {
+      elements.welcomeMessage.textContent = getTranslation('welcome_guest', settings.language);
+    } else {
+      const template = getTranslation('welcome_user', settings.language);
+      elements.welcomeMessage.innerHTML = template.replace('{user}', `<span class="text-yellow-400" id="playerNameDisplay">${user}</span>`);
+    }
+  }
+  
   if (elements.playerMMRDisplay) {
     if (user === 'Guest') {
       elements.playerMMRDisplay.textContent = '???';
@@ -69,7 +78,8 @@ function updateUI() {
   elements.statBestScore.textContent = bestRunScore;
   elements.statTotalGold.textContent = totalGoldEarned;
   elements.statBosses.textContent = totalBossesDefeated;
-  elements.statRuns.textContent = totalRuns;
+  const totalQuestions = (globalStats['+'] || 0) + (globalStats['-'] || 0) + (globalStats['*'] || 0) + (globalStats['/'] || 0);
+  elements.statRuns.textContent = totalQuestions;
   renderShop();
   renderUpgrades();
   renderQuests();
@@ -146,7 +156,7 @@ function renderLeaderboard() {
       const el = document.createElement('div');
       el.style = `display:flex; flex-direction:column; align-items:center; width:33%; justify-content:flex-end;`;
       
-      const mmrRank = entry.mmr ? (window.getRankFromMMR ? window.getRankFromMMR(entry.mmr) : Math.floor(entry.mmr)) : '🪨 Iron';
+      const mmrRank = entry.mmr ? (window.getRankFromMMR ? window.getRankFromMMR(entry.mmr) : Math.floor(entry.mmr)) : (window.getRankFromMMR ? window.getRankFromMMR(0) : '🪨 Iron');
       
       el.innerHTML = `
         <div class="text-[clamp(1.5rem,3vw,2.5rem)] mb-1 drop-shadow-[0_4px_2px_rgba(0,0,0,0.5)]">${entry.skin || '🧍'}</div>
@@ -173,7 +183,7 @@ function renderLeaderboard() {
       <td class="p-[clamp(4px,1vw,12px)] font-minecraft text-[clamp(0.45rem,1.5vw,0.65rem)] text-white max-w-[120px] whitespace-nowrap overflow-hidden text-ellipsis" title="${entry.name}">
         <span class="text-[clamp(0.8rem,2vw,1.2rem)] mr-1 align-middle">${entry.skin || '🧍'}</span><span class="align-middle">${entry.name}</span>
       </td>
-      <td class="p-[clamp(4px,1vw,12px)] text-right font-minecraft text-[clamp(0.45rem,1.5vw,0.65rem)] text-blue-400 whitespace-nowrap">${entry.mmr ? (window.getRankFromMMR ? window.getRankFromMMR(entry.mmr) : Math.floor(entry.mmr)) : '🪨 Iron'}</td>
+      <td class="p-[clamp(4px,1vw,12px)] text-right font-minecraft text-[clamp(0.45rem,1.5vw,0.65rem)] text-blue-400 whitespace-nowrap">${entry.mmr ? (window.getRankFromMMR ? window.getRankFromMMR(entry.mmr) : Math.floor(entry.mmr)) : (window.getRankFromMMR ? window.getRankFromMMR(0) : '🪨 Iron')}</td>
       <td class="p-[clamp(4px,1vw,12px)] text-right font-minecraft text-[clamp(0.45rem,1.5vw,0.65rem)] text-green-400 whitespace-nowrap">${entry.score.toLocaleString()}</td>
     `;
     elements.leaderboardList.appendChild(tr);
@@ -193,9 +203,76 @@ function checkGuestFeature() {
   return false;
 }
 
-// Mode Selection
-elements.closeModeModal.onclick = () => { elements.modeModal.classList.remove('show'); };
+// Mode Selection Menus
+const modeMainMenu = document.getElementById('modeMainMenu');
+const modeCampaignMenu = document.getElementById('modeCampaignMenu');
+const modePracticeMenu = document.getElementById('modePracticeMenu');
+
+const resetModeMenu = () => {
+  modeMainMenu.classList.remove('hidden');
+  modeCampaignMenu.classList.add('hidden');
+  modePracticeMenu.classList.add('hidden');
+  
+  const header = document.getElementById('modeModalHeader');
+  if (header) {
+    header.setAttribute('data-i18n', 'modal_mode');
+    header.textContent = getTranslation('modal_mode', settings.language) || "⚔️ Select Mode";
+  }
+};
+
+elements.closeModeModal.onclick = () => { elements.modeModal.classList.remove('show'); resetModeMenu(); };
 elements.xCloseMode.onclick = elements.closeModeModal.onclick;
+
+document.getElementById('btnShowCampaign').onclick = () => {
+  modeMainMenu.classList.add('hidden');
+  modeCampaignMenu.classList.remove('hidden');
+  
+  const header = document.getElementById('modeModalHeader');
+  if (header) {
+    header.setAttribute('data-i18n', 'modal_level');
+    header.textContent = getTranslation('modal_level', settings.language) || "📜 Select Level";
+  }
+  
+  populateCampaignLevels();
+};
+
+document.getElementById('btnShowPractice').onclick = () => {
+  modeMainMenu.classList.add('hidden');
+  modePracticeMenu.classList.remove('hidden');
+};
+
+document.getElementById('btnBackFromCampaign').onclick = resetModeMenu;
+document.getElementById('btnBackFromPractice').onclick = resetModeMenu;
+
+function populateCampaignLevels() {
+  const grid = document.getElementById('campaignLevelGrid');
+  grid.innerHTML = '';
+  const highestLevel = globalStats.highestLevelUnlocked || 1;
+  const lblLevel = getTranslation('lbl_level', settings.language) || "Level {lvl}";
+  const lblLocked = getTranslation('lbl_locked', settings.language) || "Locked";
+
+  for (let i = 1; i <= 10; i++) {
+    const btn = document.createElement('button');
+    let btnClass = 'opacity-50 cursor-not-allowed';
+    if (i < highestLevel) btnClass = 'light-blue';
+    else if (i === highestLevel) btnClass = 'success';
+    
+    btn.className = `wood-btn p-2 text-sm ${btnClass}`;
+    
+    if (i <= highestLevel) {
+      btn.innerHTML = `⚔️ ${lblLevel.replace('{lvl}', i)}`;
+      btn.onclick = () => {
+        localStorage.setItem('mathQuestMode', 'campaign');
+        localStorage.setItem('mathQuestLevel', i);
+        window.location.href = 'play.html';
+      };
+    } else {
+      btn.innerHTML = `🔒 ${lblLocked}`;
+      btn.disabled = true;
+    }
+    grid.appendChild(btn);
+  }
+}
 
 document.querySelectorAll('.btn-mode').forEach(btn => {
   btn.onclick = () => {
@@ -353,7 +430,7 @@ function populateBuffIndex() {
 
 function startHubTutorial() {
   const hubSteps = [
-    { target: 'body', titleKey: 'tut_hub_welcome', descKey: 'tut_hub_welcome_desc' },
+    { target: 'none', titleKey: 'tut_hub_welcome', descKey: 'tut_hub_welcome_desc' },
     { target: '#rankDisplayBtn', titleKey: 'tut_hub_rank', descKey: 'tut_hub_rank_desc' },
     { target: '.quests-panel', titleKey: 'tut_hub_quests', descKey: 'tut_hub_quests_desc' },
     { target: '#btnAchievements', titleKey: 'tut_hub_ach', descKey: 'tut_hub_ach_desc' },

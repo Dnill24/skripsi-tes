@@ -102,7 +102,7 @@ function handleNetworkData(data) {
     elements.opponentName.textContent = data.name;
     const oppSkin = data.skin || '🧍';
     elements.enemySprite.textContent = oppSkin;
-    if (elements.lblOpponentMMR) elements.lblOpponentMMR.textContent = data.mmr ? (window.getRankFromMMR ? window.getRankFromMMR(data.mmr) : `MMR: ${data.mmr}`) : '🪨 Iron';
+    if (elements.lblOpponentMMR) elements.lblOpponentMMR.textContent = data.mmr ? (window.getRankFromMMR ? window.getRankFromMMR(data.mmr) : `MMR: ${data.mmr}`) : (window.getRankFromMMR ? window.getRankFromMMR(0) : '🪨 Iron');
   } else if (data.type === 'update') {
     window.opponentHP = data.hp;
     window.opponentCombo = data.combo;

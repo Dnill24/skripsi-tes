@@ -56,7 +56,6 @@
         <button id="settingsButton" class="wood-btn">
           <span class="btn-icon">⚙️</span><span data-i18n="menu_settings">Settings</span>
         </button>
-      </div>
     </div>
   </div>
 
@@ -92,6 +91,8 @@
         <span class="btn-icon">❌</span><span data-i18n="menu_cancel">Cancel</span>
       </button>
     </div>
+    <!-- Sign-up hint -->
+    <p class="text-sm text-center mt-3" id="loginSignupHint"><span data-i18n="txt_no_account">Don't have an account yet?</span> <a href="#" id="loginSignupLink" class="text-yellow-300 underline" data-i18n="txt_signup_here">Sign up here</a></p>
   </div>
 </div>
 
@@ -207,6 +208,15 @@
   [loginModal, signupModal, settModal].forEach(m => {
     m.addEventListener('click', e => { if (e.target === m) m.classList.remove('show'); });
   });
+
+  const loginSignupLink = document.getElementById('loginSignupLink');
+  if (loginSignupLink) {
+    loginSignupLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      loginModal.classList.remove('show');
+      signupModal.classList.add('show');
+    });
+  }
 </script>
 <script src="js/drag-scroll.js"></script>
 </body>

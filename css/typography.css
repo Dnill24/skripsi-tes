@@ -2,12 +2,12 @@
 
 /* ─── Base Typography ──────────────────────────────────────────── */
 body {
-  font-family: 'Comic Neue', 'Comic Sans MS', cursive, sans-serif;
+  font-family: 'Press Start 2P', monospace;
   color: var(--text-main);
 }
 
 button, input, select, textarea {
-  font-family: 'Comic Neue', 'Comic Sans MS', cursive, sans-serif;
+  font-family: 'Press Start 2P', monospace;
 }
 
 h1, h2, h3, h4, h5, h6, .font-minecraft {

@@ -30,8 +30,10 @@ elements.btnHost.onclick = () => {
   window.myEventsRef = db.ref('rooms/' + window.roomCode + '/hostEvents');
   window.oppEventsRef = db.ref('rooms/' + window.roomCode + '/clientEvents');
   
-  window.roomRef.set({ status: 'waiting', hostConnected: true });
-  window.roomRef.onDisconnect().remove(); // Delete room if host leaves
+  window.roomRef.set({ status: 'waiting', hostConnected: true }).catch(err => {
+    showToast("Database Error: " + err.message);
+  });
+  window.roomRef.onDisconnect().remove().catch(() => {}); // Delete room if host leaves
   
   elements.lobbySetup.classList.add('hidden');
   elements.lobbyWaiting.classList.remove('hidden');
@@ -60,8 +62,10 @@ elements.btnJoin.onclick = () => {
   
   window.roomRef.once('value', snap => {
     if (snap.exists() && snap.val().status === 'waiting') {
-      window.roomRef.update({ clientConnected: true, status: 'playing' });
-      window.roomRef.onDisconnect().update({ clientConnected: false }); // Flag if client leaves
+      window.roomRef.update({ clientConnected: true, status: 'playing' }).catch(err => {
+        showToast("Database Error: " + err.message);
+      });
+      window.roomRef.onDisconnect().update({ clientConnected: false }).catch(() => {}); // Flag if client leaves
       setupConnection();
     } else {
       showToast("Room not found or already full!");
@@ -87,14 +91,28 @@ function setupConnection() {
   
   window.roomRef.on('value', snap => {
     if (!snap.exists()) {
-      if (window.gameActive) window.endGame("Opponent Fled!", true);
+      handleOpponentDisconnect();
     } else {
       const data = snap.val();
       if (data.status === 'playing' && data.clientConnected === false) {
-        if (window.gameActive) window.endGame("Opponent Fled!", true);
+        handleOpponentDisconnect();
       }
     }
   });
+}
+
+function handleOpponentDisconnect() {
+  if (window.gameActive) window.endGame(getTranslation('txt_opponent_fled', settings.language), true);
+  if (elements.btnPlayAgain) {
+    elements.btnPlayAgain.disabled = true;
+    elements.btnPlayAgain.classList.add('opacity-50', 'cursor-not-allowed', 'grayscale');
+    elements.btnPlayAgain.textContent = getTranslation('btn_opponent_left', settings.language);
+  }
+  if (elements.rematchStatus) {
+    elements.rematchStatus.textContent = getTranslation('txt_opponent_left_room', settings.language);
+    elements.rematchStatus.classList.remove('hidden', 'text-orange-400');
+    elements.rematchStatus.classList.add('text-red-400');
+  }
 }
 
 function handleNetworkData(data) {
@@ -131,7 +149,7 @@ function handleNetworkData(data) {
       elements.rematchStatus.classList.remove('hidden');
     }
   } else if (data.type === 'forfeit') {
-    window.endGame("Opponent Forfeited!", true);
+    window.endGame(getTranslation('txt_opponent_forfeited', settings.language), true);
   }
 }
 

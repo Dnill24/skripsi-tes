@@ -53,11 +53,24 @@ function login() {
     if (snap.exists()) {
       // Existing user: check password
       const userData = snap.val();
-      if (userData.password === password) {
+      const hashedInput = typeof CryptoJS !== 'undefined' ? CryptoJS.SHA256(password).toString() : password;
+      
+      let passwordMatched = false;
+      if (userData.password === hashedInput) {
+        passwordMatched = true;
+      } else if (userData.password === password) {
+        passwordMatched = true;
+        // Upgrade legacy plaintext password to hash silently
+        if (typeof CryptoJS !== 'undefined') {
+          userRef.update({ password: hashedInput });
+        }
+      }
+      
+      if (passwordMatched) {
         // Success
         localStorage.setItem('mathQuestUser', JSON.stringify({ user: username, isLoggedIn: true }));
         
-        if (userData.password === password) {
+        if (passwordMatched) {
           if (userData.stats) {
             // Restore sanitized keys
             if (userData.stats.globalStats) {
@@ -120,9 +133,10 @@ function signup() {
     if (snap.exists()) {
       showToast("Username is already taken! Please pick another one.");
     } else {
+      const hashedPassword = typeof CryptoJS !== 'undefined' ? CryptoJS.SHA256(password).toString() : password;
       userRef.set({
         originalName: username,
-        password: password,
+        password: hashedPassword,
         createdAt: firebase.database.ServerValue.TIMESTAMP,
         stats: {} // Will be filled by saveState() in game
       }).then(() => {

@@ -216,5 +216,5 @@ window.endGame = function(title, isWin) {
   elements.endMatchModal.classList.add('show');
   elements.endTitle.textContent = title;
   elements.endTitle.className = isWin ? 'text-4xl font-minecraft mb-6 drop-shadow-[3px_3px_0_rgba(0,0,0,1)] text-emerald-400' : 'text-4xl font-minecraft mb-6 drop-shadow-[3px_3px_0_rgba(0,0,0,1)] text-red-500';
-  elements.endMessage.textContent = isWin ? 'You crushed your opponent!' : 'You were defeated.';
+  elements.endMessage.textContent = isWin ? getTranslation('txt_versus_win_msg', settings.language) : getTranslation('txt_versus_lose_msg', settings.language);
 };

@@ -1,4 +1,10 @@
-const badWords = ['fuck', 'shit', 'bitch', 'asshole', 'dick', 'pussy', 'cunt', 'bastard', 'whore', 'slut', 'fag', 'nigger', 'crap', 'anjing', 'babi', 'bangsat', 'kontol', 'memek', 'ngentot', 'peler', 'perek', 'tai'];
+let badWords = [];
+
+// Fetch the external dictionary asynchronously when the page loads
+fetch('js/badwords.json')
+  .then(res => res.json())
+  .then(data => { badWords = data; })
+  .catch(err => console.error("Failed to load bad words dictionary:", err));
 
 function isProfane(text) {
   if (!text) return false;
@@ -11,6 +17,13 @@ function sanitizeUsername(name) {
   return name.trim().replace(/[.#$[\]\s/]/g, '_').toLowerCase();
 }
 
+async function hashPassword(password) {
+  const msgUint8 = new TextEncoder().encode(password);
+  const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
 function playAsGuest() {
   localStorage.setItem('mathQuestUser', JSON.stringify({ user: 'Guest', isLoggedIn: true }));
   localStorage.removeItem('mathQuestRogueStats'); // Start fresh
@@ -21,21 +34,23 @@ function playAsGuest() {
   window.location.href = 'game.html';
 }
 
-function login() {
+async function login() {
   const username = elements.usernameInput.value.trim();
-  const password = elements.passwordInput.value.trim();
+  const rawPassword = elements.passwordInput.value.trim();
   
   if (!username) {
     showToast(getTranslation('pickHeroName', state.language) || 'Please pick a hero name to start!');
     return;
   }
   
-  if (isProfane(username) || isProfane(password)) {
+  if (isProfane(username) || isProfane(rawPassword)) {
     let msg = getTranslation('txt_profane', state.language);
     if (msg === 'txt_profane') msg = 'Profanity is not allowed in names or passwords.';
     showToast(msg);
     return;
   }
+  
+  const password = await hashPassword(rawPassword);
   
   if (typeof db === 'undefined') {
     showToast("Firebase not connected. Logging in offline.");
@@ -82,29 +97,31 @@ function login() {
   });
 }
 
-function signup() {
+async function signup() {
   const username = elements.signupUsernameInput.value.trim();
-  const password = elements.signupPasswordInput.value.trim();
+  const rawPassword = elements.signupPasswordInput.value.trim();
   const confirmPassword = elements.signupConfirmPasswordInput ? elements.signupConfirmPasswordInput.value.trim() : '';
   
-  if (!username || !password) {
+  if (!username || !rawPassword) {
     let msg = getTranslation('txt_missing_fields', state.language);
     if (msg === 'txt_missing_fields') msg = 'Please enter a username and password!';
     showToast(msg);
     return;
   }
   
-  if (password !== confirmPassword) {
+  if (rawPassword !== confirmPassword) {
     showToast("Passwords do not match!");
     return;
   }
   
-  if (isProfane(username) || isProfane(password)) {
+  if (isProfane(username) || isProfane(rawPassword)) {
     let msg = getTranslation('txt_profane', state.language);
     if (msg === 'txt_profane') msg = 'Profanity is not allowed in names or passwords.';
     showToast(msg);
     return;
   }
+  
+  const password = await hashPassword(rawPassword);
   
   if (typeof db === 'undefined') {
     showToast("Firebase not connected.");

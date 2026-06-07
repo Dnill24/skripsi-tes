@@ -64,61 +64,63 @@ html, body {
 }
 
 @media (max-width: 768px) {
+  .hub-layout {
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 80px;
+  }
   .hub-left-column {
-    transform: scale(0.65);
-    transform-origin: top left;
+    position: relative;
+    width: 100%;
+    margin-bottom: 20px;
   }
   .hub-panel-container {
-    transform: scale(0.85);
+    position: relative;
+    bottom: 0;
+    right: 0;
+    width: 100%;
+    display: flex;
+    justify-content: center;
   }
   .hub-btn-grid {
     display: grid !important;
     grid-template-columns: 1fr 1fr;
-    gap: 6px;
+    gap: 8px;
   }
   .hub-btn-grid .btn-full {
     grid-column: span 2;
   }
-  .hub-btn-grid .wood-btn {
-    padding: 10px 8px;
-    font-size: 0.65rem;
-  }
   .quests-panel {
-    transform: scale(1.3);
-    transform-origin: top left;
-    margin-top: 10px;
-    width: 76.92% !important;
+    margin-top: 16px;
+    width: 100% !important;
   }
   #topRightMenu {
-    transform: scale(0.75);
+    transform: scale(0.85);
+    transform-origin: top right;
   }
 }
 
 @media (max-width: 480px) {
-  .hub-left-column {
-    transform: scale(0.5);
+  .hub-layout {
+    padding-top: 70px;
+    gap: 12px;
   }
-  .hub-panel-container {
-    transform: scale(0.7);
-  }
-  .quests-panel {
-    transform: scale(1.5);
-    transform-origin: top left;
-    margin-top: 10px;
-    width: 66.66% !important;
-  }
-  #topRightMenu {
-    transform: scale(0.65);
+  .hub-btn-grid .wood-btn {
+    padding: 8px;
+    font-size: 0.75rem;
   }
 }
 
 /* ─── Index Menu Classes ─── */
 .menu-layout {
   display: flex;
-  align-items: stretch;
-  justify-content: flex-end;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   padding: clamp(16px, 4vw, 48px);
   height: 100%;
+  position: relative;
 }
 .menu-logo-container {
   position: absolute;
@@ -132,11 +134,34 @@ html, body {
   right: clamp(16px, 5vw, 56px);
   z-index: 20;
 }
+
+@media (max-width: 768px) {
+  .menu-layout {
+    justify-content: space-between;
+    padding-top: 10vh;
+    padding-bottom: 5vh;
+  }
+  .menu-logo-container {
+    position: relative;
+    top: 0; left: 0;
+    text-align: center;
+    width: 100%;
+  }
+  .menu-panel-container {
+    position: relative;
+    bottom: 0; right: 0;
+    margin: 0 auto;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+  }
+}
+
 .menu-panel {
   padding: 24px 20px;
   min-width: 260px;
   max-width: 300px;
-  width: 88vw;
+  width: 90vw;
 }
 .flex-col-gap-12 {
   display: flex;

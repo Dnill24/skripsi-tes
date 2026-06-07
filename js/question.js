@@ -96,8 +96,14 @@ function createQuestion(type) {
     let answer = 0;
     
     let bound = Math.max(10, targetMMR * 3.5);
-    if (primaryOp === '*') bound = Math.max(5, targetMMR * 0.5);
-    if (primaryOp === '/') bound = Math.max(5, targetMMR * 0.6);
+    if (primaryOp === '*') {
+      if (rankMMR < 60) bound = 9;
+      else bound = Math.max(10, targetMMR * 0.5);
+    }
+    if (primaryOp === '/') {
+      if (rankMMR < 60) bound = 9;
+      else bound = Math.max(10, targetMMR * 0.6);
+    }
 
     if (numTerms > 2) {
       let terms = [];
@@ -134,18 +140,18 @@ function createQuestion(type) {
            else termBound = 1000;
         } else if (primaryOp === '*') {
            if (rankMMR < 40) termBound = 6;
-           else if (rankMMR < 60) termBound = 10;
+           else if (rankMMR < 60) termBound = 9;
            else if (rankMMR < 80) termBound = 12;
            else if (rankMMR < 100) termBound = 15;
            else if (rankMMR < 150) termBound = 20;
            else termBound = 30;
         } else if (primaryOp === '/') {
-           if (rankMMR < 20) termBound = 10;
-           else if (rankMMR < 40) termBound = 20;
-           else if (rankMMR < 60) termBound = 50;
-           else if (rankMMR < 80) termBound = 100;
-           else if (rankMMR < 100) termBound = 200;
-           else termBound = 500;
+           if (rankMMR < 20) termBound = 6;
+           else if (rankMMR < 40) termBound = 9;
+           else if (rankMMR < 60) termBound = 9;
+           else if (rankMMR < 80) termBound = 20;
+           else if (rankMMR < 100) termBound = 50;
+           else termBound = 100;
         }
         
         let prevOp = i > 0 ? expOps[i-1] : null;

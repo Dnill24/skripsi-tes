@@ -1,7 +1,7 @@
 /* ─── Animations ────────────────────────────────────── */
 @keyframes float {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-4px); }
+  0%, 100% { translate: 0px 0px; }
+  50% { translate: 0px -4px; }
 }
 .animate-float { animation: float 3s steps(4) infinite; }
 

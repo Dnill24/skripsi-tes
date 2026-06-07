@@ -26,7 +26,7 @@
   <div class="menu-logo-container">
     <div class="title-sign">
       <h1>MATH QUEST</h1>
-      <p>Sandbox Adventure</p>
+      <p data-i18n="title_subtitle">An Epic Math RPG</p>
     </div>
   </div>
 
@@ -64,8 +64,8 @@
 
 <!-- Language Prompt Modal -->
 <div class="terra-modal-overlay" id="langPromptModal">
-  <div class="terra-modal-card">
-    <h2 class="text-center mb-4 leading-tight">Select Language<br><span class="text-lg text-yellow-400">Pilih Bahasa</span></h2>
+  <div class="terra-modal-card w-[90%] max-w-[400px] mx-auto text-center">
+    <h2 class="fancy-header text-center mb-4 leading-tight">Select Language<br><span class="text-lg text-yellow-400">Pilih Bahasa</span></h2>
     <div class="flex-col-gap-10" style="display: flex; flex-direction: column; gap: 10px;">
       <button id="btnLangEn" class="wood-btn w-full justify-center">English</button>
       <button id="btnLangId" class="wood-btn w-full justify-center">Bahasa Indonesia</button>
@@ -75,8 +75,8 @@
 
 <!-- Login Modal -->
 <div class="terra-modal-overlay" id="loginModal">
-  <div class="terra-modal-card">
-    <h2 data-i18n="menu_login_title">WELCOME BACK</h2>
+  <div class="terra-modal-card w-[90%] max-w-[400px] mx-auto">
+    <h2 class="fancy-header m-0 mb-4 text-center" data-i18n="menu_login_title">WELCOME BACK</h2>
     <label for="usernameInput" data-i18n="menu_char_name">Character Name</label>
     <input id="usernameInput" type="text" autocomplete="username" />
     <label for="passwordInput" data-i18n="menu_password">Password</label>
@@ -85,11 +85,11 @@
       <button type="button" id="toggleLoginPassword" class="password-toggle">👁️</button>
     </div>
     <div class="flex-row-gap-12-mt20">
-      <button id="loginSubmitButton" class="wood-btn success flex-1">
-        <span class="btn-icon">🚀</span><span data-i18n="menu_login">Login</span>
-      </button>
       <button id="cancelLogin" class="wood-btn danger flex-1">
         <span class="btn-icon">❌</span><span data-i18n="menu_cancel">Cancel</span>
+      </button>
+      <button id="loginSubmitButton" class="wood-btn success flex-1">
+        <span class="btn-icon">🚀</span><span data-i18n="menu_login">Login</span>
       </button>
     </div>
     <!-- Sign-up hint -->
@@ -99,8 +99,8 @@
 
 <!-- Signup Modal -->
 <div class="terra-modal-overlay" id="signupModal">
-  <div class="terra-modal-card">
-    <h2 data-i18n="menu_signup">CREATE ACCOUNT</h2>
+  <div class="terra-modal-card w-[90%] max-w-[400px] mx-auto">
+    <h2 class="fancy-header m-0 mb-4 text-center" data-i18n="menu_signup">CREATE ACCOUNT</h2>
     <label for="signupUsernameInput" data-i18n="menu_char_name">Character Name</label>
     <input id="signupUsernameInput" type="text" data-i18n-placeholder="plc_hero" placeholder="e.g. Hero" autocomplete="username" />
     <label for="signupPasswordInput" data-i18n="menu_password">Password</label>
@@ -114,11 +114,11 @@
       <button type="button" id="toggleSignupConfirmPassword" class="password-toggle">👁️</button>
     </div>
     <div class="flex-row-gap-12-mt20">
-      <button id="signupSubmitButton" class="wood-btn success flex-1">
-        <span class="btn-icon">✨</span><span data-i18n="menu_signup">Sign Up</span>
-      </button>
       <button id="cancelSignup" class="wood-btn danger flex-1">
         <span class="btn-icon">❌</span><span data-i18n="menu_cancel">Cancel</span>
+      </button>
+      <button id="signupSubmitButton" class="wood-btn success flex-1">
+        <span class="btn-icon">✨</span><span data-i18n="menu_signup">Sign Up</span>
       </button>
     </div>
   </div>
@@ -126,7 +126,7 @@
 
 <!-- Settings Modal -->
 <div class="terra-modal-overlay" id="settingsModal">
-  <div class="terra-modal-card max-w-[440px]">
+  <div class="terra-modal-card w-[90%] max-w-[440px] mx-auto">
     <button id="xCloseSettings" class="modal-close-btn absolute top-3 right-3 z-20">X</button>
     <div class="mb-6 mt-3">
       <h2 class="fancy-header m-0" data-i18n="modal_settings">⚙️ Settings</h2>

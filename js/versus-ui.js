@@ -107,13 +107,19 @@ try {
 // UI Event Bindings
 elements.btnCancelHost.onclick = () => {
   if (window.conn && window.conn.close) window.conn.close();
+  if (window.roomRef && window.myRole === 'host') window.roomRef.remove().catch(()=>{});
   elements.lobbySetup.classList.remove('hidden');
   elements.lobbyWaiting.classList.add('hidden');
 };
 
-elements.btnReturnHub.onclick = () => window.location.href = 'game.html';
+elements.btnReturnHub.onclick = () => {
+  if (window.roomRef && window.myRole === 'host') window.roomRef.remove().catch(()=>{});
+  window.location.href = 'game.html';
+};
+
 elements.btnExitMatch.onclick = () => {
   if (window.conn && window.conn.close) window.conn.close();
+  if (window.roomRef && window.myRole === 'host') window.roomRef.remove().catch(()=>{});
   window.location.href = 'game.html';
 };
 

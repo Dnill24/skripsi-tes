@@ -46,6 +46,22 @@
   </div>
 </div>
 
+<!-- ── GRADE SELECT MODAL ─────────────────────────────────── -->
+<div class="terra-modal-overlay" id="gradeSelectModal">
+  <div class="terra-modal-card w-[90%] max-w-[400px] mx-auto text-center shadow-[0_0_20px_rgba(255,215,0,0.3)] anim-scale-up-glow">
+    <div class="mb-6">
+      <h2 class="fancy-header m-0" data-i18n="modal_grade_title">Select Your Grade</h2>
+      <p class="text-[#b0bec5] text-[0.8rem] mt-2 font-minecraft drop-shadow-md" data-i18n="modal_grade_desc">This sets the initial difficulty of the math questions.</p>
+    </div>
+    <div class="flex flex-col gap-4">
+      <button class="wood-btn grade-btn hover:scale-105 transition-transform duration-200" data-mmr="10" data-i18n="btn_grade_1">1st Grade</button>
+      <button class="wood-btn grade-btn hover:scale-105 transition-transform duration-200" data-mmr="30" data-i18n="btn_grade_2">2nd Grade</button>
+      <button class="wood-btn grade-btn hover:scale-105 transition-transform duration-200" data-mmr="50" data-i18n="btn_grade_3">3rd Grade</button>
+      <button class="wood-btn grade-btn hover:scale-105 transition-transform duration-200" data-mmr="70" data-i18n="btn_grade_higher">Higher</button>
+    </div>
+  </div>
+</div>
+
 <script src="js/locales.js"></script>
   <script src="js/sfx.js"></script>
   <script>tailwind.config = { theme: { extend: {} } }</script>
@@ -60,7 +76,7 @@
   </div>
 
   <!-- Left Column: Title and Missions -->
-  <div class="hub-left-column flex flex-col items-stretch w-full max-w-[340px] min-w-[280px] animate-float transition-transform duration-300 hover:scale-105">
+  <div class="hub-left-column flex flex-col items-stretch w-full max-w-[340px] min-w-[280px] animate-float transition-transform duration-300">
     <!-- Title Card -->
     <div class="hub-title-container text-center z-[2]">
       <div class="title-sign w-full border-b-0 rounded-t-md">

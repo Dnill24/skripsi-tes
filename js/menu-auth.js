@@ -18,6 +18,7 @@ function playAsGuest() {
   localStorage.removeItem('mathQuestTutorialPlay');
   localStorage.removeItem('mathQuestTutorialHub_Guest');
   localStorage.removeItem('mathQuestTutorialPlay_Guest');
+  sessionStorage.removeItem('mathQuestGradeSelectedSession');
   window.location.href = 'game.html';
 }
 
@@ -40,6 +41,7 @@ function login() {
   if (typeof db === 'undefined') {
     showToast("Firebase not connected. Logging in offline.");
     localStorage.setItem('mathQuestUser', JSON.stringify({ user: username, isLoggedIn: true }));
+    sessionStorage.removeItem('mathQuestGradeSelectedSession');
     window.location.href = 'game.html';
     return;
   }
@@ -85,6 +87,7 @@ function login() {
           }
         }
         
+        sessionStorage.removeItem('mathQuestGradeSelectedSession');
         window.location.href = 'game.html';
       } else {
         showToast("Incorrect Password!");
@@ -143,7 +146,9 @@ function signup() {
         localStorage.removeItem('mathQuestRogueStats'); // Start fresh for new accounts
         localStorage.removeItem('mathQuestTutorialHub_' + username);
         localStorage.removeItem('mathQuestTutorialPlay_' + username);
+        localStorage.removeItem('mathQuestGradeSelected_' + username);
         localStorage.setItem('mathQuestUser', JSON.stringify({ user: username, isLoggedIn: true }));
+        sessionStorage.removeItem('mathQuestGradeSelectedSession');
         window.location.href = 'game.html';
       }).catch(err => {
         showToast("Error creating account: " + err.message);

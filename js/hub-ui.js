@@ -270,7 +270,7 @@ function populateCampaignLevels() {
     if (i < highestLevel) btnClass = 'light-blue';
     else if (i === highestLevel) btnClass = 'success';
     
-    btn.className = `wood-btn p-2 text-sm ${btnClass}`;
+    btn.className = `wood-btn p-2 text-sm flex items-center justify-center whitespace-nowrap overflow-hidden text-ellipsis min-h-[44px] ${btnClass}`;
     
     if (i <= highestLevel) {
       btn.innerHTML = `⚔️ ${lblLevel.replace('{lvl}', i)}`;

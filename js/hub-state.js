@@ -227,9 +227,33 @@ window.onload = () => {
 
   const isGuest = (user === 'Guest');
   const isNew = (totalRuns === 0);
-  if ((isGuest || isNew) && !localStorage.getItem('mathQuestTutorialHub_' + user)) {
-    setTimeout(() => {
-      startHubTutorial();
-    }, 500);
+  
+  const gradeKey = 'mathQuestGradeSelectedSession';
+  const tutorialKey = 'mathQuestTutorialHub_' + user;
+  
+  if ((isGuest || isNew) && !sessionStorage.getItem(gradeKey)) {
+    // Show grade selection modal
+    const gradeModal = document.getElementById('gradeSelectModal');
+    gradeModal.classList.add('show');
+    
+    document.querySelectorAll('.grade-btn').forEach(btn => {
+      btn.onclick = () => {
+        const mmr = parseInt(btn.dataset.mmr);
+        globalStats.playerMMR = mmr;
+        saveState();
+        updateUI();
+        sessionStorage.setItem(gradeKey, 'true');
+        gradeModal.classList.remove('show');
+        
+        // Start tutorial if needed after selecting grade
+        if ((isGuest || isNew) && !localStorage.getItem(tutorialKey)) {
+          setTimeout(() => startHubTutorial(), 500);
+        }
+      };
+    });
+  } else {
+    if ((isGuest || isNew) && !localStorage.getItem(tutorialKey)) {
+      setTimeout(() => startHubTutorial(), 500);
+    }
   }
 };

@@ -52,7 +52,7 @@ elements.btnHost.onclick = () => {
 elements.btnJoin.onclick = () => {
   if (typeof db === 'undefined') return showToast("Firebase not connected!");
   const code = elements.joinCodeInput.value.trim().toUpperCase();
-  if (!code) return showToast("Enter a room code!");
+  if (!code) return showToast(getTranslation('txt_enter_room_code', settings.language) || "Enter a room code!");
   
   window.roomCode = code;
   window.myRole = 'client';

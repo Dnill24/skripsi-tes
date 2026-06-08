@@ -133,6 +133,15 @@ const locales = {
     col_score: "Score",
     col_date: "Date",
     txt_empty_leaderboard: "No scores yet. Be the first!",
+    quest_bosses: "Defeat 3 Bosses",
+    quest_questions: "Answer 50 Questions",
+    quest_runs: "Play 3 Runs",
+    quest_combo: "Reach 20x Combo",
+    quest_gold: "Collect 500 Gold",
+    txt_bounty: "Bounty",
+    btn_claim: "Claim",
+    btn_claimed: "Claimed",
+    txt_resets_in: "Resets in: ",
 
     // UI Play.html
     btn_flee: "Flee",
@@ -440,6 +449,15 @@ const locales = {
     col_score: "Skor",
     col_date: "Tanggal",
     txt_empty_leaderboard: "Belum ada skor. Jadilah yang pertama!",
+    quest_bosses: "Kalahkan 3 Bos",
+    quest_questions: "Jawab 50 Soal",
+    quest_runs: "Main 3 Ronde",
+    quest_combo: "Capai Kombo 20x",
+    quest_gold: "Kumpulkan 500 Emas",
+    txt_bounty: "Sayembara",
+    btn_claim: "Ambil",
+    btn_claimed: "Terklaim",
+    txt_resets_in: "Reset dalam: ",
 
     // UI Play.html
     btn_flee: "Kabur",

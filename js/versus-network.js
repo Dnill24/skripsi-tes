@@ -68,7 +68,7 @@ elements.btnJoin.onclick = () => {
       window.roomRef.onDisconnect().update({ clientConnected: false }).catch(() => {}); // Flag if client leaves
       setupConnection();
     } else {
-      showToast("Room not found or already full!");
+      showToast(getTranslation('txt_room_full', settings.language) || "Room not found or already full!");
     }
   });
 };

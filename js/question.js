@@ -260,30 +260,230 @@ function createQuestion(type) {
   return { text: bestExpr, answers: shuffleArray(options), correct: bestAns, operator: primaryOp };
 }
 
+const COL_COLORS = ['#b73a27', '#5a8f9a', '#ed9f40', '#9b59b6', '#2ecc71', '#e74c3c', '#3498db'];
+
+function colorizeMath(numStr) {
+    let html = '';
+    for (let i = 0; i < numStr.length; i++) {
+        if (numStr[i] === ' ' || isNaN(parseInt(numStr[i]))) {
+            html += numStr[i];
+        } else {
+            let place = numStr.length - 1 - i;
+            let color = COL_COLORS[place % COL_COLORS.length];
+            html += `<span style="color: ${color}">${numStr[i]}</span>`;
+        }
+    }
+    return html;
+}
+
+function colorizeCarries(numStr) {
+    let html = '';
+    for (let i = 0; i < numStr.length; i++) {
+        if (numStr[i] === ' ' || isNaN(parseInt(numStr[i]))) {
+            html += numStr[i];
+        } else {
+            let place = numStr.length - 1 - i;
+            let originPlace = Math.max(0, place - 1);
+            let color = COL_COLORS[originPlace % COL_COLORS.length];
+            html += `<span style="color: ${color}">${numStr[i]}</span>`;
+        }
+    }
+    return html;
+}
+
 function generateBreakdownText(q) {
-  let breakdown = `<div class="text-[1.2rem] mb-2">${q.text.replaceAll('*', '\u00d7').replaceAll('/', '\u00f7')} = <span class="text-green-400 font-bold">${q.correct}</span></div>`;
+  const lang = typeof settings !== 'undefined' ? settings.language : 'en';
   
   const tokens = q.text.split(' ');
-  if (tokens.length === 3) {
-    const a = parseInt(tokens[0]);
-    const op = tokens[1];
-    const b = parseInt(tokens[2]);
-    
-    if (op === '*') {
-      if (b > 1 && b <= 10) {
-        const arr = Array(b).fill(a);
-        breakdown += `<div class="text-[0.8rem] text-gray-300">${arr.join(' + ')} = ${q.correct}</div>`;
-      } else if (a > 1 && a <= 10) {
-        const arr = Array(a).fill(b);
-        breakdown += `<div class="text-[0.8rem] text-gray-300">${arr.join(' + ')} = ${q.correct}</div>`;
+  if (tokens.length !== 3) {
+      let currentTokens = [...tokens];
+      let steps = [];
+      steps.push(`<div class="text-[0.9rem] text-gray-300 leading-tight mb-4 font-sans text-center">${getTranslation('txt_order_of_ops', lang)}</div>`);
+      
+      let stepLines = [];
+      stepLines.push(`<div class="text-[1.8rem] text-gray-400 mb-2">${currentTokens.join(' ').replace(/\*/g, '\u00d7').replace(/\//g, '\u00f7')}</div>`);
+      
+      while (currentTokens.includes('*') || currentTokens.includes('/')) {
+          let opIndex = currentTokens.findIndex(t => t === '*' || t === '/');
+          let a = parseInt(currentTokens[opIndex - 1]);
+          let b = parseInt(currentTokens[opIndex + 1]);
+          let op = currentTokens[opIndex];
+          let res = op === '*' ? a * b : Math.floor(a / b);
+          
+          let displayLine = currentTokens.map((t, i) => {
+              if (i >= opIndex - 1 && i <= opIndex + 1) {
+                  return `<span class="text-yellow-300 font-bold underline">${t.replace('*', '\u00d7').replace('/', '\u00f7')}</span>`;
+              }
+              return t.replace('*', '\u00d7').replace('/', '\u00f7');
+          }).join(' ');
+          
+          stepLines.push(`<div class="text-[1.8rem] mb-1">${displayLine}</div>`);
+          currentTokens.splice(opIndex - 1, 3, res.toString());
       }
-    } else if (op === '/') {
-      breakdown += `<div class="text-[0.8rem] text-gray-300">${b} &times; ${q.correct} = ${a}</div>`;
-    } else if (op === '-') {
-      breakdown += `<div class="text-[0.8rem] text-gray-300">${q.correct} + ${b} = ${a}</div>`;
-    }
+      
+      while (currentTokens.includes('+') || currentTokens.includes('-')) {
+          let opIndex = currentTokens.findIndex(t => t === '+' || t === '-');
+          let a = parseInt(currentTokens[opIndex - 1]);
+          let b = parseInt(currentTokens[opIndex + 1]);
+          let op = currentTokens[opIndex];
+          let res = op === '+' ? a + b : a - b;
+          
+          let displayLine = currentTokens.map((t, i) => {
+              if (i >= opIndex - 1 && i <= opIndex + 1) {
+                  return `<span class="text-yellow-300 font-bold underline">${t}</span>`;
+              }
+              return t;
+          }).join(' ');
+          
+          stepLines.push(`<div class="text-[1.8rem] mb-1">${displayLine}</div>`);
+          currentTokens.splice(opIndex - 1, 3, res.toString());
+      }
+      
+      stepLines.push(`<div class="text-[2.5rem] text-green-400 font-bold mt-2">= ${currentTokens[0]}</div>`);
+      
+      return `<div class="flex flex-col items-center w-full my-4 font-mono bg-[#fdfdfd] text-black p-8 rounded-xl border-4 border-gray-300 shadow-[4px_4px_0_rgba(0,0,0,0.5)]">
+        ${steps.join('\n')}
+        ${stepLines.join('\n')}
+      </div>`;
   }
-  return breakdown;
+  
+  const a = parseInt(tokens[0]);
+  const op = tokens[1];
+  const b = parseInt(tokens[2]);
+  
+  let strA = a.toString();
+  let strB = b.toString();
+  let strRes = q.correct.toString();
+  let maxLen = Math.max(strA.length, strB.length, strRes.length);
+  
+  let html = '';
+  let explanation = '';
+  
+  if (op === '+') {
+      let carries = Array(maxLen).fill(' ');
+      let carry = 0;
+      let hasCarry = false;
+      for(let i=0; i<maxLen; i++) {
+        let dA = i < strA.length ? parseInt(strA[strA.length - 1 - i]) : 0;
+        let dB = i < strB.length ? parseInt(strB[strB.length - 1 - i]) : 0;
+        let sum = dA + dB + carry;
+        carry = Math.floor(sum / 10);
+        if (carry > 0) {
+          hasCarry = true;
+          if (i + 1 < maxLen) {
+            carries[maxLen - 1 - (i + 1)] = carry.toString();
+          } else {
+            carries.unshift(carry.toString());
+            strA = ' ' + strA;
+            strB = ' ' + strB;
+            strRes = q.correct.toString(); 
+            maxLen++;
+          }
+        }
+      }
+      
+      let carryStr = carries.join('');
+      
+      if (hasCarry) {
+        explanation = `<div class="text-[0.9rem] text-gray-300 leading-tight mb-4 font-sans text-center">
+          ${getTranslation('txt_add_col_desc', lang)}<br>
+          <span class="font-bold text-yellow-300 mt-1 inline-block">${getTranslation('txt_add_carry_desc', lang)}</span>
+        </div>`;
+      } else {
+        explanation = `<div class="text-[0.9rem] text-gray-300 leading-tight mb-4 font-sans text-center">
+          ${getTranslation('txt_add_col_desc', lang)}
+        </div>`;
+      }
+
+      html = `
+<div class="font-mono text-[2.5rem] inline-block text-right leading-none bg-[#fdfdfd] p-8 rounded-xl shadow-[4px_4px_0_rgba(0,0,0,0.5)] whitespace-pre font-bold mx-auto text-black border-4 border-gray-300">
+${hasCarry ? `<div class="text-[1.4rem] h-[1.8rem] pr-[0.1em] opacity-80">${colorizeCarries(carryStr)}</div>` : ''}
+<div>  ${colorizeMath(strA.padStart(maxLen, ' '))}</div>
+<div class="border-b-[5px] border-black pb-2 relative"><span class="absolute left-0 text-black">+</span>  ${colorizeMath(strB.padStart(maxLen, ' '))}</div>
+<div class="pt-3">  ${colorizeMath(strRes.padStart(maxLen, ' '))}</div>
+</div>`;
+
+  } else if (op === '-') {
+      let needsBorrow = false;
+      let tempA = a;
+      let tempB = b;
+      while(tempA > 0 || tempB > 0) {
+          if (tempA % 10 < tempB % 10) { needsBorrow = true; break; }
+          tempA = Math.floor(tempA / 10);
+          tempB = Math.floor(tempB / 10);
+      }
+      
+      if (needsBorrow) {
+        explanation = `<div class="text-[0.9rem] text-gray-300 leading-tight mb-4 font-sans text-center">
+          ${getTranslation('txt_sub_col_desc', lang)}<br>
+          <span class="font-bold text-yellow-300 mt-1 inline-block">${getTranslation('txt_sub_borrow_desc', lang)}</span>
+        </div>`;
+      } else {
+        explanation = `<div class="text-[0.9rem] text-gray-300 leading-tight mb-4 font-sans text-center">
+          ${getTranslation('txt_sub_col_desc', lang)}
+        </div>`;
+      }
+      html = `
+<div class="font-mono text-[2.5rem] inline-block text-right leading-none bg-[#fdfdfd] p-8 rounded-xl shadow-[4px_4px_0_rgba(0,0,0,0.5)] whitespace-pre font-bold mx-auto text-black border-4 border-gray-300">
+<div>  ${colorizeMath(strA.padStart(maxLen, ' '))}</div>
+<div class="border-b-[5px] border-black pb-2 relative"><span class="absolute left-0 text-black">-</span>  ${colorizeMath(strB.padStart(maxLen, ' '))}</div>
+<div class="pt-3">  ${colorizeMath(strRes.padStart(maxLen, ' '))}</div>
+</div>`;
+
+  } else if (op === '*') {
+      if (strA.length > 1 || strB.length > 1) {
+          explanation = `<div class="text-[0.9rem] text-gray-300 leading-tight mb-4 font-sans text-center">
+            ${getTranslation('txt_mul_col_desc', lang)}<br>
+            <span class="font-bold text-yellow-300 mt-1 inline-block">${getTranslation('txt_mul_add_desc', lang)}</span>
+          </div>`;
+      } else {
+         explanation = `<div class="text-[0.9rem] text-gray-300 leading-tight mb-4 font-sans text-center">
+           ${getTranslation('txt_mul_col_desc', lang)}
+         </div>`;
+      }
+      html = `
+<div class="font-mono text-[2.5rem] inline-block text-right leading-none bg-[#fdfdfd] p-8 rounded-xl shadow-[4px_4px_0_rgba(0,0,0,0.5)] whitespace-pre font-bold mx-auto text-black border-4 border-gray-300">
+<div>  ${colorizeMath(strA.padStart(maxLen, ' '))}</div>
+<div class="border-b-[5px] border-black pb-2 relative"><span class="absolute left-0 text-black">&times;</span>  ${colorizeMath(strB.padStart(maxLen, ' '))}</div>`;
+
+      if (strB.length > 1) {
+          let intermediates = [];
+          for(let i=0; i<strB.length; i++) {
+              let digit = parseInt(strB[strB.length - 1 - i]);
+              let prod = (a * digit).toString() + '0'.repeat(i);
+              intermediates.push(prod);
+              if (prod.length > maxLen) maxLen = prod.length;
+          }
+          for (let i=0; i<intermediates.length; i++) {
+             if (i === intermediates.length - 1) {
+                 html += `<div class="border-b-[5px] border-black pb-2 relative mt-2"><span class="absolute left-0 text-black">+</span>  ${colorizeMath(intermediates[i].padStart(maxLen, ' '))}</div>`;
+             } else {
+                 html += `<div class="pt-3">  ${colorizeMath(intermediates[i].padStart(maxLen, ' '))}</div>`;
+             }
+          }
+      }
+      
+      html += `<div class="pt-3">  ${colorizeMath(strRes.padStart(maxLen, ' '))}</div>
+</div>`;
+
+  } else if (op === '/') {
+      explanation = `<div class="text-[0.9rem] text-gray-300 leading-tight mb-4 font-sans text-center">
+        ${getTranslation('txt_div_col_desc', lang)}<br>
+        <span class="font-bold text-yellow-300 mt-1 inline-block">${getTranslation('txt_div_step_desc', lang)}</span>
+      </div>`;
+      
+      let pad = ' '.repeat(strB.length + 1);
+      html = `
+<div class="font-mono text-[2.5rem] inline-block text-left leading-none bg-[#fdfdfd] p-8 rounded-xl shadow-[4px_4px_0_rgba(0,0,0,0.5)] whitespace-pre font-bold mx-auto text-black border-4 border-gray-300">
+<div class="pb-1">${pad}  ${colorizeMath(strRes)}</div>
+<div class="pt-1">${colorizeMath(strB)} <span class="border-t-[5px] border-l-[5px] border-black rounded-tl-2xl pl-3 pt-2 pb-2 inline-block leading-none">${colorizeMath(strA)}</span></div>
+</div>`;
+  }
+  
+  return `<div class="flex flex-col items-center w-full my-4">
+    ${explanation}
+    ${html}
+  </div>`;
 }
 
 function renderQuestion() {

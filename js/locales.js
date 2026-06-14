@@ -317,7 +317,16 @@ const locales = {
     tut_play_pause: "Pause",
     tut_play_pause_desc: "Need a break? Pause here, or return to Camp safely.",
     modal_breakdown: "Answer Breakdown",
-    btn_continue: "Continue"
+    btn_continue: "Continue",
+    txt_add_col_desc: "Add column by column starting from the right.",
+    txt_add_carry_desc: "If a column adds up to 10 or more, carry the extra to the next column!",
+    txt_sub_col_desc: "Subtract column by column starting from the right.",
+    txt_sub_borrow_desc: "If the top number is smaller, borrow from the next column!",
+    txt_mul_col_desc: "Multiply the top number by each digit of the bottom number.",
+    txt_mul_add_desc: "Then add the results together!",
+    txt_div_col_desc: "Divide the inside number by the outside number.",
+    txt_div_step_desc: "Think: How many times does the outside number fit in?",
+    txt_order_of_ops: "Solve step-by-step (Multiplication and Division first!):"
   },
   id: {
     // UI Main Menu (index.html)
@@ -637,7 +646,16 @@ const locales = {
     tut_play_pause: "Jeda",
     tut_play_pause_desc: "Butuh istirahat? Jeda di sini, atau kembali ke Kemah dengan aman.",
     modal_breakdown: "Penjelasan Jawaban",
-    btn_continue: "Lanjutkan"
+    btn_continue: "Lanjutkan",
+    txt_add_col_desc: "Tambahkan setiap kolom mulai dari kanan.",
+    txt_add_carry_desc: "Jika jumlahnya 10 atau lebih, simpan sisanya ke kolom berikutnya!",
+    txt_sub_col_desc: "Kurangi setiap kolom mulai dari kanan.",
+    txt_sub_borrow_desc: "Jika angka atas lebih kecil, pinjam dari kolom berikutnya!",
+    txt_mul_col_desc: "Kalikan angka atas dengan setiap digit angka bawah.",
+    txt_mul_add_desc: "Lalu jumlahkan hasilnya!",
+    txt_div_col_desc: "Bagi angka di dalam dengan angka di luar.",
+    txt_div_step_desc: "Pikir: Berapa kali angka luar bisa masuk?",
+    txt_order_of_ops: "Selesaikan bertahap (Perkalian dan Pembagian dulu!):"
   }
 };
 

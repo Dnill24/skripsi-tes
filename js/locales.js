@@ -482,7 +482,7 @@ const locales = {
     lbl_score: "Skor: ",
     lbl_health: "Darah",
     lbl_hp: "Darah",
-    lbl_stage_progress: "Progress Level",
+    lbl_stage_progress: "Progres Tahap",
     lbl_combo: "Kombo",
     lbl_def: "PER: ",
     lbl_goldmod: "EMAS: ",

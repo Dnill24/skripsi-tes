@@ -42,7 +42,10 @@ const elements = {
   musicVolumeSlider: document.getElementById('musicVolumeSlider'),
   musicVolumeValue: document.getElementById('musicVolumeValue'),
   btnResumePause: document.getElementById('btnResumePause'),
-  btnQuitPause: document.getElementById('btnQuitPause')
+  btnQuitPause: document.getElementById('btnQuitPause'),
+  breakdownModal: document.getElementById('breakdownModal'),
+  breakdownText: document.getElementById('breakdownText'),
+  btnContinueBreakdown: document.getElementById('btnContinueBreakdown')
 };
 
 let currency = 0;

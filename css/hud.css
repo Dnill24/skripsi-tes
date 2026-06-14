@@ -252,7 +252,7 @@
 }
 
 .player-sprite {
-  font-size: clamp(4.5rem,12vw,7.5rem);
+  font-size: clamp(5.625rem,15vw,9.375rem);
   filter: drop-shadow(2px 4px 0 rgba(0,0,0,0.6));
   transition: transform 0.1s;
   transform-origin: bottom center;

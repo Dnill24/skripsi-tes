@@ -315,7 +315,9 @@ const locales = {
     tut_play_answers: "Answers",
     tut_play_answers_desc: "Click the correct answer. The faster you answer, the more damage you deal!",
     tut_play_pause: "Pause",
-    tut_play_pause_desc: "Need a break? Pause here, or return to Base Camp with your gold."
+    tut_play_pause_desc: "Need a break? Pause here, or return to Camp safely.",
+    modal_breakdown: "Answer Breakdown",
+    btn_continue: "Continue"
   },
   id: {
     // UI Main Menu (index.html)
@@ -633,7 +635,9 @@ const locales = {
     tut_play_answers: "Jawaban",
     tut_play_answers_desc: "Klik jawaban yang benar. Semakin cepat menjawab, semakin besar seranganmu!",
     tut_play_pause: "Jeda",
-    tut_play_pause_desc: "Butuh istirahat? Jeda di sini, atau kembali ke Kemah dengan aman."
+    tut_play_pause_desc: "Butuh istirahat? Jeda di sini, atau kembali ke Kemah dengan aman.",
+    modal_breakdown: "Penjelasan Jawaban",
+    btn_continue: "Lanjutkan"
   }
 };
 

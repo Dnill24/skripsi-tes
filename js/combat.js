@@ -183,12 +183,29 @@ function processPlayerDamage(isTimeout, op) {
       showCombatText(`${getTranslation('txt_miss', settings.language)} -${damage} HP`, 'text-red-400', 'player');
     }
     
-    if (run.health === 0) {
-      if (run.modifiers.nineLives) {
-        run.modifiers.nineLives = false;
-        run.health = 50;
-        showCombatText(getTranslation('txt_nine_lives', settings.language), 'text-blue-400 text-5xl');
-        elements.lblHealth.textContent = `${run.health}/${run.maxHealth}`;
+    const proceedAfterBreakdown = () => {
+      elements.breakdownModal.classList.remove('show');
+      if (run.health === 0) {
+        if (run.modifiers.nineLives) {
+          run.modifiers.nineLives = false;
+          run.health = 50;
+          showCombatText(getTranslation('txt_nine_lives', settings.language), 'text-blue-400 text-5xl');
+          elements.lblHealth.textContent = `${run.health}/${run.maxHealth}`;
+          if (run.isBoss) {
+            setTimeout(() => {
+              if (elements.runOverModal.classList.contains('show')) return;
+              run.active = true;
+              run.currentQuestion = createQuestion('boss');
+              renderQuestion();
+              startTimer();
+            }, 1200);
+          } else {
+            setTimeout(nextQuestion, 1000);
+          }
+        } else {
+          endRun(getTranslation('txt_defeated', settings.language));
+        }
+      } else {
         if (run.isBoss) {
           setTimeout(() => {
             if (elements.runOverModal.classList.contains('show')) return;
@@ -196,25 +213,18 @@ function processPlayerDamage(isTimeout, op) {
             run.currentQuestion = createQuestion('boss');
             renderQuestion();
             startTimer();
-          }, 1200);
+          }, 300);
         } else {
-          setTimeout(nextQuestion, 1000);
+          nextQuestion();
         }
-      } else {
-        setTimeout(() => endRun(getTranslation('txt_defeated', settings.language)), 1000);
       }
-    } else {
-      if (run.isBoss) {
-        setTimeout(() => {
-          if (elements.runOverModal.classList.contains('show')) return;
-          run.active = true;
-          run.currentQuestion = createQuestion('boss');
-          renderQuestion();
-          startTimer();
-        }, 1200);
-      } else {
-        setTimeout(nextQuestion, 1000);
-      }
-    }
+    };
+
+    setTimeout(() => {
+      run.active = false;
+      elements.breakdownText.innerHTML = typeof generateBreakdownText === 'function' ? generateBreakdownText(run.currentQuestion) : `${run.currentQuestion.text.replaceAll('*', '\u00d7').replaceAll('/', '\u00f7')} = ${run.currentQuestion.correct}`;
+      elements.breakdownModal.classList.add('show');
+      elements.btnContinueBreakdown.onclick = proceedAfterBreakdown;
+    }, 800);
   }, run.isBoss ? 450 : 250);
 }

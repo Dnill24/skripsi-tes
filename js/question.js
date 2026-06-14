@@ -260,6 +260,32 @@ function createQuestion(type) {
   return { text: bestExpr, answers: shuffleArray(options), correct: bestAns, operator: primaryOp };
 }
 
+function generateBreakdownText(q) {
+  let breakdown = `<div class="text-[1.2rem] mb-2">${q.text.replaceAll('*', '\u00d7').replaceAll('/', '\u00f7')} = <span class="text-green-400 font-bold">${q.correct}</span></div>`;
+  
+  const tokens = q.text.split(' ');
+  if (tokens.length === 3) {
+    const a = parseInt(tokens[0]);
+    const op = tokens[1];
+    const b = parseInt(tokens[2]);
+    
+    if (op === '*') {
+      if (b > 1 && b <= 10) {
+        const arr = Array(b).fill(a);
+        breakdown += `<div class="text-[0.8rem] text-gray-300">${arr.join(' + ')} = ${q.correct}</div>`;
+      } else if (a > 1 && a <= 10) {
+        const arr = Array(a).fill(b);
+        breakdown += `<div class="text-[0.8rem] text-gray-300">${arr.join(' + ')} = ${q.correct}</div>`;
+      }
+    } else if (op === '/') {
+      breakdown += `<div class="text-[0.8rem] text-gray-300">${b} &times; ${q.correct} = ${a}</div>`;
+    } else if (op === '-') {
+      breakdown += `<div class="text-[0.8rem] text-gray-300">${q.correct} + ${b} = ${a}</div>`;
+    }
+  }
+  return breakdown;
+}
+
 function renderQuestion() {
   elements.lblQuestion.textContent = run.currentQuestion.text.replaceAll('*', '\u00d7').replaceAll('/', '\u00f7');
   elements.lblRunStage.textContent = Math.floor((run.monstersDefeated || 0) / 8) + 1;

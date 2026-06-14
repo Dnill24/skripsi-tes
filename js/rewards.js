@@ -32,7 +32,7 @@ function showRewardModal() {
     card.innerHTML = `
       <div class="text-[3.5rem] mb-4 drop-shadow-[2px_2px_0_rgba(0,0,0,1)]">${buff.icon}</div>
       <div class="font-minecraft text-[0.75rem] text-yellow-400 mb-3 drop-shadow-[1px_1px_0_rgba(0,0,0,1)] text-center">${getTranslation(buff.nameKey, settings.language)}</div>
-      <div class="font-[Comic_Neue] text-[1rem] text-[#ccc] text-center leading-[1.2]">${getTranslation(buff.descKey, settings.language)}</div>
+            <div class="font-minecraft text-[0.55rem] text-[#ccc] text-center leading-[1.4]">${getTranslation(buff.descKey, settings.language)}</div>
     `;
     card.onclick = () => {
       SFX.buffPick();

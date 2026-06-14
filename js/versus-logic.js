@@ -61,7 +61,7 @@ window.startTimer = function() {
       window.combo = 0;
       updateComboUI();
       window.takeDamage(6); // Scaled from 10
-      if (typeof showCombatText !== 'undefined') showCombatText("TIMEOUT!", "text-red-500");
+      if (typeof showCombatText !== 'undefined') showCombatText(getTranslation('txt_timeout', settings.language).toUpperCase(), "text-red-500");
       setTimeout(window.nextQuestion, 500); // Fast paced
     }
   }, 100);
@@ -190,7 +190,7 @@ window.handleAnswer = function(selected) {
     if (typeof triggerPlayerAttack !== 'undefined') triggerPlayerAttack();
     
     setTimeout(() => {
-      if (typeof showCombatText !== 'undefined') showCombatText("CORRECT!", "text-emerald-400");
+       if (typeof showCombatText !== 'undefined') showCombatText(getTranslation('txt_hit', settings.language).toUpperCase(), "text-emerald-400");
       showOpponentDamage(dmg);
     }, 250);
     
@@ -200,7 +200,7 @@ window.handleAnswer = function(selected) {
     if (typeof SFX !== 'undefined') SFX.wrong();
     window.combo = 0;
     updateComboUI();
-    if (typeof showCombatText !== 'undefined') showCombatText("MISS!", "text-red-400");
+ if (typeof showCombatText !== 'undefined') showCombatText(getTranslation('txt_miss', settings.language).toUpperCase(), "text-red-400");
     window.takeDamage(6); // scaled down from 10
     setTimeout(window.nextQuestion, 500); // Fast paced
   }

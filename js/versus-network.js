@@ -76,7 +76,7 @@ elements.btnJoin.onclick = () => {
 function setupConnection() {
   window.conn.open = true;
   setTimeout(() => {
-    window.conn.send({ type: 'handshake', name: user, skin: skinEmojis[selectedSkin] || '🧍', mmr: Math.floor(playerMMR) });
+    window.conn.send({ type: 'handshake', name: user, skin: skinEmojis[selectedSkin] || '<img src="characters/Hero.png" style="height:1em; width:1em; object-fit:contain; display:inline-block; vertical-align:middle; pointer-events:none;">', mmr: Math.floor(playerMMR) });
     
     elements.lobbyModal.classList.remove('show');
     elements.gameArena.classList.remove('hidden');
@@ -119,7 +119,7 @@ function handleNetworkData(data) {
   if (data.type === 'handshake') {
     elements.opponentName.textContent = data.name;
     const oppSkin = data.skin || '🧍';
-    elements.enemySprite.textContent = oppSkin;
+    elements.enemySprite.innerHTML = oppSkin;
     if (elements.lblOpponentMMR) elements.lblOpponentMMR.textContent = data.mmr ? (window.getRankFromMMR ? window.getRankFromMMR(data.mmr) : `MMR: ${data.mmr}`) : (window.getRankFromMMR ? window.getRankFromMMR(0) : '🪨 Iron');
   } else if (data.type === 'update') {
     window.opponentHP = data.hp;

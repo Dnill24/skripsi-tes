@@ -167,7 +167,7 @@ function renderLeaderboard() {
       
       el.innerHTML = `
         <div class="relative text-[clamp(1.5rem,3vw,2.5rem)] mb-1 drop-shadow-[0_4px_2px_rgba(0,0,0,0.5)]" ${avatarAnim}>
-          ${entry.skin || '🧍'}
+          ${entry.skin || '<img src="characters/Hero.png" style="height:1em; width:1em; object-fit:contain; display:inline-block; vertical-align:middle; pointer-events:none;">'}
         </div>
         <div class="font-minecraft text-[0.45rem] text-white max-w-full overflow-hidden text-ellipsis whitespace-nowrap mb-1" title="${entry.name}">
           ${starHtml ? starHtml + ' ' : ''}${entry.name}${starHtml ? ' ' + starHtml : ''}
@@ -194,7 +194,7 @@ function renderLeaderboard() {
     tr.innerHTML = `
       <td class="p-[clamp(4px,1vw,12px)] text-center font-minecraft text-[clamp(0.45rem,1.5vw,0.65rem)] text-white whitespace-nowrap">#${realRank}</td>
       <td class="p-[clamp(4px,1vw,12px)] font-minecraft text-[clamp(0.45rem,1.5vw,0.65rem)] text-white max-w-[120px] whitespace-nowrap overflow-hidden text-ellipsis" title="${entry.name}">
-        <span class="text-[clamp(0.8rem,2vw,1.2rem)] mr-1 align-middle">${entry.skin || '🧍'}</span><span class="align-middle">${entry.name}</span>
+        <span class="text-[clamp(0.8rem,2vw,1.2rem)] mr-1 align-middle">${entry.skin || '<img src="characters/Hero.png" style="height:1em; width:1em; object-fit:contain; display:inline-block; vertical-align:middle; pointer-events:none;">'}</span><span class="align-middle">${entry.name}</span>
       </td>
       <td class="p-[clamp(4px,1vw,12px)] text-right font-minecraft text-[clamp(0.45rem,1.5vw,0.65rem)] text-blue-400 whitespace-nowrap">${entry.mmr ? (window.getRankFromMMR ? window.getRankFromMMR(entry.mmr) : Math.floor(entry.mmr)) : (window.getRankFromMMR ? window.getRankFromMMR(0) : '🪨 Iron')}</td>
       <td class="p-[clamp(4px,1vw,12px)] text-right font-minecraft text-[clamp(0.45rem,1.5vw,0.65rem)] text-green-400 whitespace-nowrap">${entry.score.toLocaleString()}</td>

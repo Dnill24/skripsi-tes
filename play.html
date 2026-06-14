@@ -118,13 +118,11 @@
       <!-- Hero -->
       <div id="playerSpriteContainer" class="sprite-container-left">
         <div id="playerSprite" class="player-sprite">
-          🧍
         </div>
       </div>
       <!-- Enemy -->
       <div id="enemyContainer" class="sprite-container-right">
         <div id="enemySprite" class="enemy-sprite">
-          🦇
         </div>
         <!-- Attack intent indicator -->
         <div id="attackIntent" class="attack-intent">
@@ -207,7 +205,7 @@
     </div>
       <p class="font-minecraft text-[0.6rem] text-gray-400 text-center mb-6 drop-shadow-[1px_1px_0_rgba(0,0,0,0.8)]" data-i18n="msg_reward">Choose your loot...</p>
       
-      <div id="rewardCardsContainer" class="grid grid-cols-[repeat(auto-fit,minmax(140px,1fr))] gap-4"></div>
+      <div id="rewardCardsContainer" class="grid grid-cols-1 sm:grid-cols-3 gap-3 overflow-y-auto max-h-[60vh] sm:max-h-none p-1"></div>
     </div>
   </div>
 
@@ -242,6 +240,7 @@
     </div>
   </div>
 
+<script src="js/utils.js"></script>
 <script src="js/locales.js"></script>
 <script src="js/sfx.js"></script>
 <script src="js/tutorial.js"></script>

@@ -125,16 +125,16 @@ function nextQuestion() {
     if (elements.lblBossHp) {
       elements.lblBossHp.textContent = `${run.bossHP}/${run.bossMaxHP}`;
     }
-    elements.enemySprite.textContent = bossEmojis[(run.bossesEncountered - 1) % bossEmojis.length];
+    elements.enemySprite.innerHTML = bossEmojis[(run.bossesEncountered - 1) % bossEmojis.length];
     
     elements.enemySprite.parentElement.classList.add('animate-float');
-    elements.enemySprite.style.fontSize = 'clamp(6rem,19.5vw,9rem)';
+    elements.enemySprite.style.fontSize = 'clamp(9rem,29.25vw,13.5rem)';
     elements.enemySprite.style.filter = 'drop-shadow(0 0 30px rgba(239,68,68,0.8))';
     elements.enemySprite.style.transform = 'scale(1.1)';
     if (typeof SFX !== 'undefined') SFX.playBGM('Boss Music.mp3');
   } else if (!run.isBoss) {
     elements.bossHpContainer.classList.add('hidden');
-    elements.enemySprite.textContent = enemyEmojis[getRandomInt(0, enemyEmojis.length - 1)];
+    elements.enemySprite.innerHTML = enemyEmojis[getRandomInt(0, enemyEmojis.length - 1)];
     
     elements.enemySprite.parentElement.classList.remove('animate-float');
     elements.enemySprite.style.fontSize = 'clamp(2.5rem,8vw,4rem)';
@@ -259,7 +259,7 @@ function endRun(msg) {
     try {
       leaderboard.push({
         name: user,
-        skin: skinEmojis[selectedSkin] || '🏃',
+        skin: skinEmojis[selectedSkin] || '<img src="characters/Hero.png" style="height:1em; width:1em; object-fit:contain; display:inline-block; vertical-align:middle; pointer-events:none;">',
         mmr: globalStats.playerMMR,
         score: Math.floor(run.score),
         date: new Date().toLocaleDateString()
@@ -277,7 +277,7 @@ function endRun(msg) {
       if (typeof db !== 'undefined') {
         db.ref('leaderboard').push({
           name: user,
-          skin: skinEmojis[selectedSkin] || '🏃',
+          skin: skinEmojis[selectedSkin] || '<img src="characters/Hero.png" style="height:1em; width:1em; object-fit:contain; display:inline-block; vertical-align:middle; pointer-events:none;">',
           mmr: globalStats.playerMMR,
           score: Math.floor(run.score),
           date: new Date().toLocaleDateString(),
@@ -372,6 +372,12 @@ function initGame() {
     };
   }
 
+  if (run.isBoss) {
+    elements.enemySprite.innerHTML = bossEmojis[(run.bossesEncountered - 1) % bossEmojis.length];
+  } else {
+    elements.enemySprite.innerHTML = enemyEmojis[Math.floor(Math.random() * enemyEmojis.length)];
+  }
+
   runCountdown(() => {
     if (!run.currentQuestion) {
       run.currentQuestion = createQuestion(run.isBoss ? 'boss' : 'enemy');
@@ -384,12 +390,11 @@ function initGame() {
       if (run.isBoss) {
         elements.bossHpContainer.classList.remove('hidden');
         elements.barBossHp.style.width = `${(run.bossHP / run.bossMaxHP) * 100}%`;
-        elements.enemySprite.textContent = bossEmojis[(run.bossesEncountered - 1) % bossEmojis.length];
+        // Enemy sprite is already set before countdown, just update the class
         elements.enemySprite.classList.add('anim-boss-idle');
       } else {
         elements.bossHpContainer.classList.add('hidden');
-        const enemies = ['👾', '👻', '💀', '👽', '🕷️', '🦇'];
-        elements.enemySprite.textContent = enemies[Math.floor(Math.random() * enemies.length)];
+        // Enemy sprite is already set before countdown, just update the class
         elements.enemySprite.classList.add('anim-idle');
       }
     };

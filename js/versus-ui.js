@@ -3,20 +3,21 @@
 window.gameMode = 'normal';
 
 const skinEmojis = {
-  'rainbow': '🧍', 'peasant': '🧑‍🌾', 'adventurer': '🧝', 'stone': '👹',
-  'knight': '🤺', 'mage': '🧙', 'glow': '🧚', 'ninja': '🥷', 'robot': '🤖',
-  'gold': '🤴', 'diamond': '🫅', 'fire': '🦸', 'ice': '🧛', 'phantom': '👻',
-  'alien': '👽', 'demon': '👿', 'angel': '👼', 'dragon': '🐉', 'void': '🧑‍🚀',
-  'celestial': '🧞', 'god': '🦹'
+  'hero': '<img src="characters/Hero.png" style="height:1em; width:1em; object-fit:contain; display:inline-block; vertical-align:middle; pointer-events:none;">',
+  'knight': '<img src="characters/Knight.png" style="height:1em; width:1em; object-fit:contain; display:inline-block; vertical-align:middle; pointer-events:none;">',
+  'ninja': '<img src="characters/Ninja.png" style="height:1em; width:1em; object-fit:contain; display:inline-block; vertical-align:middle; pointer-events:none;">',
+  'robot': '<img src="characters/Robot.png" style="height:1em; width:1em; object-fit:contain; display:inline-block; vertical-align:middle; pointer-events:none;">',
+  'wizard': '<img src="characters/Wizard.png" style="height:1em; width:1em; object-fit:contain; display:inline-block; vertical-align:middle; pointer-events:none;">',
+  'angel': '<img src="characters/Angel.png" style="height:1em; width:1em; object-fit:contain; display:inline-block; vertical-align:middle; pointer-events:none;">'
 };
 
-let selectedSkin = 'rainbow';
+let selectedSkin = 'hero';
 let playerMMR = 10;
 try {
   const statsStored = localStorage.getItem('mathQuestRogueStats');
   if (statsStored) {
     const parsed = JSON.parse(statsStored);
-    selectedSkin = parsed.selectedSkin || 'rainbow';
+    selectedSkin = skinEmojis[parsed.selectedSkin] ? parsed.selectedSkin : 'hero';
     playerMMR = (parsed.globalStats && parsed.globalStats.playerMMR) ? parsed.globalStats.playerMMR : 10;
   }
 } catch(e){}
@@ -93,7 +94,7 @@ const elements = {
 };
 
 window.addEventListener('DOMContentLoaded', () => {
-  if (elements.playerSprite) elements.playerSprite.textContent = skinEmojis[selectedSkin] || '🧍';
+  if (elements.playerSprite) elements.playerSprite.innerHTML = skinEmojis[selectedSkin] || '<img src="characters/Hero.png" style="height:1em; width:1em; object-fit:contain; display:inline-block; vertical-align:middle; pointer-events:none;">';
   if (elements.lblPlayerMMR) elements.lblPlayerMMR.textContent = window.getRankFromMMR ? window.getRankFromMMR(playerMMR) : (window.getRankFromMMR ? window.getRankFromMMR(0) : '🪨 Iron');
   if (elements.playerName) elements.playerName.textContent = user;
 });

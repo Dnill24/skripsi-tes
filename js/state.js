@@ -52,7 +52,7 @@ let totalBossesDefeated = 0;
 let totalRuns = 0;
 let highestStreak = 0;
 let totalQuestionsAnswered = 0;
-let selectedSkin = 'rainbow';
+let selectedSkin = 'hero';
 let globalStats = { '+': 0, '-': 0, '*': 0, '/': 0, fastestTime: 999, bossRushBosses: 0, glassCannonBosses: 0, comboGod: 0, playerMMR: 10, highestLevelUnlocked: 1 };
 
 let gameMode = localStorage.getItem('mathQuestMode') || 'endless';
@@ -99,15 +99,24 @@ let run = {
 };
 
 const skinEmojis = {
-  'rainbow': '🧍', 'peasant': '🧑‍🌾', 'adventurer': '🧝', 'stone': '👹',
-  'knight': '🤺', 'mage': '🧙', 'glow': '🧚', 'ninja': '🥷', 'robot': '🤖',
-  'gold': '🤴', 'diamond': '🫅', 'fire': '🦸', 'ice': '🧛', 'phantom': '👻',
-  'alien': '👽', 'demon': '👿', 'angel': '👼', 'dragon': '🐉', 'void': '🧑‍🚀',
-  'celestial': '🧞', 'god': '🦹'
+  'hero': '<img src="characters/Hero.png" style="height:1em; width:1em; object-fit:contain; display:inline-block; vertical-align:middle; pointer-events:none;">',
+  'knight': '<img src="characters/Knight.png" style="height:1em; width:1em; object-fit:contain; display:inline-block; vertical-align:middle; pointer-events:none;">',
+  'ninja': '<img src="characters/Ninja.png" style="height:1em; width:1em; object-fit:contain; display:inline-block; vertical-align:middle; pointer-events:none;">',
+  'robot': '<img src="characters/Robot.png" style="height:1em; width:1em; object-fit:contain; display:inline-block; vertical-align:middle; pointer-events:none;">',
+  'wizard': '<img src="characters/Wizard.png" style="height:1em; width:1em; object-fit:contain; display:inline-block; vertical-align:middle; pointer-events:none;">',
+  'angel': '<img src="characters/Angel.png" style="height:1em; width:1em; object-fit:contain; display:inline-block; vertical-align:middle; pointer-events:none;">'
 };
 
-const bossEmojis = ['🐲', '🧟', '🧛', '👹', '👽', '💀', '🤡', '🤖', '🦖', '🦂', '👁️', '🎃'];
-const enemyEmojis = ['👾', '👻', '🦇', '🕷️', '🐍'];
+const bossEmojis = [
+  '<img src="enemies/Boss-Dragon.png" style="height:1em; width:1em; object-fit:contain; display:inline-block; vertical-align:middle; pointer-events:none;">',
+  '<img src="enemies/Boss-Golem.png" style="height:1em; width:1em; object-fit:contain; display:inline-block; vertical-align:middle; pointer-events:none;">'
+];
+const enemyEmojis = [
+  '<img src="enemies/Enemy-Bat.png" style="height:1em; width:1em; object-fit:contain; display:inline-block; vertical-align:middle; pointer-events:none;">',
+  '<img src="enemies/Enemy-Ghost.png" style="height:1em; width:1em; object-fit:contain; display:inline-block; vertical-align:middle; pointer-events:none;">',
+  '<img src="enemies/Enemy-Skeleton.png" style="height:1em; width:1em; object-fit:contain; display:inline-block; vertical-align:middle; pointer-events:none;">',
+  '<img src="enemies/Enemy-Slime.png" style="height:1em; width:1em; object-fit:contain; display:inline-block; vertical-align:middle; pointer-events:none;">'
+];
 
 const buffPool = [
   { id: 'heal', nameKey: 'buff_heal_name', descKey: 'buff_heal_desc', icon: '❤️', apply: () => { run.health = Math.min(Number(run.maxHealth), Number(run.health) + 50); } },
@@ -153,7 +162,7 @@ function loadState() {
       totalRuns = parsed.totalRuns ?? 0;
       highestStreak = parsed.highestStreak ?? 0;
       totalQuestionsAnswered = parsed.totalQuestionsAnswered ?? 0;
-      selectedSkin = parsed.selectedSkin || 'rainbow';
+      selectedSkin = skinEmojis[parsed.selectedSkin] ? parsed.selectedSkin : 'hero';
       if (parsed.dailyQuests) window.dailyQuests = parsed.dailyQuests;
       globalStats = parsed.globalStats || { '+': 0, '-': 0, '*': 0, '/': 0, fastestTime: 999, bossRushBosses: 0, glassCannonBosses: 0, comboGod: 0, playerMMR: 10, highestLevelUnlocked: 1 };
       globalStats.playerMMR = globalStats.playerMMR ?? 10;
@@ -167,13 +176,13 @@ function loadState() {
   }
   
   if (elements.sfxVolumeSlider) {
-    elements.sfxVolumeSlider.value = settings.sfxVolume || 70;
-    elements.sfxVolumeValue.textContent = (settings.sfxVolume || 70) + '%';
-    elements.musicVolumeSlider.value = settings.musicVolume || 50;
-    elements.musicVolumeValue.textContent = (settings.musicVolume || 50) + '%';
+    elements.sfxVolumeSlider.value = settings.sfxVolume ?? 70;
+    elements.sfxVolumeValue.textContent = (settings.sfxVolume ?? 70) + '%';
+    elements.musicVolumeSlider.value = settings.musicVolume ?? 50;
+    elements.musicVolumeValue.textContent = (settings.musicVolume ?? 50) + '%';
   }
   
-  elements.playerSprite.textContent = skinEmojis[selectedSkin] || '🧍';
+  elements.playerSprite.innerHTML = skinEmojis[selectedSkin] || '<img src="characters/Hero.png" style="height:1em; width:1em; object-fit:contain; display:inline-block; vertical-align:middle; pointer-events:none;">';
 }
 
 function saveState() {

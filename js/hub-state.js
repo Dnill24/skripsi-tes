@@ -5,7 +5,7 @@ let bestRunScore = 0;
 let totalGoldEarned = 0;
 let totalBossesDefeated = 0;
 let totalRuns = 0;
-let selectedSkin = 'rainbow';
+let selectedSkin = 'hero';
 let globalStats = { '+': 0, '-': 0, '*': 0, '/': 0, fastestTime: 999, bossRushBosses: 0, glassCannonBosses: 0, comboGod: 0, playerMMR: 10, notifiedAchievements: [] };
 
 let upgrades = {
@@ -20,27 +20,12 @@ let dailyQuests = {
 };
 
 let skins = [
-  { id: 'rainbow', nameKey: 'skin_rainbow_name', descKey: 'skin_rainbow_desc', cost: 0, unlocked: true, icon: '🧍' },
-  { id: 'peasant', nameKey: 'skin_peasant_name', descKey: 'skin_peasant_desc', cost: 50, unlocked: false, icon: '🧑‍🌾' },
-  { id: 'adventurer', nameKey: 'skin_adv_name', descKey: 'skin_adv_desc', cost: 100, unlocked: false, icon: '🧝' },
-  { id: 'stone', nameKey: 'skin_stone_name', descKey: 'skin_stone_desc', cost: 250, unlocked: false, icon: '👹' },
-  { id: 'knight', nameKey: 'skin_knight_name', descKey: 'skin_knight_desc', cost: 500, unlocked: false, icon: '🤺' },
-  { id: 'mage', nameKey: 'skin_mage_name', descKey: 'skin_mage_desc', cost: 750, unlocked: false, icon: '🧙' },
-  { id: 'glow', nameKey: 'skin_glow_name', descKey: 'skin_glow_desc', cost: 1000, unlocked: false, icon: '🧚' },
-  { id: 'ninja', nameKey: 'skin_ninja_name', descKey: 'skin_ninja_desc', cost: 1500, unlocked: false, icon: '🥷' },
-  { id: 'robot', nameKey: 'skin_robot_name', descKey: 'skin_robot_desc', cost: 2000, unlocked: false, icon: '🤖' },
-  { id: 'gold', nameKey: 'skin_gold_name', descKey: 'skin_gold_desc', cost: 3000, unlocked: false, icon: '🤴' },
-  { id: 'diamond', nameKey: 'skin_diamond_name', descKey: 'skin_diamond_desc', cost: 5000, unlocked: false, icon: '🫅' },
-  { id: 'fire', nameKey: 'skin_fire_name', descKey: 'skin_fire_desc', cost: 7500, unlocked: false, icon: '🦸' },
-  { id: 'ice', nameKey: 'skin_ice_name', descKey: 'skin_ice_desc', cost: 10000, unlocked: false, icon: '🧛' },
-  { id: 'phantom', nameKey: 'skin_phantom_name', descKey: 'skin_phantom_desc', cost: 15000, unlocked: false, icon: '👻' },
-  { id: 'alien', nameKey: 'skin_alien_name', descKey: 'skin_alien_desc', cost: 20000, unlocked: false, icon: '👽' },
-  { id: 'demon', nameKey: 'skin_demon_name', descKey: 'skin_demon_desc', cost: 25000, unlocked: false, icon: '👿' },
-  { id: 'angel', nameKey: 'skin_angel_name', descKey: 'skin_angel_desc', cost: 30000, unlocked: false, icon: '👼' },
-  { id: 'dragon', nameKey: 'skin_dragon_name', descKey: 'skin_dragon_desc', cost: 40000, unlocked: false, icon: '🐉' },
-  { id: 'void', nameKey: 'skin_void_name', descKey: 'skin_void_desc', cost: 50000, unlocked: false, icon: '🧑‍🚀' },
-  { id: 'celestial', nameKey: 'skin_celestial_name', descKey: 'skin_celestial_desc', cost: 75000, unlocked: false, icon: '🧞' },
-  { id: 'god', nameKey: 'skin_god_name', descKey: 'skin_god_desc', cost: 100000, unlocked: false, icon: '🦹' }
+  { id: 'hero', nameKey: 'skin_hero_name', descKey: 'skin_hero_desc', cost: 0, unlocked: true, icon: '<img src="characters/Hero.png" style="height:1em; width:1em; object-fit:contain; display:inline-block; vertical-align:middle; pointer-events:none;">' },
+  { id: 'knight', nameKey: 'skin_knight_name', descKey: 'skin_knight_desc', cost: 50, unlocked: false, icon: '<img src="characters/Knight.png" style="height:1em; width:1em; object-fit:contain; display:inline-block; vertical-align:middle; pointer-events:none;">' },
+  { id: 'ninja', nameKey: 'skin_ninja_name', descKey: 'skin_ninja_desc', cost: 100, unlocked: false, icon: '<img src="characters/Ninja.png" style="height:1em; width:1em; object-fit:contain; display:inline-block; vertical-align:middle; pointer-events:none;">' },
+  { id: 'robot', nameKey: 'skin_robot_name', descKey: 'skin_robot_desc', cost: 250, unlocked: false, icon: '<img src="characters/Robot.png" style="height:1em; width:1em; object-fit:contain; display:inline-block; vertical-align:middle; pointer-events:none;">' },
+  { id: 'wizard', nameKey: 'skin_wizard_name', descKey: 'skin_wizard_desc', cost: 500, unlocked: false, icon: '<img src="characters/Wizard.png" style="height:1em; width:1em; object-fit:contain; display:inline-block; vertical-align:middle; pointer-events:none;">' },
+  { id: 'angel', nameKey: 'skin_angel_name', descKey: 'skin_angel_desc', cost: 1000, unlocked: false, icon: '<img src="characters/Angel.png" style="height:1em; width:1em; object-fit:contain; display:inline-block; vertical-align:middle; pointer-events:none;">' }
 ];
 
 const achievementsData = [
@@ -88,7 +73,7 @@ const achievementsData = [
   
   { id: 'speed_demon', nameKey: 'ach_m3_name', descKey: 'ach_m3_desc', getProgress: () => globalStats.fastestTime <= 1 ? 1 : 0, target: 1 },
   { id: 'quick_thinker', nameKey: 'ach_m9_name', descKey: 'ach_m9_desc', getProgress: () => globalStats.fastestTime <= 0.5 ? 1 : 0, target: 1 },
-  { id: 'true_hero', nameKey: 'ach_m5_name', descKey: 'ach_m5_desc', getProgress: () => skins.find(s => s.id === 'god').unlocked ? 1 : 0, target: 1 }
+  { id: 'true_hero', nameKey: 'ach_m5_name', descKey: 'ach_m5_desc', getProgress: () => skins.find(s => s.id === 'angel').unlocked ? 1 : 0, target: 1 }
 ];
 
 let settings = { sfxVolume: 70, musicVolume: 50, language: 'en' };
@@ -107,10 +92,10 @@ function loadState() {
   }
   
   if (elements.sfxVolumeSlider) {
-    elements.sfxVolumeSlider.value = settings.sfxVolume || 70;
-    elements.sfxVolumeValue.textContent = (settings.sfxVolume || 70) + '%';
-    elements.musicVolumeSlider.value = settings.musicVolume || 50;
-    elements.musicVolumeValue.textContent = (settings.musicVolume || 50) + '%';
+    elements.sfxVolumeSlider.value = settings.sfxVolume ?? 70;
+    elements.sfxVolumeValue.textContent = (settings.sfxVolume ?? 70) + '%';
+    elements.musicVolumeSlider.value = settings.musicVolume ?? 50;
+    elements.musicVolumeValue.textContent = (settings.musicVolume ?? 50) + '%';
   }
   elements.languageSelect.value = settings.language;
 
@@ -123,7 +108,10 @@ function loadState() {
       totalGoldEarned = parsed.totalGoldEarned ?? totalGoldEarned;
       totalBossesDefeated = parsed.totalBossesDefeated ?? totalBossesDefeated;
       totalRuns = parsed.totalRuns ?? totalRuns;
-      selectedSkin = parsed.selectedSkin || selectedSkin;
+      selectedSkin = parsed.selectedSkin || 'hero';
+      if (!skins.find(s => s.id === selectedSkin)) {
+        selectedSkin = 'hero';
+      }
       globalStats = parsed.globalStats || globalStats;
       if (parsed.upgrades) upgrades = parsed.upgrades;
       if (parsed.dailyQuests) dailyQuests = parsed.dailyQuests;

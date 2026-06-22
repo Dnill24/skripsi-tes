@@ -34,7 +34,9 @@ html, body {
   align-items: stretch;
   justify-content: flex-start;
   padding: clamp(16px, 4vw, 48px);
-  height: 100vh;
+  height: 100dvh;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 .hub-title-container {
   z-index: 10;
@@ -107,8 +109,9 @@ html, body {
     gap: 12px;
   }
   .hub-btn-grid .wood-btn {
-    padding: 8px;
+    padding: 8px 4px;
     font-size: 0.75rem;
+    white-space: nowrap;
   }
 }
 

@@ -50,7 +50,7 @@ class TutorialSystem {
 
     if (targetEl) {
       targetEl.classList.add('tutorial-highlight-bright');
-      targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      targetEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
 
     let lang = 'en';

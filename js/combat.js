@@ -102,7 +102,7 @@ function processEnemyDefeat(damage) {
   const randomHit = hitVariations[Math.floor(Math.random() * hitVariations.length)];
   showCombatText(getTranslation(randomHit, settings.language), 'text-emerald-400', 'enemy');
     
-  let baseGold = getRandomInt(5, 10);
+  let baseGold =  10;
   let baseScore = 15;
   
   let gold = Math.floor(baseGold * (1 + (run.streak * 0.2)) * run.modifiers.goldMult);

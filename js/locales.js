@@ -694,9 +694,14 @@ window.showToast = function(message, type = 'error') {
   container.appendChild(toast);
   
   if (typeof SFX !== 'undefined') {
-    if (type === 'error') SFX.btnDanger();
-    else SFX.btnClick();
+ if (type === 'error') {
+      if (typeof SFX.error === 'function') SFX.error();
+      else if (typeof SFX.wrong === 'function') SFX.wrong();
+    }
+    else if (typeof SFX.correct === 'function') SFX.correct();
   }
+  
+  setTimeout(() => toast.classList.add('show'), 10);
   
   setTimeout(() => {
     toast.classList.add('fade-out');

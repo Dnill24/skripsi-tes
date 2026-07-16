@@ -3,7 +3,9 @@ let badWords = ['fuck', 'shit', 'bitch', 'asshole', 'dick', 'pussy', 'cunt', 'ba
 fetch('js/badwords.json')
   .then(res => res.json())
   .then(data => {
-    if (Array.isArray(data)) badWords = data;
+ if (Array.isArray(data)) {
+      badWords = [...new Set([...badWords, ...data])];
+    }
   })
   .catch(err => console.warn('Could not load badwords.json (possibly running locally), using fallback.', err));
 

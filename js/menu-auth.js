@@ -1,13 +1,4 @@
-let badWords = ['fuck', 'shit', 'bitch', 'asshole', 'dick', 'pussy', 'cunt', 'bastard', 'whore', 'slut', 'fag', 'nigger', 'crap', 'anjing', 'babi', 'bangsat', 'kontol', 'memek', 'ngentot', 'peler', 'perek', 'tai', 'asu', 'goblok', 'tolol', 'bajingan', 'lonte', 'anjir', 'anjg', 'bgst', 'kampret', 'bangke', 'keparat', 'jembut', 'pantek', 'pukimak', 'kasar'];
-
-fetch('js/badwords.json')
-  .then(res => res.json())
-  .then(data => {
- if (Array.isArray(data)) {
-      badWords = [...new Set([...badWords, ...data])];
-    }
-  })
-  .catch(err => console.warn('Could not load badwords.json (possibly running locally), using fallback.', err));
+const badWords = ['kasar', 'fuck', 'shit', 'bitch', 'asshole', 'dick', 'pussy', 'cunt', 'bastard', 'whore', 'slut', 'fag', 'nigger', 'crap', 'anjing', 'babi', 'bangsat', 'kontol', 'memek', 'ngentot', 'peler', 'perek', 'tai', 'asu', 'goblok', 'tolol', 'bajingan', 'lonte', 'anjir', 'anjg', 'bgst', 'kampret', 'bangke', 'keparat', 'jembut', 'pantek', 'pukimak'];
 
 function isProfane(text) {
   if (!text) return false;

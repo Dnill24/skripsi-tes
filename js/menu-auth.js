@@ -1,9 +1,14 @@
-const badWords = ['fuck', 'shit', 'bitch', 'asshole', 'dick', 'pussy', 'cunt', 'bastard', 'whore', 'slut', 'fag', 'nigger', 'crap', 'anjing', 'babi', 'bangsat', 'kontol', 'memek', 'ngentot', 'peler', 'perek', 'tai'];
+fetch('js/badwords.json')
+  .then(res => res.json())
+  .then(data => {
+    if (Array.isArray(data)) badWords = data;
+  })
+  .catch(err => console.warn('Could not load badwords.json (possibly running locally), using fallback.', err));
 
 function isProfane(text) {
   if (!text) return false;
   const lower = text.toLowerCase();
-  return badWords.some(word => lower.includes(word));
+return badWords.some(word => stripped.includes(word.toLowerCase()));
 }
 
 // Validates username for Firebase NoSQL keys

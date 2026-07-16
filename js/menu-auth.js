@@ -1,3 +1,5 @@
+let badWords = ['fuck', 'shit', 'bitch', 'asshole', 'dick', 'pussy', 'cunt', 'bastard', 'whore', 'slut', 'fag', 'nigger', 'crap', 'anjing', 'babi', 'bangsat', 'kontol', 'memek', 'ngentot', 'peler', 'perek', 'tai', 'asu', 'goblok', 'tolol', 'bajingan', 'lonte', 'anjir', 'anjg', 'bgst', 'kampret', 'bangke', 'keparat', 'jembut', 'pantek', 'pukimak', 'kasar'];
+
 fetch('js/badwords.json')
   .then(res => res.json())
   .then(data => {

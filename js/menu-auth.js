@@ -3,7 +3,7 @@ const badWords = ['kasar', 'fuck', 'shit', 'bitch', 'asshole', 'dick', 'pussy', 
 function isProfane(text) {
   if (!text) return false;
   const lower = text.toLowerCase();
-return badWords.some(word => stripped.includes(word.toLowerCase()));
+  return badWords.some(word => lower.includes(word));
 }
 
 // Validates username for Firebase NoSQL keys
